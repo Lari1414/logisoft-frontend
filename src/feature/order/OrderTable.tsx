@@ -6,9 +6,10 @@ import { orderApi } from "@/api/endpoints/orderApi.ts";
 const OrderTable = () => {
   const { data } = orderApi.useGetOrdersQuery();
   const columns: ColumnDef<Order>[] = [
-    { accessorKey: "orderNumber", header: "Auftragsnummer" },
-    { accessorKey: "status", header: "Status" },
-    { accessorKey: "customerId", header: "Kunde" },
+    { accessorKey: "orderNumber", header: "Bestellnummer" },
+    { accessorKey: "supplierId", header: "Lieferantennummer" },
+    { accessorKey: "materialNumber", header: "Materialnummer" },
+    { accessorKey: "quantity", header: "Menge" },
   ];
 
   return <DataTable data={data || []} columns={columns} />;
