@@ -1,25 +1,48 @@
-import { IconDashboard, IconDownload, IconTable } from "@tabler/icons-react";
+import { IconBox, IconClipboardList, IconDashboard, IconDatabase, IconPackage, IconShoppingCart} from "@tabler/icons-react";
 import Dashboard from "@/feature/dashboard/Dashboard.tsx";
-import Export from "@/feature/export/Export.tsx";
+//import Export from "@/feature/export/Export.tsx";
 import Order from "@/feature/order/Order.tsx";
+import Stammdaten from "@/feature/stammdaten/Stammdaten";
+import Rohmateriallager from "@/feature/rohmateriallager/Rohmateriallager.tsx";
+import Fertigmateriallager from "@/feature/fertigmateriallager/Fertigmateriallager.tsx";
+import Auftrag from "@/feature/auftrag/Auftrag.tsx";
+
 
 export const NAV_MAIN = [
   {
-    title: "Dashboard",
-    url: "/dashboard",
-    icon: IconDashboard,
-    element: <Dashboard />,
+    title: "Stammdaten",
+    url: "/stammdaten",
+    icon: IconDatabase,
+    element: <Stammdaten />,
   },
   {
-    title: "Bestellung",
+    title: "Bestellwesen",
     url: "/bestellung",
-    icon: IconTable,
+    icon: IconShoppingCart,
     element: <Order />,
   },
   {
-    title: "Export / Import",
-    url: "/export",
-    icon: IconDownload,
-    element: <Export />,
+    title: "Rohmateriallager",
+    url: "/rohmateriallager",
+    icon: IconBox,
+    element: <Rohmateriallager />,
+  },
+  {
+    title: "Fertigmateriallager",
+    url: "/fertigmateriallager",
+    icon: IconPackage,
+    element: <Fertigmateriallager />,
+  },
+  {
+    title: "Aufträge",
+    url: "/auftraege",
+    icon: IconClipboardList,
+    element: <Auftrag />,
+  },
+  {
+    title: "Kennzahlen",
+    url: "/kennzahlen",
+    icon: IconDashboard,
+    element: <Dashboard />,
   },
 ];
