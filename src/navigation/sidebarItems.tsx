@@ -2,7 +2,7 @@ import { IconBox, IconClipboardList, IconDashboard, IconDatabase, IconPackage, I
 import Dashboard from "@/feature/dashboard/Dashboard.tsx";
 //import Export from "@/feature/export/Export.tsx";
 import Order from "@/feature/order/Order.tsx";
-import Stammdaten from "@/feature/stammdaten/Stammdaten";
+import Lieferant from "@/feature/stammdaten/stammdaten.tsx";
 import Rohmateriallager from "@/feature/rohmateriallager/Rohmateriallager.tsx";
 import Fertigmateriallager from "@/feature/fertigmateriallager/Fertigmateriallager.tsx";
 import Auftrag from "@/feature/auftrag/Auftrag.tsx";
@@ -13,7 +13,7 @@ export const NAV_MAIN = [
     title: "Stammdaten",
     url: "/stammdaten",
     icon: IconDatabase,
-    element: <Stammdaten />,
+    element: <Lieferant />,
   },
   {
     title: "Bestellwesen",
