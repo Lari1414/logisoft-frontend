@@ -14,6 +14,7 @@ import { NAV_MAIN } from "@/navigation/sidebarItems.tsx";
 import { Shirt } from "lucide-react";
 import { NavUser } from "@/components/sidebar/nav-user.tsx";
 
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -27,6 +28,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <a href="#">
                 <Shirt className="!size-5" />
                 <span className="text-base font-semibold">YourShirt GmbH</span>
+              
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
