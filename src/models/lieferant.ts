@@ -1,5 +1,6 @@
 export type Lieferant = {
-    firmenname: string;
+  lieferant_ID: number;
+  firmenname: string;
   kontaktperson: string;
   adresse: {
     strasse: string;

@@ -1,31 +1,59 @@
-import { Lieferant } from "@/models/lieferant.ts"; 
+//import { Lieferant } from "@/models/lieferant.ts";
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "@/components/sidebar/data-table.tsx";
+import { DataTable } from "@/components/sidebar/data-table";
 import { lieferantApi } from "@/api/endpoints/lieferantApi.ts";
+import { Trash } from "react-bootstrap-icons";
 
-const LieferantTable = () => {
-  const { data, isLoading, error } = lieferantApi.useGetLieferantQuery();
-  
-  // Lade- und Fehlerbehandlung
-  if (isLoading) {
-    return <div>Lädt...</div>;
-  }
+interface Lieferant {
+  lieferant_ID: number;
+  firmenname: string;
+  kontaktperson: string;
+  adresse: {
+    strasse: string;
+    plz: number;
+    ort: string;
+  };
+}
 
-  if (error) {
-    return <div>Fehler beim Laden der Daten: {error.message}</div>;
-  }
+const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
+const [deleteLieferant] = lieferantApi.useDeleteLieferantMutation();
 
-  // Spaltendefinition
-  const columns: ColumnDef<Lieferant>[] = [
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteLieferant(id).unwrap();
+      // Kein setState nötig – refetch passiert im Elternkomponent
+    } catch (err) {
+      console.error("Fehler beim Löschen des Lieferanten:", err);
+    }
+  };
+
+  const columns: ColumnDef<Lieferant & { id: string }>[] = [
+    { accessorKey: "lieferant_ID", header: "ID" },
     { accessorKey: "firmenname", header: "Firmenname" },
     { accessorKey: "kontaktperson", header: "Kontaktperson" },
     { accessorFn: (row) => row.adresse.strasse, header: "Straße" },
-    { accessorFn: (row) => row.adresse.plz, header: "PLZ" },
+    { accessorFn: (row) => row.adresse.plz.toString(), header: "PLZ" },
     { accessorFn: (row) => row.adresse.ort, header: "Ort" },
+    {
+      id: "delete",
+      header: "",
+      cell: ({ row }) => (
+        <button onClick={() => handleDelete(row.original.lieferant_ID)}>
+           <Trash size={18} /> 
+        </button>
+      ),
+    },
   ];
 
-  return <DataTable data={data || []} columns={columns} />;
+  return (
+    <DataTable
+      data={lieferanten.map((item) => ({
+        ...item,
+        id: `${item.firmenname}-${item.kontaktperson}`,
+      }))}
+      columns={columns}
+    />
+  );
 };
-
 
 export default LieferantTable;

@@ -1,11 +1,10 @@
-import { IconBox, IconClipboardList, IconDashboard, IconDatabase, IconPackage, IconShoppingCart} from "@tabler/icons-react";
+import { IconClipboardList, IconDashboard, IconDatabase, IconPackage, IconShoppingCart} from "@tabler/icons-react";
 import Dashboard from "@/feature/dashboard/Dashboard.tsx";
-//import Export from "@/feature/export/Export.tsx";
 import Order from "@/feature/order/Order.tsx";
 import Lieferant from "@/feature/stammdaten/stammdaten.tsx";
-import Rohmateriallager from "@/feature/rohmateriallager/Rohmateriallager.tsx";
 import Fertigmateriallager from "@/feature/fertigmateriallager/Fertigmateriallager.tsx";
 import Auftrag from "@/feature/auftrag/Auftrag.tsx";
+import RohMateriallager from "@/feature/Rohmateriallager/Rohmateriallager.tsx";
 
 
 export const NAV_MAIN = [
@@ -22,10 +21,10 @@ export const NAV_MAIN = [
     element: <Order />,
   },
   {
-    title: "Rohmateriallager",
+   title: "Rohmateriallager",
     url: "/rohmateriallager",
-    icon: IconBox,
-    element: <Rohmateriallager />,
+    icon: IconPackage,
+    element: <RohMateriallager />,
   },
   {
     title: "Fertigmateriallager",

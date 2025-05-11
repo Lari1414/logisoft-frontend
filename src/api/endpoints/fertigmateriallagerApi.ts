@@ -1,4 +1,4 @@
-import { Material } from "@/models/material.ts"; 
+import { Fertigmateriallager } from "@/models/fertigmateriallager.ts"; 
 import { baseApi } from "@/api/baseApi.ts";
 
 
@@ -11,17 +11,17 @@ export interface CreateMaterialRequest {
   url: string;          
 }
 
-export const materialApi = baseApi.injectEndpoints({
+export const fertigmateriallagerApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Alle Materialen abrufen
-    getMaterial: builder.query<Material[], void>({
-      query: () => "/materials"
+    getFertigmaterial: builder.query<Fertigmateriallager[], void>({
+      query: () => "/materials/fertig"
     }),
 
     // Materialen erstellen
-    createMaterial: builder.mutation<Material, CreateMaterialRequest>({
+    createFertigmaterial: builder.mutation<Fertigmateriallager, CreateMaterialRequest>({
       query: (data) => ({
-        url: "/materials",
+        url: "/materials/fertig",
         method: "POST",
         body: data,
       }),
@@ -29,9 +29,9 @@ export const materialApi = baseApi.injectEndpoints({
     }),
 
     // Materialen aktualisieren
-    updateMaterial: builder.mutation<Material, { id: number; data: Partial<Material> }>({
+    updateFertigmaterial: builder.mutation<Fertigmateriallager, { id: number; data: Partial<Fertigmateriallager> }>({
       query: ({ id, data }) => ({
-        url: `/materials/${id}`,
+        url: `/materials/fertig/${id}`,
         method: "PATCH",
         body: data,
       }),
@@ -39,9 +39,9 @@ export const materialApi = baseApi.injectEndpoints({
     }),
 
     // Material löschen
-    deleteMaterial: builder.mutation<void, number>({
+    deleteFertigmaterial: builder.mutation<void, number>({
       query: (id) => ({
-        url: `/materials/${id}`,
+        url: `/materials/fertig/${id}`,
         method: "DELETE",
       }),
    
