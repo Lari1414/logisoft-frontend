@@ -105,7 +105,7 @@ export function DataTable<T extends { id: string }>({
       columnFilters,
       pagination,
     },
-    getRowId: (row,index) => index.toString(),  //row.id.toString(),
+    getRowId: (index) => index.toString(),  //row.id.toString(),
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,

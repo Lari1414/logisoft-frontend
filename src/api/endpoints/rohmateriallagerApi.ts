@@ -1,4 +1,4 @@
-import { Material } from "@/models/material.ts"; 
+import { Rohmateriallager } from "@/models/Rohmateriallager"; 
 import { baseApi } from "@/api/baseApi.ts";
 
 
@@ -11,17 +11,17 @@ export interface CreateMaterialRequest {
   url: string;          
 }
 
-export const materialApi = baseApi.injectEndpoints({
+export const rohmateriallagerApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Alle Materialen abrufen
-    getMaterial: builder.query<Material[], void>({
-      query: () => "/materials"
+    getRohmaterial: builder.query<Rohmateriallager[], void>({
+      query: () => "/materials/rohm"
     }),
 
     // Materialen erstellen
-    createMaterial: builder.mutation<Material, CreateMaterialRequest>({
+    createRohmaterial: builder.mutation<Rohmateriallager, CreateMaterialRequest>({
       query: (data) => ({
-        url: "/materials",
+        url: "/materials/rohm",
         method: "POST",
         body: data,
       }),
@@ -29,9 +29,9 @@ export const materialApi = baseApi.injectEndpoints({
     }),
 
     // Materialen aktualisieren
-    updateMaterial: builder.mutation<Material, { id: number; data: Partial<Material> }>({
+    updateRohmaterial: builder.mutation<Rohmateriallager, { id: number; data: Partial<Rohmateriallager> }>({
       query: ({ id, data }) => ({
-        url: `/materials/${id}`,
+        url: `/materials/rohm/${id}`,
         method: "PATCH",
         body: data,
       }),
@@ -39,9 +39,9 @@ export const materialApi = baseApi.injectEndpoints({
     }),
 
     // Material löschen
-    deleteMaterial: builder.mutation<void, number>({
+    deleteRohmaterial: builder.mutation<void, number>({
       query: (id) => ({
-        url: `/materials/${id}`,
+        url: `/materials/rohm/${id}`,
         method: "DELETE",
       }),
    

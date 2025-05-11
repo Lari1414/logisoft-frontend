@@ -5,11 +5,7 @@ import { baseApi } from "@/api/baseApi.ts";
 export interface CreateLieferantRequest {
   firmenname: string;
   kontaktperson: string;
-  adresse: {
-    strasse: string;
-    ort: string;
-    plz: number;
-  };
+  adresse_ID: number;
 }
 
 export const lieferantApi = baseApi.injectEndpoints({

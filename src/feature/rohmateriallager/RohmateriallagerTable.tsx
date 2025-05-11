@@ -1,38 +1,17 @@
-import { ColumnDef } from "@tanstack/react-table";
+//import { Material } from "@/models/material.ts";
+import  { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table.tsx";
-import { materialApi } from "@/api/endpoints/materialApi.ts";
-import { Trash } from "react-bootstrap-icons";
+import { rohmateriallagerApi } from "@/api/endpoints/rohmateriallagerApi";
 
-interface Material {
-  material_ID: number;
-  lager_ID: number;
-  category: string;
-  farbe: string;
-  typ: string;
-  groesse: string;
-  url: string;
-}
-
-const MaterialTable = () => {
-  const { data, isLoading, error } = materialApi.useGetMaterialQuery();
-  const [deleteMaterial] = materialApi.useDeleteMaterialMutation();
-
-  const handleDelete = async (id: number) => {
-    try {
-      await deleteMaterial(id).unwrap();
-        console.error("Materials:" +id+ " gelöscht");
-      // Kein setState nötig – refetch passiert im Elternkomponent
-    } catch (err) {
-      console.error("Fehler beim Löschen des Materials:", err);
-    }
-  };
+const RohmateriallagerTable = () => {
+  const { data, isLoading, error } = rohmateriallagerApi.useGetRohmaterialQuery();
 
   // Lade- und Fehlerbehandlung
   if (isLoading) return <div>Lädt...</div>;
   if (error) return <div>Fehler beim Laden der Daten.</div>;
 
   // Spaltendefinition
-  const columns: ColumnDef<Material & { id: string }>[] = [
+  const columns: ColumnDef<{ id: string; lagerId: number; category: string; farbe: string; typ: string; groesse: string; url: string }>[] = [
     { accessorKey: "material_ID", header: "ID" },  // material_ID bleibt als accessorKey
     { accessorKey: "lager_ID", header: "Lager" },  // lager_ID bleibt als accessorKey
     { accessorKey: "category", header: "Kategorie" },
@@ -51,16 +30,7 @@ const MaterialTable = () => {
         );
       },
     },
-    {
-      id: "delete",
-      header: "",
-      cell: ({ row }) => (
-        <button onClick={() => handleDelete(row.original.material_ID)}>
-          <Trash size={20} /> 
-        </button>
-      
-      ),
-    },
+     {  header: "Menge" },
   ];
 
   // Umwandlung der Daten: ID wird von `material_ID` auf `id` und in `string` umgewandelt
@@ -73,4 +43,4 @@ const MaterialTable = () => {
   return <DataTable data={transformedData} columns={columns} />;
 };
 
-export default MaterialTable;
+export default RohmateriallagerTable;
