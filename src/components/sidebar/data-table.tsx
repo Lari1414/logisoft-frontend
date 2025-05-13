@@ -1,28 +1,25 @@
 import * as React from "react";
-import { type UniqueIdentifier } from "@dnd-kit/core";
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import {
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
-} from "@tabler/icons-react";
+//import { type UniqueIdentifier } from "@dnd-kit/core";
+//import {
+  //SortableContext,
+ // useSortable,
+ // verticalListSortingStrategy,
+//} from "@dnd-kit/sortable";
+//import { CSS } from "@dnd-kit/utilities";
+import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight } from "@tabler/icons-react";
 import {
   ColumnDef,
   ColumnFiltersState,
   flexRender,
+  RowSelectionState,
+  Updater,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  Row as TSRow,
+  //Row as TSRow,
   SortingState,
   useReactTable,
   VisibilityState,
@@ -45,7 +42,7 @@ import {
   TableRow,
 } from "@/components/ui/table.tsx";
 import { Col } from "@/common/flex/Flex.tsx";
-
+/*
 function DraggableRow<T extends { id: string }>({ row }: { row: TSRow<T> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
@@ -70,30 +67,29 @@ function DraggableRow<T extends { id: string }>({ row }: { row: TSRow<T> }) {
     </TableRow>
   );
 }
+*/
 
 export function DataTable<T extends { id: string }>({
   data,
   columns,
+  rowSelection,
+  onRowSelectionChange
 }: {
   data: T[];
   columns: ColumnDef<T>[];
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: (updater: Updater<RowSelectionState>) => void;
 }) {
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
+  const [internalRowSelection, setInternalRowSelection] = React.useState<RowSelectionState>({});
+  const resolvedRowSelection = rowSelection ?? internalRowSelection;
+
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   });
-
-  const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ id }) => id) || [],
-    [data],
-  );
 
   const table = useReactTable({
     data,
@@ -101,13 +97,19 @@ export function DataTable<T extends { id: string }>({
     state: {
       sorting,
       columnVisibility,
-      rowSelection,
+      rowSelection: resolvedRowSelection,
       columnFilters,
       pagination,
     },
-    getRowId: (index) => index.toString(),  //row.id.toString(),
+    getRowId: (row) => row.id,
     enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: (updater) => {
+      if (onRowSelectionChange) {
+        onRowSelectionChange(updater);
+      } else {
+        setInternalRowSelection(updater);
+      }
+    },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
@@ -119,51 +121,51 @@ export function DataTable<T extends { id: string }>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
-
   return (
     <Col f1>
       <div className="overflow-hidden rounded-lg border">
-        <Table>
-          <TableHeader className="bg-muted sticky top-0 z-10">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody className="**:data-[slot=table-cell]:first:w-8">
-            {table.getRowModel().rows?.length ? (
-              <SortableContext
-                items={dataIds}
-                strategy={verticalListSortingStrategy}
-              >
-                {table.getRowModel().rows.map((row) => (
-                  <DraggableRow key={row.id} row={row} />
-                ))}
-              </SortableContext>
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+ <Table>
+  <TableHeader className="bg-muted sticky top-0 z-10">
+    {table.getHeaderGroups().map((headerGroup) => (
+      <TableRow key={headerGroup.id}>
+        {headerGroup.headers.map((header) => {
+          return (
+            <TableHead key={header.id} colSpan={header.colSpan}>
+              {header.isPlaceholder
+                ? null
+                : flexRender(
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
+            </TableHead>
+          );
+        })}
+      </TableRow>
+    ))}
+  </TableHeader>
+  <TableBody>
+    {table.getRowModel().rows?.length ? (
+      table.getRowModel().rows.map((row) => (
+        <TableRow
+          key={row.id}
+          data-state={row.getIsSelected() && "selected"}
+        >
+          {row.getVisibleCells().map((cell) => (
+            <TableCell key={cell.id}>
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </TableCell>
+          ))}
+        </TableRow>
+      ))
+    ) : (
+      <TableRow>
+        <TableCell colSpan={columns.length} className="h-24 text-center">
+          No results.
+        </TableCell>
+      </TableRow>
+    )}
+  </TableBody>
+</Table>
       </div>
       <div className="flex items-center justify-between px-4">
         <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">

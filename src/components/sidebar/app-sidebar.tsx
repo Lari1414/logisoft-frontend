@@ -12,7 +12,13 @@ import {
 } from "@/components/ui/sidebar.tsx";
 import { NAV_MAIN } from "@/navigation/sidebarItems.tsx";
 import { Shirt } from "lucide-react";
-import { NavUser } from "@/components/sidebar/nav-user.tsx";
+//import { NavUser } from "@/components/sidebar/nav-user.tsx";
+//import {
+  //IconPackage,
+ //IconWarehouse ,
+//  IconShoppingCart,
+ // IconBuildingFactory 
+//} from "@tabler/icons-react";
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -39,15 +45,34 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/*<NavDocuments items={data.documents} />*/}
         {/*<NavSecondary items={data.navSecondary} className="mt-auto" />*/}
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser
-          user={{
-            name: "John Doe",
-            email: "hi@test.de",
-            avatar: "Avatar",
-          }}
-        />
-      </SidebarFooter>
+      
+
+<SidebarFooter>
+  <div className="flex flex-col gap-1 p-4 text-sm">
+
+    <a
+      href="/Verkauf&Versand"
+      className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors"
+    >
+
+      <span className="text-gray-800 font-medium">Verkauf & Versand</span>
+    </a>
+    <a
+      href="/Produktion"
+      className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors"
+    >
+   
+      <span className="text-gray-800 font-medium">Produktion</span>
+    </a>
+        <a
+      href="/kennzahlen"
+      className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors"
+    >
+      
+      <span className="text-gray-800 font-medium">Materialwirtschaft</span>
+    </a>
+  </div>
+</SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
