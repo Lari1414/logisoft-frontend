@@ -272,7 +272,7 @@ const handleSubmitLieferant = async () => {
                   Material anlegen
                 </Typography>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel id="lager-label">Lager ID</InputLabel>
+                  <InputLabel id="lager-label">Lager</InputLabel>
                   <Select
                     labelId="lager-label"
                     name="lager_ID"
@@ -282,7 +282,7 @@ const handleSubmitLieferant = async () => {
                   >
                     {lagerList.map((lager) => (
                       <MenuItem key={lager.lager_ID} value={lager.lager_ID}>
-                        {lager.name || `Lager #${lager.lager_ID}`}
+                        {`${lager.bezeichnung}`}
                       </MenuItem>
                     ))}
                   </Select>
