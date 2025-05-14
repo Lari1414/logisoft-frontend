@@ -1,10 +1,10 @@
 import { IconClipboardList, IconDashboard, IconDatabase, IconPackage, IconShoppingCart} from "@tabler/icons-react";
 import Dashboard from "@/feature/dashboard/Dashboard.tsx";
 import Order from "@/feature/order/Order.tsx";
-import Lieferant from "@/feature/stammdaten/stammdaten.tsx";
+import Lieferant from "@/feature/stammdaten/Stammdaten.tsx";
 import Fertigmateriallager from "@/feature/fertigmateriallager/Fertigmateriallager.tsx";
 import Auftrag from "@/feature/auftrag/Auftrag.tsx";
-import RohMateriallager from "@/feature/Rohmateriallager/Rohmateriallager.tsx";
+import RohMateriallager from "@/feature/rohmateriallager/Rohmateriallager.tsx";
 
 
 export const NAV_MAIN = [
