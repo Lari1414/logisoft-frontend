@@ -8,6 +8,17 @@ export interface outsourceMaterialRequest {
   menge: number;         
 }
 
+export interface storeMaterialRequest {
+  lager_ID: number;     
+  menge: number;  
+  farbe: String;
+  typ : String;
+  groesse: String;
+  url: String;
+}
+
+
+
 export const fertigmateriallagerApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Alle Materialen abrufen
@@ -15,15 +26,23 @@ export const fertigmateriallagerApi = baseApi.injectEndpoints({
       query: () => "/lagerbestand/fertig"
     }),
 
-    // Materialen erstellen
+    // Materialen Auslagern
     outsourceFertigmaterial: builder.mutation<Fertigmateriallager, outsourceMaterialRequest>({
       query: (data) => ({
-        url: "/lagerbestand/fertig",
+        url: "/lagerbestand/auslagern",
         method: "POST",
         body: data,
-      }),
-    
+      }), 
     }),
+  // Materialen Einlagern
+   storeFertigmaterial: builder.mutation<Fertigmateriallager, storeMaterialRequest>({
+      query: (data) => ({
+        url: "/lagerbestand/einlagernFertig",
+        method: "POST",
+        body: data,
+      }), 
+    }),
+
 /*
     // Materialen aktualisieren
     updateFertigmaterial: builder.mutation<Fertigmateriallager, { id: number; data: Partial<Fertigmateriallager> }>({
