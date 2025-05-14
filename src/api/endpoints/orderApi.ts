@@ -1,29 +1,31 @@
-import { Order, OrderTemplate } from "@/models/order.ts";
+import { Order } from "@/models/order.ts";
 import { baseApi } from "@/api/baseApi.ts";
 import { Filter, FilterResult } from "@/api/types.ts";
 
 export const orderApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getOrders: builder.query<Order[], void>({
-      query: () => "/orders",
+      query: () => "/materialbestellungen",
       providesTags: ["Order"],
     }),
     //
     createOrder: builder.mutation<
       Order,
-      { customerId: string; template?: OrderTemplate }
+      {  lieferant_ID: number;
+  material_ID: number;
+  status: string; }
     >({
-      query: ({ customerId, template }) => ({
-        url: "/orders/create",
+      query: (body) => ({
+        url: "/materialbestellungen/create",
         method: "POST",
-        body: { customerId, orderTemplate: template },
+        body,
       }),
       invalidatesTags: ["Order"],
     }),
     //
     filterOrders: builder.query<FilterResult<Order>, Filter<Order>>({
       query: (filter) => ({
-        url: "/orders/filter",
+        url: "/materialbestellungen/filter",
         method: "GET",
         params: filter,
       }),
@@ -35,7 +37,7 @@ export const orderApi = baseApi.injectEndpoints({
       { id: string; status: Order["status"] }
     >({
       query: ({ id, status }) => ({
-        url: `/orders/${id}`,
+        url: `/materialbestellungen/${id}`,
         method: "PATCH",
         body: { status },
       }),
@@ -44,7 +46,7 @@ export const orderApi = baseApi.injectEndpoints({
     //
     deleteOrder: builder.mutation<void, string>({
       query: (id) => ({
-        url: `/orders/${id}`,
+        url: `/materialbestellungen/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Order"],
