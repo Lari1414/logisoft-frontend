@@ -12,5 +12,14 @@ export const adresseApi = baseApi.injectEndpoints({
           body: data,
         }),
       }),
+
+      deleteAdresse: builder.mutation<void, number>({
+        query: (id) => ({
+          url: `/adressen/${id}`,
+          method: "DELETE",
+        }),
+      }),
+
     }),
+    
   });
