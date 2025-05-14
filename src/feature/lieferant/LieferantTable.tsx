@@ -2,6 +2,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table";
 import { lieferantApi } from "@/api/endpoints/lieferantApi.ts";
+import { adresseApi } from "@/api/endpoints/adresseApi.ts";
 import { Trash } from "react-bootstrap-icons";
 
 interface Lieferant {
@@ -17,11 +18,13 @@ interface Lieferant {
 
 const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
 const [deleteLieferant] = lieferantApi.useDeleteLieferantMutation();
+const [deleteAdresse] = adresseApi.useDeleteAdresseMutation();
 
   const handleDelete = async (id: number) => {
     try {
       await deleteLieferant(id).unwrap();
-      // Kein setState nötig – refetch passiert im Elternkomponent
+      await deleteAdresse(id).unwrap();
+     
     } catch (err) {
       console.error("Fehler beim Löschen des Lieferanten:", err);
     }
