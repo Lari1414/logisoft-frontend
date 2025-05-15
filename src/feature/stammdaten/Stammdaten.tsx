@@ -140,31 +140,31 @@ const Stammdaten = () => {
         isLoading: isLieferantLoading || isMaterialLoading,
       }}
     >
- <div className="flex flex-col space-y-4">
-  <Tabs
-    value={activeTab}
-    onChange={handleTabChange}
-    textColor="primary"
-    indicatorColor="primary"
-  >
-    <Tab label="Lieferantenstammdaten" value="lieferant" />
-    <Tab label="Materialstammdaten" value="material" />
-  </Tabs>
+      <div className="flex flex-col space-y-4">
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          textColor="primary"
+          indicatorColor="primary"
+        >
+          <Tab label="Lieferantenstammdaten" value="lieferant" />
+          <Tab label="Materialstammdaten" value="material" />
+        </Tabs>
 
-  <div>
-    {activeTab === "lieferant" ? (
-      <>
-        <h2 className="text-xl font-semibold mb-2"></h2>
-        <LieferantTable lieferanten={lieferanten} />
-      </>
-    ) : (
-      <>
-        <h2 className="text-xl font-semibold mb-2"></h2>
-        <MaterialTable />
-      </>
-    )}
-  </div>
-</div>
+        <div>
+          {activeTab === "lieferant" ? (
+            <>
+              <h2 className="text-xl font-semibold mb-2"></h2>
+              <LieferantTable lieferanten={lieferanten} />
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold mb-2"></h2>
+              <MaterialTable />
+            </>
+          )}
+        </div>
+      </div>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
@@ -224,7 +224,7 @@ const Stammdaten = () => {
               <select
                 name="lager_ID"
                 value={materialForm.lager_ID}
-                onChange={handleMaterialChange}
+                onChange={(e) => handleMaterialChange(e as any)}
                 className="w-full border rounded px-2 py-2 mt-2"
               >
                 <option value="">Lager auswählen</option>
