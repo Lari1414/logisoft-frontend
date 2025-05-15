@@ -2,7 +2,7 @@ import { Grid2x2Plus } from "lucide-react";
 import { useState, useCallback, useEffect } from "react";
 import { rohmateriallagerApi } from "@/api/endpoints/rohmateriallagerApi.ts";
 import { BaseContentLayout } from "@/common/BaseContentLayout.tsx";
-import RohmateriallagerTable, { TransformedData } from "@/feature/rohmateriallager/RohmateriallagerTable.tsx";
+import RohmateriallagerTable, { TransformedData } from "@/feature/rohmateriallager/RohmateriallagerTable";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -75,7 +75,7 @@ const RohMateriallager = () => {
         text: "Auslagern",
         icon: Grid2x2Plus,
         onClick: handleAuslagernClick,
-        isLoading,
+        isLoading
       }}
     >
       <RohmateriallagerTable onSelectionChange={handleSelectionChange} />

@@ -1,20 +1,19 @@
-import React, { useState } from "react";
-import { BaseContentLayout } from "@/common/BaseContentLayout.tsx";
+import { useState, useCallback } from "react";
+import { BaseContentLayout } from "@/common/BaseContentLayout";
 import { Grid2x2Plus } from "lucide-react";
-import { orderApi } from "@/api/endpoints/orderApi.ts";
-import OrderTable from "@/feature/order/OrderTable.tsx";
-
-import {
-  Modal,
-  Box,
-  Button,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { orderApi } from "@/api/endpoints/orderApi";
+import { lieferantApi } from "@/api/endpoints/lieferantApi.ts";
+import { materialApi } from "@/api/endpoints/materialApi.ts";
+import OrderTable from "@/feature/order/OrderTable";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Order as OrderModel } from "@/models/order";
 
 const Order = () => {
-  const [openModal, setOpenModal] = useState(false);
   const [createOrder, { isLoading }] = orderApi.useCreateOrderMutation();
+  const [selectedOrders, setSelectedOrders] = useState<(OrderModel & { id: string })[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [absendenDialogOpen, setAbsendenDialogOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     lieferant_ID: "",
@@ -22,17 +21,19 @@ const Order = () => {
     status: "bestellt",
   });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const { data: lieferanten = [] } = lieferantApi.useGetLieferantQuery();
+  const { data: materialien = [] } = materialApi.useGetMaterialQuery();
 
-  const handleOpen = () => setOpenModal(true);
-  const handleClose = () => {
-    setOpenModal(false);
+  const handleSelectionChange = useCallback(
+    (rows: (OrderModel & { id: string })[]) => {
+      setSelectedOrders(rows);
+    },
+    []
+  );
+
+  const handleOpenModal = () => setModalOpen(true);
+  const handleCloseModal = () => {
+    setModalOpen(false);
     setFormData({
       lieferant_ID: "",
       material_ID: "",
@@ -40,95 +41,131 @@ const Order = () => {
     });
   };
 
- const handleSubmit = async () => {
-  const lieferantID = parseInt(formData.lieferant_ID, 10);
-  const materialID = parseInt(formData.material_ID, 10);
+  const handleFormChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  if (isNaN(lieferantID) || isNaN(materialID)) {
-    alert("Bitte geben Sie gültige Lieferant-ID und Material-ID ein.");
-    return;
-  }
+  const handleSubmit = async () => {
+    const lieferantID = parseInt(formData.lieferant_ID, 10);
+    const materialID = parseInt(formData.material_ID, 10);
 
-  try {
-    await createOrder({
-      lieferant_ID: lieferantID,
-      material_ID: materialID,
-      status: formData.status,
-    }).unwrap();
+    if (isNaN(lieferantID) || isNaN(materialID)) {
+      alert("Bitte gültige Werte auswählen.");
+      return;
+    }
 
-    handleClose();
-  } catch (error) {
-    console.error("Fehler beim Erstellen der Bestellung:", error);
-    alert("Fehler beim Speichern! Siehe Konsole.");
-  }
-};
+    try {
+      await createOrder({
+        lieferant_ID: lieferantID,
+        material_ID: materialID,
+      }).unwrap();
+      handleCloseModal();
+    } catch (error) {
+      console.error("Fehler beim Erstellen:", error);
+      alert("Fehler beim Speichern!");
+    }
+  };
+
+  const handleAbsenden = () => {
+    if (selectedOrders.length === 0) return;
+    setAbsendenDialogOpen(true);
+  };
+
+  const confirmAbsenden = async () => {
+    console.log("Ausgewählte Bestellungen absenden:", selectedOrders);
+    setAbsendenDialogOpen(false);
+    setSelectedOrders([]);
+  };
 
   return (
-    <BaseContentLayout
-      title="Bestellungen"
-      primaryCallToActionButton={{
-        text: "Bestellung anlegen",
-        icon: Grid2x2Plus,
-        onClick: handleOpen,
-        isLoading,
-      }}
-    >
-      <OrderTable />
+    <BaseContentLayout title="Bestellungen">
+      <OrderTable onSelectionChange={handleSelectionChange} />
 
-      <Modal open={openModal} onClose={handleClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            width: 400,
-            borderRadius: 2,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Neue Bestellung anlegen
-          </Typography>
+      <div className="flex gap-4 mb-4">
+        <Button onClick={handleOpenModal} disabled={isLoading}>
+          <Grid2x2Plus className="mr-2 h-4 w-4" />
+          Bestellung anlegen
+        </Button>
+        <Button onClick={handleAbsenden} disabled={selectedOrders.length === 0}>
+          Absenden
+        </Button>
+      </div>
 
-          <TextField
-            label="Lieferant ID"
-            name="lieferant_ID"
-            value={formData.lieferant_ID}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            type="number"
-          />
+      {/* Modal zur Bestellungserstellung */}
+      <Dialog open={modalOpen} onOpenChange={handleCloseModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Neue Bestellung anlegen</DialogTitle>
+          </DialogHeader>
 
-          <TextField
-            label="Material ID"
-            name="material_ID"
-            value={formData.material_ID}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            type="number"
-          />
+          <div className="space-y-4 mt-2">
+            <div>
+              <label className="block mb-1 font-medium">Lieferant auswählen</label>
+              <select
+                name="lieferant_ID"
+                value={formData.lieferant_ID}
+                onChange={handleFormChange}
+                className="w-full border rounded px-2 py-2"
+              >
+                <option value="">Bitte wählen</option>
+                {lieferanten.map((l) => (
+                  <option key={l.lieferant_ID} value={l.lieferant_ID}>
+                    {l.firmenname}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <TextField
-            label="Status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
+            <div>
+              <label className="block mb-1 font-medium">Material auswählen</label>
+              <select
+                name="material_ID"
+                value={formData.material_ID}
+                onChange={handleFormChange}
+                className="w-full border rounded px-2 py-2"
+              >
+                <option value="">Bitte wählen</option>
+                {materialien.map((m) => (
+                  <option key={m.material_ID} value={m.material_ID}>
+                    {m.typ} – {m.farbe} – {m.groesse}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <Box sx={{ mt: 2, display: "flex", justifyContent: "flex-end" }}>
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
+            <Button
+              onClick={handleSubmit}
+              className="mt-2"
+              disabled={!formData.lieferant_ID || !formData.material_ID}
+            >
               Speichern
             </Button>
-          </Box>
-        </Box>
-      </Modal>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Absenden Dialog */}
+      <Dialog open={absendenDialogOpen} onOpenChange={() => setAbsendenDialogOpen(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Bestellungen absenden</DialogTitle>
+          </DialogHeader>
+
+          {selectedOrders.map((item) => (
+            <div key={item.materialbestellung_ID} className="mb-4 p-4 border rounded space-y-1 text-sm">
+              <div className="font-bold">Materialbestellung-ID: {item.materialbestellung_ID}</div>
+              <div>Material-ID: {item.material_ID}</div>
+              <div>Lieferant-ID: {item.lieferant_ID}</div>
+              <div>Status: {item.status ?? "–"}</div>
+            </div>
+          ))}
+
+          <Button onClick={confirmAbsenden} className="mt-4" disabled={selectedOrders.length === 0}>
+            Bestätigen
+          </Button>
+        </DialogContent>
+      </Dialog>
     </BaseContentLayout>
   );
 };

@@ -11,6 +11,19 @@ export interface CreateWareneingangRequest {
   lieferdatum: string;     
 }
 
+export interface storeMaterialRequest {
+  eingang_ID: number;     
+  material_ID: number;
+  lager_ID: number;
+  menge: number;          
+  qualitaet_ID: number;   
+  category: string;    
+  farbe: string;         
+  typ: string;           
+  groesse: string;        
+  url: string;            
+}
+
 export const wareneingangApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     
@@ -18,6 +31,14 @@ export const wareneingangApi = baseApi.injectEndpoints({
       query: () => "/wareneingaenge"
     }),
 
+     // Materialen Einlagern
+    storeRohmaterial: builder.mutation<Wareneingang, storeMaterialRequest>({
+          query: (data) => ({
+            url: "/lagerbestand/einlagernRoh",
+            method: "POST",
+            body: data,
+          }), 
+        }),
     
     createWareneingang: builder.mutation<Wareneingang, CreateWareneingangRequest>({
       query: (data) => ({

@@ -79,7 +79,9 @@ const Stammdaten = () => {
     setLieferantForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMaterialChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
     const { name, value } = e.target;
     setMaterialForm((prev) => ({ ...prev, [name]: value }));
   };

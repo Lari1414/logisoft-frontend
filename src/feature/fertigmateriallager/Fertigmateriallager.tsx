@@ -1,15 +1,15 @@
 import { Grid2x2Plus } from "lucide-react";
 import { useState, useCallback } from "react";
 import { fertigmateriallagerApi, storeMaterialRequest } from "@/api/endpoints/fertigmateriallagerApi.ts";
+import { lagerApi } from "@/api/endpoints/lagerApi"; // <-- neu importiert
 import { BaseContentLayout } from "@/common/BaseContentLayout.tsx";
-import FertigMateriallagerTable, { TransformedData } from "@/feature/fertigmateriallager/FertigmateriallagerTable"; 
+import FertigMateriallagerTable, { TransformedData } from "@/feature/fertigmateriallager/FertigmateriallagerTable";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-
 const FertigMateriallager = () => {
-  const [outsourceFertigmaterial, { isLoading }] = fertigmateriallagerApi.useOutsourceFertigmaterialMutation();
+  const [outsourceFertigmaterial] = fertigmateriallagerApi.useOutsourceFertigmaterialMutation();
   const [storeMaterial, { isLoading: isStoring }] = fertigmateriallagerApi.useStoreFertigmaterialMutation();
 
   const [selectedRows, setSelectedRows] = useState<TransformedData[]>([]);
@@ -25,6 +25,9 @@ const FertigMateriallager = () => {
     groesse: "",
     url: "",
   });
+
+  // Neu: Lagerliste aus API holen
+  const { data: lagerListe = [] } = lagerApi.useGetLagerQuery();
 
   const handleAuslagernClick = () => {
     const initialMengen: Record<number, string> = {};
@@ -101,21 +104,19 @@ const FertigMateriallager = () => {
   });
 
   return (
-<BaseContentLayout title="Fertigmaterial Lager">
- 
+    <BaseContentLayout title="Fertigmaterial Lager">
+      <FertigMateriallagerTable onSelectionChange={handleSelectionChange} />
+      <div className="flex gap-4 mb-4">
+        <Button onClick={() => setIsEinlagernModalOpen(true)} disabled={isStoring}>
+          <Grid2x2Plus className="mr-2 h-4 w-4" />
+          Einlagern
+        </Button>
+        <Button onClick={handleAuslagernClick} disabled={selectedRows.length === 0}>
+          <Grid2x2Plus className="mr-2 h-4 w-4" />
+          Auslagern
+        </Button>
+      </div>
 
-  <FertigMateriallagerTable onSelectionChange={handleSelectionChange} />
-   <div className="flex gap-4 mb-4">
-    <Button onClick={() => setIsEinlagernModalOpen(true)} disabled={isStoring}>
-           <Grid2x2Plus className="mr-2 h-4 w-4" />
-       Einlagern
-    </Button>
-    <Button onClick={handleAuslagernClick} disabled={isLoading}>
-      <Grid2x2Plus className="mr-2 h-4 w-4" />
-      Auslagern
-    </Button>
-   
-  </div>
       {/* Auslagern Dialog */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
@@ -143,11 +144,7 @@ const FertigMateriallager = () => {
             </div>
           ))}
 
-          <Button 
-            onClick={confirmAuslagerung} 
-            disabled={isConfirmDisabled}
-            className="mt-4"
-          >
+          <Button onClick={confirmAuslagerung} disabled={isConfirmDisabled} className="mt-4">
             Auslagern
           </Button>
         </DialogContent>
@@ -155,46 +152,61 @@ const FertigMateriallager = () => {
 
       {/* Einlagern Dialog */}
       <Dialog open={isEinlagernModalOpen} onOpenChange={setIsEinlagernModalOpen}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Material einlagern</DialogTitle>
-    </DialogHeader>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Material einlagern</DialogTitle>
+          </DialogHeader>
 
-    <div className="space-y-4">
-      {[
-        ["lager_ID", "Lager-ID", "number"],
-        ["menge", "Menge", "number"],
-        ["farbe", "Farbe", "text"],
-        ["typ", "Typ", "text"],
-        ["groesse", "Größe", "text"],
-        ["url", "Bild-URL", "text"],
-      ].map(([field, label, type]) => (
-        <div key={field} className="flex flex-col space-y-1">
-          <label htmlFor={field} className="text-sm font-medium text-gray-700">
-            {label}
-          </label>
-          <Input
-            id={field}
-            type={type}
-            placeholder={label as string}
-            value={newMaterial[field as keyof storeMaterialRequest] as string | number}
-            onChange={(e) =>
-              handleNewMaterialChange(field as keyof storeMaterialRequest, e.target.value)
-            }
-          />
-        </div>
-      ))}
-    </div>
+          <div className="space-y-4">
+            {/* Lager-Auswahl als Dropdown */}
+            <div className="flex flex-col space-y-1">
+              <label htmlFor="lager_ID" className="text-sm font-medium text-gray-700">
+                Lager auswählen
+              </label>
+              <select
+                id="lager_ID"
+                name="lager_ID"
+                value={newMaterial.lager_ID || ""}
+                onChange={(e) => handleNewMaterialChange("lager_ID", e.target.value)}
+                className="w-full border rounded px-2 py-2"
+              >
+                <option value="">Bitte wählen</option>
+                {lagerListe.map((lager) => (
+                  <option key={lager.lager_ID} value={lager.lager_ID}>
+                    {lager.bezeichnung}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-    <Button
-      onClick={handleStoreMaterial}
-      disabled={isStoring}
-      className="mt-6"
-    >
-      Einlagern
-    </Button>
-  </DialogContent>
-</Dialog>
+            {/* Andere Felder außer lager_ID */}
+            {[
+              ["menge", "Menge", "number"],
+              ["farbe", "Farbe", "text"],
+              ["typ", "Typ", "text"],
+              ["groesse", "Größe", "text"],
+              ["url", "Bild-URL", "text"],
+            ].map(([field, label, type]) => (
+              <div key={field} className="flex flex-col space-y-1">
+                <label htmlFor={field} className="text-sm font-medium text-gray-700">
+                  {label}
+                </label>
+                <Input
+                  id={field}
+                  type={type}
+                  placeholder={label as string}
+                  value={newMaterial[field as keyof storeMaterialRequest] as string | number}
+                  onChange={(e) => handleNewMaterialChange(field as keyof storeMaterialRequest, e.target.value)}
+                />
+              </div>
+            ))}
+          </div>
+
+          <Button onClick={handleStoreMaterial} disabled={isStoring} className="mt-6">
+            Einlagern
+          </Button>
+        </DialogContent>
+      </Dialog>
     </BaseContentLayout>
   );
 };

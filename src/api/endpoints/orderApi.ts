@@ -2,6 +2,12 @@ import { Order } from "@/models/order.ts";
 import { baseApi } from "@/api/baseApi.ts";
 import { Filter, FilterResult } from "@/api/types.ts";
 
+export interface CreateOrderRequest {
+  material_ID: number;
+  lieferant_ID: number;
+}
+
+
 export const orderApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getOrders: builder.query<Order[], void>({
@@ -9,23 +15,18 @@ export const orderApi = baseApi.injectEndpoints({
       providesTags: ["Order"],
     }),
     //
-    createOrder: builder.mutation<
-      Order,
-      {  lieferant_ID: number;
-  material_ID: number;
-  status: string; }
-    >({
-      query: (body) => ({
-        url: "/materialbestellungen/create",
-        method: "POST",
-        body,
-      }),
-      invalidatesTags: ["Order"],
-    }),
+     createOrder: builder.mutation<Order, CreateOrderRequest>({
+       query: (data) => ({
+         url: "/materialbestellungen",
+         method: "POST",
+         body: data,
+       }),
+       invalidatesTags: ["Lieferant"],
+     }),
     //
     filterOrders: builder.query<FilterResult<Order>, Filter<Order>>({
       query: (filter) => ({
-        url: "/materialbestellungen/filter",
+        url: "/materialbestellungen",
         method: "GET",
         params: filter,
       }),
