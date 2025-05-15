@@ -9,6 +9,11 @@ on:
       - main
   workflow_dispatch:
 
+
+env:
+  VITE_API_URL: https://mawi-backend-atfhg6amfbcfgmd5.swedencentral-01.azurewebsites.net/api
+
+
 jobs:
   build:
     runs-on: ubuntu-latest
