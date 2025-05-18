@@ -67,6 +67,11 @@ const WareneingangTable = ({ onSelectionChange }: WareneingangTableProps) => {
       ),
     },
     {
+    accessorFn: row => row.eingang_ID,
+    id: "eingang_ID",
+    header: "Eingang-ID",
+  },
+    {
       accessorFn: row => row.material_ID,
       id: "material_ID",
       header: "Material-ID",

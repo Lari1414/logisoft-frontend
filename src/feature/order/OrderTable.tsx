@@ -35,6 +35,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange }) => {
     { accessorKey: "materialbestellung_ID", header: "Materialbestellung-ID" },
     { accessorKey: "material.material_ID", header: "Materialnummer" },
     { accessorKey: "lieferant.lieferant_ID", header: "Lieferantennummer" },
+    { accessorKey: "menge", header: "Menge" },
     { accessorKey: "status", header: "Status" },
   ];
 

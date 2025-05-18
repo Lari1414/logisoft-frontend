@@ -11,6 +11,8 @@ const Wareneingang = () => {
   const [deleteWareneingang] = wareneingangApi.useDeleteWareneingangMutation();
   const [selectedRows, setSelectedRows] = useState<WareneingangData[]>([]);
   const [modalType, setModalType] = useState<"einlagern" | "sperren" | null>(null);
+  const [sperreWareneingaenge] = wareneingangApi.useSperreWareneingaengeMutation();
+
 
   const handleEinlagernClick = () => setModalType("einlagern");
   const handleSperrenClick = () => setModalType("sperren");
@@ -47,13 +49,17 @@ const Wareneingang = () => {
   };
 
   const confirmSperre = async () => {
-    for (const item of selectedRows) {
-      console.log(`Material-ID ${item.material_ID} gesperrt`);
-    }
+  try {
+    const ids = selectedRows.map((item) => item.eingang_ID);
+    const response = await sperreWareneingaenge({ ids }).unwrap(); // unwrap für direktes Handling
+    console.log(`${response.updatedCount} Einträge gesperrt.`);
+  } catch (error) {
+    console.error("Fehler beim Sperren:", error);
+  }
 
-    setModalType(null);
-    setSelectedRows([]);
-  };
+  setModalType(null);
+  setSelectedRows([]);
+};
 
   return (
     <BaseContentLayout title="Wareneingang">

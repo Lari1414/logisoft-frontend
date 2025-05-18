@@ -5,6 +5,7 @@ import { Filter, FilterResult } from "@/api/types.ts";
 export interface CreateOrderRequest {
   material_ID: number;
   lieferant_ID: number;
+  menge: number;
 }
 
 
@@ -49,6 +50,18 @@ export const orderApi = baseApi.injectEndpoints({
       query: (id) => ({
         url: `/materialbestellungen/${id}`,
         method: "DELETE",
+      }),
+      invalidatesTags: ["Order"],
+    }),
+
+    updateMultipleOrdersStatus: builder.mutation<
+  { updatedCount: number },
+  { ids: number[] }
+        >({
+      query: (data) => ({
+        url: "/materialbestellungen/absenden",
+        method: "PUT",
+        body: data,
       }),
       invalidatesTags: ["Order"],
     }),

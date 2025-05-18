@@ -67,5 +67,13 @@ export const wareneingangApi = baseApi.injectEndpoints({
       }),
    
     }),
+
+    sperreWareneingaenge: builder.mutation<{ updatedCount: number }, { ids: number[] }>({
+        query: (data) => ({
+          url: "/wareneingaenge/sperren",
+          method: "PUT",
+          body: data,
+      }),
+    }),
   }),
 });
