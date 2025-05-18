@@ -3,23 +3,51 @@ import { baseApi } from "@/api/baseApi.ts";
 
 
 export interface CreateAuftragRequest {
-    material_ID: number;
+  material_ID: number;
   anzahl: number;
   bestellposition?: string;
+}
+
+export interface StoreOrOutsourceRequest {
+  auftragIds: number[];
 }
 
 export const auftragApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     
     getAuftrag: builder.query<Auftrag[], void>({
-      query: () => "/auftraege",
+      query: () => "/auftraege/abfragen",
       providesTags: ["Auftrag"],
     }),
 
-    
+     getAuftraghistory: builder.query<Auftrag[], void>({
+      query: () => "/auftraege/historie/abfragen",
+      providesTags: ["Auftrag"],
+    }),
+
     createAuftrag: builder.mutation<Auftrag, CreateAuftragRequest>({
       query: (data) => ({
         url: "/auftraege",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Auftrag"],
+    }),
+
+    //Material einlagern
+    storeMaterial: builder.mutation<Auftrag, StoreOrOutsourceRequest>({
+      query: (data) => ({
+        url: "/auftraege/material/einlagern",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Auftrag"],
+    }),
+    
+    //Material auslagern
+    outsourceMaterial: builder.mutation<Auftrag, StoreOrOutsourceRequest>({
+      query: (data) => ({
+        url: "/auftraege/material/auslagern",
         method: "POST",
         body: data,
       }),
