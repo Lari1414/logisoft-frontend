@@ -15,6 +15,16 @@ export const orderApi = baseApi.injectEndpoints({
       query: () => "/materialbestellungen",
       providesTags: ["Order"],
     }),
+
+     getbestelltOrders: builder.query<Order[], void>({
+      query: () => "/materialbestellungen/bestellt",
+      providesTags: ["Order"],
+    }),
+
+    getOpenOrders: builder.query<Order[], void>({
+      query: () => "/materialbestellungen/offen",
+      providesTags: ["Order"],
+    }),
     
      createOrder: builder.mutation<Order, CreateOrderRequest>({
        query: (data) => ({
@@ -24,7 +34,7 @@ export const orderApi = baseApi.injectEndpoints({
        }),
        invalidatesTags: ["Lieferant"],
      }),
-    //
+    
     filterOrders: builder.query<FilterResult<Order>, Filter<Order>>({
       query: (filter) => ({
         url: "/materialbestellungen",

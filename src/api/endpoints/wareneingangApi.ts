@@ -4,7 +4,6 @@ import { Wareneingang } from "@/models/wareneingang";
 
 
 export interface CreateWareneingangRequest {
-  material_ID: number;
   materialbestellung_ID: number;
   menge: number;
   status?: string;
