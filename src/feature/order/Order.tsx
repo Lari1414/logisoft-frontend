@@ -14,11 +14,12 @@ const Order = () => {
   const [selectedOrders, setSelectedOrders] = useState<(OrderModel & { id: string })[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [absendenDialogOpen, setAbsendenDialogOpen] = useState(false);
+  const [updateMultipleOrdersStatus] = orderApi.useUpdateMultipleOrdersStatusMutation();
 
   const [formData, setFormData] = useState({
     lieferant_ID: "",
     material_ID: "",
-    status: "bestellt",
+    menge: "",
   });
 
   const { data: lieferanten = [] } = lieferantApi.useGetLieferantQuery();
@@ -32,16 +33,17 @@ const Order = () => {
   );
 
   const handleOpenModal = () => setModalOpen(true);
+
   const handleCloseModal = () => {
     setModalOpen(false);
     setFormData({
       lieferant_ID: "",
       material_ID: "",
-      status: "bestellt",
+      menge: "",
     });
   };
 
-  const handleFormChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleFormChange = (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -49,9 +51,10 @@ const Order = () => {
   const handleSubmit = async () => {
     const lieferantID = parseInt(formData.lieferant_ID, 10);
     const materialID = parseInt(formData.material_ID, 10);
+    const menge = parseInt(formData.menge, 10);
 
-    if (isNaN(lieferantID) || isNaN(materialID)) {
-      alert("Bitte gültige Werte auswählen.");
+    if (isNaN(lieferantID) || isNaN(materialID) || isNaN(menge) || menge <= 0) {
+      alert("Bitte gültige Werte eingeben.");
       return;
     }
 
@@ -59,6 +62,7 @@ const Order = () => {
       await createOrder({
         lieferant_ID: lieferantID,
         material_ID: materialID,
+        menge: menge,
       }).unwrap();
       handleCloseModal();
     } catch (error) {
@@ -73,9 +77,20 @@ const Order = () => {
   };
 
   const confirmAbsenden = async () => {
-    console.log("Ausgewählte Bestellungen absenden:", selectedOrders);
-    setAbsendenDialogOpen(false);
-    setSelectedOrders([]);
+    if (selectedOrders.length === 0) return;
+
+    const ids = selectedOrders.map((order) => Number(order.materialbestellung_ID));
+
+    try {
+      const response = await updateMultipleOrdersStatus({ ids }).unwrap();
+      console.log(`Erfolgreich aktualisiert: ${response.updatedCount} Bestellungen`);
+
+      setAbsendenDialogOpen(false);
+      setSelectedOrders([]);
+    } catch (error) {
+      console.error("Fehler beim Absenden:", error);
+      alert("Fehler beim Absenden der Bestellungen!");
+    }
   };
 
   return (
@@ -134,10 +149,22 @@ const Order = () => {
               </select>
             </div>
 
+            <div>
+              <label className="block mb-1 font-medium">Menge</label>
+              <input
+                type="number"
+                name="menge"
+                value={formData.menge}
+                onChange={handleFormChange}
+                className="w-full border rounded px-2 py-2"
+                min="1"
+              />
+            </div>
+
             <Button
               onClick={handleSubmit}
               className="mt-2"
-              disabled={!formData.lieferant_ID || !formData.material_ID}
+              disabled={!formData.lieferant_ID || !formData.material_ID || !formData.menge}
             >
               Speichern
             </Button>
