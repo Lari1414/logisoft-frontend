@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, Tab } from "@mui/material";
 
+
 const Stammdaten = () => {
   const [activeTab, setActiveTab] = useState("lieferant");
   const [isModalOpen, setIsModalOpen] = useState(false);

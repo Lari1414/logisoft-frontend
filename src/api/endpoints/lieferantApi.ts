@@ -30,7 +30,7 @@ export const lieferantApi = baseApi.injectEndpoints({
     updateLieferant: builder.mutation<Lieferant, { id: number; data: Partial<Lieferant> }>({
       query: ({ id, data }) => ({
         url: `/lieferanten/${id}`,
-        method: "PATCH",
+        method: "PUT",
         body: data,
       }),
       invalidatesTags: ["Lieferant"],
