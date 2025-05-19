@@ -141,11 +141,13 @@ const Order = () => {
                 className="w-full border rounded px-2 py-2"
               >
                 <option value="">Bitte wählen</option>
-                {materialien.map((m) => (
+             {materialien
+                .filter((m) => m.lager_ID === 1)
+                .map((m) => (
                   <option key={m.material_ID} value={m.material_ID}>
                     {m.typ} – {m.farbe} – {m.groesse}
                   </option>
-                ))}
+              ))}
               </select>
             </div>
 

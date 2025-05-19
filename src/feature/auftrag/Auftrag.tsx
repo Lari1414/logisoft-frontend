@@ -1,29 +1,118 @@
+import { useState, useCallback } from "react";
 import { Grid2x2Plus } from "lucide-react";
-import { auftragApi } from "@/api/endpoints/auftragApi.ts";
-import { BaseContentLayout } from "@/common/BaseContentLayout.tsx";
-import AuftragTable from "@/feature/auftrag/AuftragTable";  
+import { Tabs, Tab } from "@mui/material";
+import { auftragApi } from "@/api/endpoints/auftragApi";
+import { BaseContentLayout } from "@/common/BaseContentLayout";
+import AuftragTable, { TransformedAuftrag } from "@/feature/auftrag/AuftragTable";
+import AuftraghistoryTable from "@/feature/auftrag/AuftraghistoryTable";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const Auftrag = () => {
-  const [createAuftrag, { isLoading }] = auftragApi.useCreateAuftragMutation();
+  const [activeTab, setActiveTab] = useState("offen");
+  //const [createAuftrag, { isLoading }] = auftragApi.useCreateAuftragMutation();
+  const [storeMaterial,{ isLoading }] = auftragApi.useStoreMaterialMutation();
+  const [outsourceMaterial] = auftragApi.useOutsourceMaterialMutation();
+
+  const [selectedRows, setSelectedRows] = useState<TransformedAuftrag[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
+    setActiveTab(newValue);
+  };
+
+  const handleSelectionChange = useCallback((rows: TransformedAuftrag[]) => {
+    setSelectedRows(rows.filter(row => row !== undefined));
+  }, []);
+
+  const handleExecuteClick = () => {
+    if (selectedRows.length === 0) return;
+    setIsModalOpen(true);
+  };
+
+const handleConfirm = async () => {
+  const einlagerungAuftraege = selectedRows.filter(a => a.status === "Einlagerung angefordert");
+  const auslagerungAuftraege = selectedRows.filter(a => a.status === "Auslagerung angefordert");
+
+  try {
+    if (einlagerungAuftraege.length > 0) {
+      const auftragIds = einlagerungAuftraege.map(a => a.auftrag_ID);
+      await storeMaterial({ auftragIds });
+      console.log("Einlagerungsaufträge ausgeführt:", auftragIds);
+    }
+
+    if (auslagerungAuftraege.length > 0) {
+      const auftragIds = auslagerungAuftraege.map(a => a.auftrag_ID);
+      await outsourceMaterial({ auftragIds });
+      console.log("Auslagerungsaufträge ausgeführt:", auftragIds);
+    }
+
+
+
+  } catch (error) {
+    console.error("Fehler beim Ausführen der Aufträge:", error);
+  }
+
+  setIsModalOpen(false);
+  setSelectedRows([]);
+};
+
 
   return (
     <BaseContentLayout
       title="Aufträge"
       primaryCallToActionButton={{
-        text: "Bearbeiten",
+        text: "Auftrag ausführen",
         icon: Grid2x2Plus,
-        onClick: () => {
-          
-            createAuftrag({
-                material_ID: 1,
-      anzahl: 1,
-     // bestellposition?: "string",
-          });
-        },
+        onClick: handleExecuteClick,
         isLoading,
       }}
     >
-      <AuftragTable />
+      <div className="flex flex-col space-y-4">
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          textColor="primary"
+          indicatorColor="primary"
+        >
+          <Tab label="Offene Aufträge" value="offen" />
+          <Tab label="Historie" value="historie" />
+        </Tabs>
+
+        {activeTab === "offen" ? (
+          <AuftragTable onSelectionChange={handleSelectionChange} />
+        ) : (
+          <AuftraghistoryTable />
+        )}
+
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Ausgewählte Aufträge ausführen</DialogTitle>
+            </DialogHeader>
+
+            {selectedRows.map((auftrag) => (
+              <div key={auftrag.auftrag_ID} className="mb-4 p-4 border rounded">
+                <div className="font-semibold">
+                  Auftrag-ID: {auftrag.auftrag_ID}
+                </div>
+                <div>Material-ID: {auftrag.material_ID}</div>
+                <div>Menge: {auftrag.menge}</div>
+                <div>Status: {auftrag.status}</div>
+                <div>Lagerbestand-ID: {auftrag.lagerbestand_ID}</div>
+              </div>
+            ))}
+
+            <Button
+              onClick={handleConfirm}
+              className="mt-4"
+              disabled={selectedRows.length === 0}
+            >
+              Bestätigen
+            </Button>
+          </DialogContent>
+        </Dialog>
+      </div>
     </BaseContentLayout>
   );
 };
