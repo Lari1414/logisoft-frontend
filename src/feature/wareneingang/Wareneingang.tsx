@@ -16,7 +16,9 @@ const Wareneingang = () => {
   const [selectedRows, setSelectedRows] = useState<WareneingangData[]>([]);
   const [modalType, setModalType] = useState<"einlagern" | "sperren" | "anlegen" | null>(null);
 
-  // Hier: bestellte Bestellungen aus der API laden
+  const [refetchTable, setRefetchTable] = useState<(() => void) | null>(null);
+
+  
   const { data: bestelltOrders, isLoading, error } = orderApi.useGetbestelltOrdersQuery();
 
   const [neuerWareneingang, setNeuerWareneingang] = useState({
@@ -49,39 +51,35 @@ const Wareneingang = () => {
   }, []);
 
   const confirmEinlagerung = async () => {
-  const ids = selectedRows.map((item) => item.eingang_ID);
-
+  const ids = selectedRows.map(item => item.eingang_ID);
   try {
     await storeRohmaterial({ ids });
-    console.log(`Materialien eingelagert: ${ids.join(", ")}`);
-
-    // Jetzt lokale Einträge löschen
     for (const id of ids) {
       await deleteWareneingang(id);
     }
+    if (refetchTable) refetchTable(); // Tabelle neu laden
   } catch (error) {
-    console.error("Fehler beim Einlagern:", error);
+    console.error(error);
   }
-
   setModalType(null);
   setSelectedRows([]);
 };
-  const confirmSperre = async () => {
-    try {
-      const ids = selectedRows.map((item) => item.eingang_ID);
-      const response = await sperreWareneingaenge({ ids }).unwrap();
-      console.log(`${response.updatedCount} Einträge gesperrt.`);
-    } catch (error) {
-      console.error("Fehler beim Sperren:", error);
-    }
 
-    setModalType(null);
-    setSelectedRows([]);
-  };
+const confirmSperre = async () => {
+  try {
+    const ids = selectedRows.map(item => item.eingang_ID);
+    await sperreWareneingaenge({ ids }).unwrap();
+    if (refetchTable) refetchTable(); // Tabelle neu laden
+  } catch (error) {
+    console.error(error);
+  }
+  setModalType(null);
+  setSelectedRows([]);
+};
 
   return (
     <BaseContentLayout title="Wareneingang">
-      <WareneingangTable onSelectionChange={handleSelectionChange} />
+      <WareneingangTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchTable}  />
 
       <div className="flex gap-4 mt-4">
         <Button onClick={handleEinlagernClick} disabled={selectedRows.length === 0}>
@@ -261,6 +259,7 @@ const Wareneingang = () => {
                 await createWareneingang(neuerWareneingang);
                 setModalType(null);
                 console.log("Wareneingang erfolgreich angelegt.");
+                if (refetchTable) refetchTable(); 
               } catch (error) {
                 console.error("Fehler beim Anlegen:", error);
               }

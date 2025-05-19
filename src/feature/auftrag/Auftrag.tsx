@@ -13,14 +13,19 @@ const Auftrag = () => {
   //const [createAuftrag, { isLoading }] = auftragApi.useCreateAuftragMutation();
   const [storeMaterial,{ isLoading }] = auftragApi.useStoreMaterialMutation();
   const [outsourceMaterial] = auftragApi.useOutsourceMaterialMutation();
-
   const [selectedRows, setSelectedRows] = useState<TransformedAuftrag[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  const [refetchTable, setRefetchTable] = useState<(() => void) | null>(null);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
   };
 
+  const handleSetRefetch = useCallback((refetchFn: () => void) => {
+      setRefetchTable(() => refetchFn);
+  }, []);
+  
   const handleSelectionChange = useCallback((rows: TransformedAuftrag[]) => {
     setSelectedRows(rows.filter(row => row !== undefined));
   }, []);
@@ -55,6 +60,7 @@ const handleConfirm = async () => {
 
   setIsModalOpen(false);
   setSelectedRows([]);
+   if (refetchTable) refetchTable();
 };
 
 
@@ -80,7 +86,7 @@ const handleConfirm = async () => {
         </Tabs>
 
         {activeTab === "offen" ? (
-          <AuftragTable onSelectionChange={handleSelectionChange} />
+          <AuftragTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch}/>
         ) : (
           <AuftraghistoryTable />
         )}

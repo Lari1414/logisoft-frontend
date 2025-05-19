@@ -14,9 +14,15 @@ const RohMateriallager = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mengenMap, setMengenMap] = useState<Record<number, string>>({});
 
+  const [refetchTable, setRefetchTable] = useState<(() => void) | null>(null);
+
   useEffect(() => {
     // console.log("Selected Rows", selectedRows);
   }, [selectedRows]);
+
+  const handleSetRefetch = useCallback((refetchFn: () => void) => {
+    setRefetchTable(() => refetchFn);
+  }, []);
 
   const handleAuslagernClick = () => {
     const initialMengen: Record<number, string> = {};
@@ -61,6 +67,8 @@ const RohMateriallager = () => {
     setIsModalOpen(false);
     setMengenMap({});
     setSelectedRows([]);
+
+    if (refetchTable) refetchTable();
   };
 
   const isConfirmDisabled = selectedRows.some((item) => {
@@ -78,7 +86,7 @@ const RohMateriallager = () => {
         isLoading
       }}
     >
-      <RohmateriallagerTable onSelectionChange={handleSelectionChange} />
+      <RohmateriallagerTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} />
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>

@@ -24,26 +24,21 @@ export interface TransformedWareneingang extends WareneingangData {
 }
 
 interface WareneingangTableProps {
-  onSelectionChange: (selectedRows: TransformedWareneingang[]) => void;
+  onSelectionChange?: (selectedRows: TransformedWareneingang[]) => void;
+  setRefetch?: (fn: () => void) => void; // Refetch Funktion an Parent weitergeben
 }
 
-const WareneingangTable = ({ onSelectionChange }: WareneingangTableProps) => {
-  const { data, isLoading, error } = wareneingangApi.useGetWareneingangQuery();
+const WareneingangTable: React.FC<WareneingangTableProps> = ({ onSelectionChange, setRefetch }) => {
+  const { data, isLoading, error, refetch } = wareneingangApi.useGetWareneingangQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [, setSelectedRows] = useState<TransformedWareneingang[]>([]);
 
-  const transformedData = useMemo(
-    () =>
-      (data || []).map((item) => ({
-        ...item,
-        id: item.eingang_ID.toString(),
-      })),
-    [data]
-  );
-
-  useEffect(() => {
-    const selected = transformedData.filter((row) => rowSelection[row.id]);
-    onSelectionChange(selected);
-  }, [rowSelection, transformedData, onSelectionChange]);
+  const transformedData = useMemo(() => {
+    return (data || []).map((item) => ({
+      ...item,
+      id: item.eingang_ID.toString(),
+    }));
+  }, [data]);
 
   const handleRowSelectionChange = useCallback(
     (updater: Updater<RowSelectionState>) => {
@@ -53,6 +48,18 @@ const WareneingangTable = ({ onSelectionChange }: WareneingangTableProps) => {
     },
     []
   );
+
+  useEffect(() => {
+    const selected = transformedData.filter((row) => rowSelection[row.id]);
+    setSelectedRows(selected);
+    onSelectionChange?.(selected);
+  }, [rowSelection, transformedData, onSelectionChange]);
+
+  useEffect(() => {
+    if (setRefetch) {
+      setRefetch(() => refetch);
+    }
+  }, [refetch, setRefetch]);
 
   const columns: ColumnDef<TransformedWareneingang>[] = [
     {
@@ -67,32 +74,32 @@ const WareneingangTable = ({ onSelectionChange }: WareneingangTableProps) => {
       ),
     },
     {
-    accessorFn: row => row.eingang_ID,
-    id: "eingang_ID",
-    header: "Eingang-ID",
-  },
+      accessorFn: (row) => row.eingang_ID,
+      id: "eingang_ID",
+      header: "Eingang-ID",
+    },
     {
-      accessorFn: row => row.material_ID,
+      accessorFn: (row) => row.material_ID,
       id: "material_ID",
       header: "Material-ID",
     },
     {
-      accessorFn: row => row.materialbestellung_ID,
+      accessorFn: (row) => row.materialbestellung_ID,
       id: "materialbestellung_ID",
       header: "Bestell-ID",
     },
     {
-      accessorFn: row => row.menge,
+      accessorFn: (row) => row.menge,
       id: "menge",
       header: "Menge",
     },
     {
-      accessorFn: row => row.status ?? "",
+      accessorFn: (row) => row.status ?? "",
       id: "status",
       header: "Status",
     },
     {
-      accessorFn: row => row.lieferdatum ?? "",
+      accessorFn: (row) => row.lieferdatum ?? "",
       id: "lieferdatum",
       header: "Lieferdatum",
     },
@@ -102,12 +109,14 @@ const WareneingangTable = ({ onSelectionChange }: WareneingangTableProps) => {
   if (error) return <div>Fehler beim Laden der Daten.</div>;
 
   return (
-    <DataTable<TransformedWareneingang>
-      data={transformedData}
-      columns={columns}
-      rowSelection={rowSelection}
-      onRowSelectionChange={handleRowSelectionChange}
-    />
+    <div className="space-y-4">
+      <DataTable<TransformedWareneingang>
+        data={transformedData}
+        columns={columns}
+        rowSelection={rowSelection}
+        onRowSelectionChange={handleRowSelectionChange}
+      />
+    </div>
   );
 };
 

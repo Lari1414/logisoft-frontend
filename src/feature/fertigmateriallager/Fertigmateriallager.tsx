@@ -1,7 +1,6 @@
 import { Grid2x2Plus } from "lucide-react";
 import { useState, useCallback } from "react";
 import { fertigmateriallagerApi, storeMaterialRequest } from "@/api/endpoints/fertigmateriallagerApi.ts";
-import { lagerApi } from "@/api/endpoints/lagerApi"; // <-- neu importiert
 import { BaseContentLayout } from "@/common/BaseContentLayout.tsx";
 import FertigMateriallagerTable, { TransformedData } from "@/feature/fertigmateriallager/FertigmateriallagerTable";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -16,9 +15,10 @@ const FertigMateriallager = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEinlagernModalOpen, setIsEinlagernModalOpen] = useState(false);
 
+  const [refetchTable, setRefetchTable] = useState<(() => void) | null>(null);
   const [mengenMap, setMengenMap] = useState<Record<number, string>>({});
   const [newMaterial, setNewMaterial] = useState<storeMaterialRequest>({
-    lager_ID: 0,
+    lager_ID: 2,
     menge: 0,
     farbe: "",
     typ: "",
@@ -26,8 +26,11 @@ const FertigMateriallager = () => {
     url: "",
   });
 
-  // Neu: Lagerliste aus API holen
-  const { data: lagerListe = [] } = lagerApi.useGetLagerQuery();
+
+
+  const handleSetRefetch = useCallback((refetchFn: () => void) => {
+    setRefetchTable(() => refetchFn);
+  }, []);
 
   const handleAuslagernClick = () => {
     const initialMengen: Record<number, string> = {};
@@ -72,6 +75,8 @@ const FertigMateriallager = () => {
     setIsModalOpen(false);
     setMengenMap({});
     setSelectedRows([]);
+
+    if (refetchTable) refetchTable();
   };
 
   const handleNewMaterialChange = (field: keyof storeMaterialRequest, value: string | number) => {
@@ -86,13 +91,15 @@ const FertigMateriallager = () => {
       await storeMaterial(newMaterial);
       setIsEinlagernModalOpen(false);
       setNewMaterial({
-        lager_ID: 0,
+        lager_ID: 2,
         menge: 0,
         farbe: "",
         typ: "",
         groesse: "",
         url: "",
       });
+
+    if (refetchTable) refetchTable();
     } catch (error) {
       console.error("Fehler beim Einlagern:", error);
     }
@@ -105,7 +112,7 @@ const FertigMateriallager = () => {
 
   return (
     <BaseContentLayout title="Fertigmaterial Lager">
-      <FertigMateriallagerTable onSelectionChange={handleSelectionChange} />
+      <FertigMateriallagerTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch}/>
       <div className="flex gap-4 mb-4">
         <Button onClick={() => setIsEinlagernModalOpen(true)} disabled={isStoring}>
           <Grid2x2Plus className="mr-2 h-4 w-4" />
@@ -158,26 +165,7 @@ const FertigMateriallager = () => {
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Lager-Auswahl als Dropdown */}
-            <div className="flex flex-col space-y-1">
-              <label htmlFor="lager_ID" className="text-sm font-medium text-gray-700">
-                Lager auswählen
-              </label>
-              <select
-                id="lager_ID"
-                name="lager_ID"
-                value={newMaterial.lager_ID || ""}
-                onChange={(e) => handleNewMaterialChange("lager_ID", e.target.value)}
-                className="w-full border rounded px-2 py-2"
-              >
-                <option value="">Bitte wählen</option>
-                {lagerListe.map((lager) => (
-                  <option key={lager.lager_ID} value={lager.lager_ID}>
-                    {lager.bezeichnung}
-                  </option>
-                ))}
-              </select>
-            </div>
+          
 
             {/* Andere Felder außer lager_ID */}
             {[

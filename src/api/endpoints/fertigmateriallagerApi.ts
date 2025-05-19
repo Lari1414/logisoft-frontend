@@ -9,7 +9,7 @@ export interface outsourceMaterialRequest {
 }
 
 export interface storeMaterialRequest {
-  lager_ID: number;     
+  lager_ID: 2;     
   menge: number;  
   farbe: String;
   typ : String;

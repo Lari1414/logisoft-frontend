@@ -6,10 +6,11 @@ import { Order } from "@/models/order";
 
 interface OrderTableProps {
   onSelectionChange?: (selectedRows: (Order & { id: string })[]) => void;
+  setRefetch?: (fn: () => void) => void; // NEU: Funktion zum Weitergeben von refetch
 }
 
-const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange }) => {
-  const { data, isLoading, error } = orderApi.useGetOrdersQuery();
+const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }) => {
+  const { data, isLoading, error, refetch } = orderApi.useGetOrdersQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [, setSelectedOrders] = useState<(Order & { id: string })[]>([]);
 
@@ -51,8 +52,15 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange }) => {
   useEffect(() => {
     const selected = transformedData.filter((row) => rowSelection[row.id]);
     setSelectedOrders(selected);
-    onSelectionChange?.(selected); 
+    onSelectionChange?.(selected);
   }, [rowSelection, transformedData, onSelectionChange]);
+
+  // NEU: refetch-Funktion an Parent weitergeben
+  useEffect(() => {
+    if (setRefetch) {
+      setRefetch(() => refetch);
+    }
+  }, [refetch, setRefetch]);
 
   if (isLoading) return <div>Lädt...</div>;
   if (error) return <div>Fehler beim Laden der Daten.</div>;
