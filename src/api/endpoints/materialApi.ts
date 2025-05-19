@@ -32,7 +32,7 @@ export const materialApi = baseApi.injectEndpoints({
     updateMaterial: builder.mutation<Material, { id: number; data: Partial<Material> }>({
       query: ({ id, data }) => ({
         url: `/materials/${id}`,
-        method: "PATCH",
+        method: "PUT",
         body: data,
       }),
     
