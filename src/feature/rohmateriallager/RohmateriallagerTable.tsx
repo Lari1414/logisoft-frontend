@@ -25,10 +25,11 @@ export interface TransformedData {
 // Type for the onSelectionChange function prop
 interface RohmateriallagerTableProps {
   onSelectionChange: (selectedRows: TransformedData[]) => void;
+  onRefetch?: (refetchFn: () => void) => void;
 }
 
-const RohmateriallagerTable = ({ onSelectionChange }: RohmateriallagerTableProps) => {
-  const { data, isLoading, error } = rohmateriallagerApi.useGetRohmaterialQuery();
+const RohmateriallagerTable = ({ onSelectionChange, onRefetch  }: RohmateriallagerTableProps) => {
+  const { data, isLoading, error, refetch  } = rohmateriallagerApi.useGetRohmaterialQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   // Transform the data into the correct shape
@@ -51,7 +52,12 @@ const RohmateriallagerTable = ({ onSelectionChange }: RohmateriallagerTableProps
       weissgrad: item.qualitaet?.weissgrad ?? 0,
     }))
   ), [data]);
-
+  
+  useEffect(() => {
+    if (onRefetch && refetch) {
+      onRefetch(refetch);
+    }
+  }, [onRefetch, refetch]);
   // Monitor row selection state and filter selected rows
   useEffect(() => {
     const selected = transformedData.filter(row => rowSelection[String(row.id)]);

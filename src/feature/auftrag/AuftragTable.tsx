@@ -12,10 +12,11 @@ export interface TransformedAuftrag extends Auftrag {
 // Props für Übergabe der ausgewählten Zeilen
 interface AuftragTableProps {
   onSelectionChange: (selectedRows: TransformedAuftrag[]) => void;
+  onRefetch?: (refetchFn: () => void) => void;
 }
 
-const AuftragTable = ({ onSelectionChange }: AuftragTableProps) => {
-  const { data, isLoading, error } = auftragApi.useGetAuftragQuery();
+const AuftragTable = ({ onSelectionChange, onRefetch }: AuftragTableProps) => {
+  const { data, isLoading, error, refetch } = auftragApi.useGetAuftragQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const transformedData: TransformedAuftrag[] = useMemo(() => {
@@ -35,6 +36,12 @@ const AuftragTable = ({ onSelectionChange }: AuftragTableProps) => {
     const selected = transformedData.filter(row => rowSelection[row.id]);
     onSelectionChange(selected);
   }, [rowSelection, transformedData, onSelectionChange]);
+
+    useEffect(() => {
+      if (onRefetch && refetch) {
+        onRefetch(refetch);
+      }
+    }, [onRefetch, refetch]);
 
   const handleRowSelectionChange = useCallback(
     (updater: Updater<RowSelectionState>) => {

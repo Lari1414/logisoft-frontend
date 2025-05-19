@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table.tsx";
 import { materialApi } from "@/api/endpoints/materialApi.ts";
 import { Trash } from "react-bootstrap-icons";
+import { useEffect } from "react";
 
 interface Material {
   material_ID: number;
@@ -13,15 +14,26 @@ interface Material {
   url: string;
 }
 
-const MaterialTable = () => {
-  const { data, isLoading, error } = materialApi.useGetMaterialQuery();
+interface MaterialTableProps {
+  onRefetch?: (refetchFn: () => void) => void;
+}
+
+const MaterialTable = ({ onRefetch }: MaterialTableProps) => {
+  const { data, isLoading, error, refetch } = materialApi.useGetMaterialQuery();
   const [deleteMaterial] = materialApi.useDeleteMaterialMutation();
+
+    useEffect(() => {
+      if (onRefetch && refetch) {
+        onRefetch(refetch);
+      }
+    }, [onRefetch, refetch]);
 
   const handleDelete = async (id: number) => {
     try {
       await deleteMaterial(id).unwrap();
         console.error("Materials:" +id+ " gelöscht");
       // Kein setState nötig – refetch passiert im Elternkomponent
+        refetch();
     } catch (err) {
       console.error("Fehler beim Löschen des Materials:", err);
     }

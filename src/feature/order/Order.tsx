@@ -16,6 +16,9 @@ const Order = () => {
   const [absendenDialogOpen, setAbsendenDialogOpen] = useState(false);
   const [updateMultipleOrdersStatus] = orderApi.useUpdateMultipleOrdersStatusMutation();
 
+  // NEU: refetch-Funktion speichern
+  const [refetchOrdersFn, setRefetchOrdersFn] = useState<() => void>(() => () => {});
+
   const [formData, setFormData] = useState({
     lieferant_ID: "",
     material_ID: "",
@@ -64,6 +67,8 @@ const Order = () => {
         material_ID: materialID,
         menge: menge,
       }).unwrap();
+
+      await refetchOrdersFn(); // NEU: Tabelle neu laden
       handleCloseModal();
     } catch (error) {
       console.error("Fehler beim Erstellen:", error);
@@ -85,6 +90,7 @@ const Order = () => {
       const response = await updateMultipleOrdersStatus({ ids }).unwrap();
       console.log(`Erfolgreich aktualisiert: ${response.updatedCount} Bestellungen`);
 
+      await refetchOrdersFn(); // NEU: Tabelle neu laden
       setAbsendenDialogOpen(false);
       setSelectedOrders([]);
     } catch (error) {
@@ -95,7 +101,10 @@ const Order = () => {
 
   return (
     <BaseContentLayout title="Bestellungen">
-      <OrderTable onSelectionChange={handleSelectionChange} />
+      <OrderTable
+        onSelectionChange={handleSelectionChange}
+        setRefetch={setRefetchOrdersFn} // NEU: Refetch-Funktion weitergeben
+      />
 
       <div className="flex gap-4 mb-4">
         <Button onClick={handleOpenModal} disabled={isLoading}>
@@ -141,13 +150,13 @@ const Order = () => {
                 className="w-full border rounded px-2 py-2"
               >
                 <option value="">Bitte wählen</option>
-             {materialien
-                .filter((m) => m.lager_ID === 1)
-                .map((m) => (
-                  <option key={m.material_ID} value={m.material_ID}>
-                    {m.typ} – {m.farbe} – {m.groesse}
-                  </option>
-              ))}
+                {materialien
+                  .filter((m) => m.lager_ID === 1)
+                  .map((m) => (
+                    <option key={m.material_ID} value={m.material_ID}>
+                      {m.typ} – {m.farbe} – {m.groesse}
+                    </option>
+                  ))}
               </select>
             </div>
 

@@ -19,10 +19,11 @@ export interface TransformedData {
 
 interface FertigMateriallagerTableProps {
   onSelectionChange: (selectedRows: TransformedData[]) => void;
+  onRefetch?: (refetchFn: () => void) => void;
 }
 
-const FertigMateriallagerTable = ({ onSelectionChange }: FertigMateriallagerTableProps) => {
-  const { data, isLoading, error } = fertigmateriallagerApi.useGetFertigmaterialQuery();
+const FertigMateriallagerTable = ({ onSelectionChange, onRefetch }: FertigMateriallagerTableProps) => {
+  const { data, isLoading, error, refetch } = fertigmateriallagerApi.useGetFertigmaterialQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const transformedData = useMemo(() => {
@@ -39,6 +40,12 @@ const FertigMateriallagerTable = ({ onSelectionChange }: FertigMateriallagerTabl
       url: item.material?.url ?? ""
     }));
   }, [data]);
+
+   useEffect(() => {
+    if (onRefetch && refetch) {
+      onRefetch(refetch);
+    }
+  }, [onRefetch, refetch]);
 
   useEffect(() => {
     const selected = transformedData.filter(row => rowSelection[String(row.id)]);
