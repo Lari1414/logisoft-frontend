@@ -17,7 +17,6 @@ export interface TransformedData {
   url: string;
   viskositaet: number;
   ppml: number;
-  deltaE: number;
   saugfaehigkeit: number;
   weissgrad: number;
 }
@@ -28,8 +27,8 @@ interface RohmateriallagerTableProps {
   onRefetch?: (refetchFn: () => void) => void;
 }
 
-const RohmateriallagerTable = ({ onSelectionChange, onRefetch  }: RohmateriallagerTableProps) => {
-  const { data, isLoading, error, refetch  } = rohmateriallagerApi.useGetRohmaterialQuery();
+const RohmateriallagerTable = ({ onSelectionChange, onRefetch }: RohmateriallagerTableProps) => {
+  const { data, isLoading, error, refetch } = rohmateriallagerApi.useGetRohmaterialQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   // Transform the data into the correct shape
@@ -47,12 +46,11 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch  }: Rohmateriallag
       url: item.material?.url ?? "",
       viskositaet: item.qualitaet?.viskositaet ?? 0,
       ppml: item.qualitaet?.ppml ?? 0,
-      deltaE: item.qualitaet?.deltaE ?? 0,
       saugfaehigkeit: item.qualitaet?.saugfaehigkeit ?? 0,
       weissgrad: item.qualitaet?.weissgrad ?? 0,
     }))
   ), [data]);
-  
+
   useEffect(() => {
     if (onRefetch && refetch) {
       onRefetch(refetch);
@@ -81,8 +79,8 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch  }: Rohmateriallag
       cell: ({ row }) => (
         <input
           type="checkbox"
-          checked={row.getIsSelected()} 
-          onChange={() => row.toggleSelected()} 
+          checked={row.getIsSelected()}
+          onChange={() => row.toggleSelected()}
         />
       ),
     },
@@ -107,7 +105,6 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch  }: Rohmateriallag
     { accessorKey: "menge", header: "Menge" },
     { accessorKey: "viskositaet", header: "Viskosität" },
     { accessorKey: "ppml", header: "PPML" },
-    { accessorKey: "deltaE", header: "Delta E" },
     { accessorKey: "saugfaehigkeit", header: "Saugfähigkeit" },
     { accessorKey: "weissgrad", header: "Weißgrad" },
   ];

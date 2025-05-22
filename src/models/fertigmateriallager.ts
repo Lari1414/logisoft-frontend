@@ -18,8 +18,7 @@ export interface Fertigmateriallager {
     qualitaet_ID: number;
     viskositaet: number;
     ppml: number;
-    deltaE: number;
     saugfaehigkeit: number;
     weissgrad: number;
   };
-  } 
+} 
