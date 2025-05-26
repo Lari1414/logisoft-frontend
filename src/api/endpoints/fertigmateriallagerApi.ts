@@ -11,7 +11,13 @@ export interface outsourceMaterialRequest {
 export interface storeMaterialRequest {
   lager_ID: 2;     
   menge: number;  
-  farbe: String;
+  farbe_json: {
+    cyan: number;
+    magenta: number;
+    yellow: number;
+    black: number;
+  };
+  standardmaterial: boolean;
   typ : String;
   groesse: String;
   url: String;

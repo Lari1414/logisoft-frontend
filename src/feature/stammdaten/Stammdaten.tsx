@@ -17,18 +17,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, Tab } from "@mui/material";
 
-
 const Stammdaten = () => {
   const [activeTab, setActiveTab] = useState("lieferant");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [createLieferant, { isLoading: isLieferantLoading }] = lieferantApi.useCreateLieferantMutation();
+  const [createLieferant, { isLoading: isLieferantLoading }] =
+    lieferantApi.useCreateLieferantMutation();
   const [createAdresse] = adresseApi.useCreateAdresseMutation();
-  const [createMaterial, { isLoading: isMaterialLoading }] = materialApi.useCreateMaterialMutation();
+  const [createMaterial, { isLoading: isMaterialLoading }] =
+    materialApi.useCreateMaterialMutation();
 
   const { data: lagerList = [] } = useGetLagerQuery();
   const { refetch: refetchMaterials } = materialApi.useGetMaterialQuery();
-  const { data: lieferanten = [], refetch: refetchLieferanten } = lieferantApi.useGetLieferantQuery();
+  const { data: lieferanten = [], refetch: refetchLieferanten } =
+    lieferantApi.useGetLieferantQuery();
 
   const [lieferantForm, setLieferantForm] = useState({
     firmenname: "",
@@ -41,10 +43,14 @@ const Stammdaten = () => {
   const [materialForm, setMaterialForm] = useState({
     lager_ID: "",
     category: "",
-    farbe: "",
+    cyan: "",
+    magenta: "",
+    yellow: "",
+    black: "",
     typ: "",
     groesse: "",
     url: "",
+    standardmaterial: false
   });
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
@@ -62,10 +68,14 @@ const Stammdaten = () => {
     setMaterialForm({
       lager_ID: "",
       category: "",
-      farbe: "",
+      cyan: "",
+      magenta: "",
+      yellow: "",
+      black: "",
       typ: "",
       groesse: "",
       url: "",
+      standardmaterial: false
     });
   };
 
@@ -81,8 +91,8 @@ const Stammdaten = () => {
   };
 
   const handleMaterialChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-) => {
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setMaterialForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -108,34 +118,46 @@ const Stammdaten = () => {
     }
   };
 
-  const handleSubmitMaterial = async () => {
-    try {
-      await createMaterial({
-        lager_ID: parseInt(materialForm.lager_ID),
-        category: materialForm.category,
-        farbe: materialForm.farbe,
-        typ: materialForm.typ,
-        groesse: materialForm.groesse,
-        url: materialForm.url,
-      }).unwrap();
+ const handleSubmitMaterial = async () => {
+  try {
+    await createMaterial({
+      lager_ID: parseInt(materialForm.lager_ID),
+      category: materialForm.category,
+      farbe_json: {
+        cyan: parseFloat(materialForm.cyan),
+        magenta: parseFloat(materialForm.magenta),
+        yellow: parseFloat(materialForm.yellow),
+        black: parseFloat(materialForm.black),
+      },
+      standardmaterial: materialForm.standardmaterial,
+      typ: materialForm.typ,
+      groesse: materialForm.groesse,
+      url: materialForm.url,
+    }).unwrap();
 
-      await refetchMaterials();
-      handleClose();
-    } catch (err) {
-      console.error("Fehler beim Anlegen des Materials:", err);
-    }
-  };
+    await refetchMaterials();
+    handleClose();
+  } catch (err) {
+    console.error("Fehler beim Anlegen des Materials:", err);
+  }
+};
 
   const isSaveDisabled =
     activeTab === "lieferant"
       ? !lieferantForm.firmenname || !lieferantForm.plz
-      : !materialForm.lager_ID || !materialForm.category;
+      : !materialForm.lager_ID ||
+        !materialForm.category ||
+        !materialForm.cyan ||
+        !materialForm.magenta ||
+        !materialForm.yellow ||
+        !materialForm.black;
 
   return (
     <BaseContentLayout
       title="Stammdaten"
       primaryCallToActionButton={{
-        text: activeTab === "lieferant" ? "Lieferant anlegen" : "Material anlegen",
+        text:
+          activeTab === "lieferant" ? "Lieferant anlegen" : "Material anlegen",
         icon: Grid2x2Plus,
         onClick: handleOpen,
         isLoading: isLieferantLoading || isMaterialLoading,
@@ -155,12 +177,10 @@ const Stammdaten = () => {
         <div>
           {activeTab === "lieferant" ? (
             <>
-              <h2 className="text-xl font-semibold mb-2"></h2>
               <LieferantTable lieferanten={lieferanten} />
             </>
           ) : (
             <>
-              <h2 className="text-xl font-semibold mb-2"></h2>
               <MaterialTable />
             </>
           )}
@@ -171,7 +191,9 @@ const Stammdaten = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {activeTab === "lieferant" ? "Lieferant anlegen" : "Material anlegen"}
+              {activeTab === "lieferant"
+                ? "Lieferant anlegen"
+                : "Material anlegen"}
             </DialogTitle>
           </DialogHeader>
 
@@ -221,7 +243,7 @@ const Stammdaten = () => {
               </Button>
             </>
           ) : (
-            <>
+           <>
               <select
                 name="lager_ID"
                 value={materialForm.lager_ID}
@@ -235,6 +257,7 @@ const Stammdaten = () => {
                   </option>
                 ))}
               </select>
+
               <Input
                 name="category"
                 placeholder="Kategorie"
@@ -242,13 +265,39 @@ const Stammdaten = () => {
                 onChange={handleMaterialChange}
                 className="mt-2"
               />
-              <Input
-                name="farbe"
-                placeholder="Farbe"
-                value={materialForm.farbe}
-                onChange={handleMaterialChange}
-                className="mt-2"
-              />
+
+              <div className="mt-4 font-semibold">Farbe</div>
+              <div className="flex space-x-2 mt-2">
+                <Input
+                  name="cyan"
+                  placeholder="Cyan"
+                  value={materialForm.cyan}
+                  onChange={handleMaterialChange}
+                  className="w-1/4"
+                />
+                <Input
+                  name="magenta"
+                  placeholder="Magenta"
+                  value={materialForm.magenta}
+                  onChange={handleMaterialChange}
+                  className="w-1/4"
+                />
+                <Input
+                  name="yellow"
+                  placeholder="Yellow"
+                  value={materialForm.yellow}
+                  onChange={handleMaterialChange}
+                  className="w-1/4"
+                />
+                <Input
+                  name="black"
+                  placeholder="Black"
+                  value={materialForm.black}
+                  onChange={handleMaterialChange}
+                  className="w-1/4"
+                />
+              </div>
+
               <Input
                 name="typ"
                 placeholder="Typ"
@@ -270,6 +319,23 @@ const Stammdaten = () => {
                 onChange={handleMaterialChange}
                 className="mt-2"
               />
+           <label className="mt-2 block text-sm font-medium text-gray-700">
+                  Standardmaterial
+                </label>
+                <select
+                  name="standardmaterial"
+                  value={materialForm.standardmaterial ? "true" : "false"}
+                  onChange={(e) =>
+                    setMaterialForm((prev) => ({
+                      ...prev,
+                      standardmaterial: e.target.value === "true",
+                    }))
+                  }
+                  className="w-full border rounded px-2 py-2 mt-1"
+                >
+                  <option value="false">Nein</option>
+                  <option value="true">Ja</option>
+                </select>
               <Button
                 onClick={handleSubmitMaterial}
                 disabled={isSaveDisabled}
@@ -278,13 +344,12 @@ const Stammdaten = () => {
                 Speichern
               </Button>
             </>
+
           )}
         </DialogContent>
       </Dialog>
     </BaseContentLayout>
   );
 };
-
-
 
 export default Stammdaten;

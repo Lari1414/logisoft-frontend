@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Lieferant, Adresse } from "@/models/lieferant";
+import { Pencil } from "react-bootstrap-icons";
 
 const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
   const [deleteLieferant] = lieferantApi.useDeleteLieferantMutation();
@@ -91,10 +92,10 @@ const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
       cell: ({ row }) => (
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => openEditDialog(row.original)}>
-            Bearbeiten
+              <Pencil size={18} />
           </Button>
           <button onClick={() => handleDelete(row.original.lieferant_ID)}>
-            <Trash size={18} />
+            <Trash size={18} color="red"/>
           </button>
         </div>
       ),
