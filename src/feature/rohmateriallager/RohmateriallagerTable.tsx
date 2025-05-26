@@ -5,6 +5,7 @@ import { rohmateriallagerApi } from "@/api/endpoints/rohmateriallagerApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Eye  } from "react-bootstrap-icons";
+import { IoExit } from "react-icons/io5";
 
 // Define the type for the transformed data
 export interface TransformedData {
@@ -181,13 +182,13 @@ const transformedData = useMemo(() => (
       header: "Aktion",
       cell: ({ row }) => (
         <Button 
-          variant="secondary" 
+          variant="ghost" 
           size="sm" 
           onClick={() => {
             if (onAuslagernClick) onAuslagernClick(row.original);
           }}
         >
-          Auslagern
+           <IoExit className="h-5 w-5" />
         </Button>
       ),
     },

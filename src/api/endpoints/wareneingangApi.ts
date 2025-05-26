@@ -1,14 +1,34 @@
-
 import { baseApi } from "@/api/baseApi.ts";
 import { Wareneingang } from "@/models/wareneingang";
 
 
 export interface CreateWareneingangRequest {
   materialbestellung_ID: number;
+  lieferdatum: string;
   menge: number;
-  status?: string;
-  lieferdatum: string;     
+  guterTeil?: {
+    menge: number;
+    qualitaet: {
+      viskositaet: number;
+      ppml: number;
+      saugfaehigkeit: number;
+      weissgrad: number;
+    };
+  };
+  gesperrterTeil?: {
+    menge: number;
+    qualitaet: {
+      viskositaet: number;
+      ppml: number;
+      saugfaehigkeit: number;
+      weissgrad: number;
+    };
+  };
+  reklamierterTeil?: {
+    menge: number;
+  };
 }
+
 
 export interface storeMaterialRequest {
  ids: number[];        
@@ -34,7 +54,7 @@ export const wareneingangApi = baseApi.injectEndpoints({
     
     createWareneingang: builder.mutation<Wareneingang, CreateWareneingangRequest>({
       query: (data) => ({
-        url: "/wareneingaenge",
+        url: "/materialbestellungen/wareneingaenge",
         method: "POST",
         body: data,
       }),
