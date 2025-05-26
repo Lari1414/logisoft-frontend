@@ -21,7 +21,9 @@ export interface TransformedReklamation extends ReklamationData {
 }
 
 interface ReklamationTableProps {
-  setRefetch?: (fn: () => void) => void;
+  //setRefetch?: (fn: () => void) => void;
+  onSelectionChange?: (rows: ReklamationData[]) => void;
+  setRefetch: React.Dispatch<React.SetStateAction<(() => void) | null>>;
 }
 
 const ReklamationTable: React.FC<ReklamationTableProps> = ({ setRefetch }) => {
