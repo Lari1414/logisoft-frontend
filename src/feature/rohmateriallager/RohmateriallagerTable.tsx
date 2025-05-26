@@ -27,7 +27,6 @@ export interface TransformedData {
   standardmaterial: boolean;
   viskositaet: number;
   ppml: number;
-  deltaE?: number;
   saugfaehigkeit: number | null;
   weissgrad: number | null;
 }
@@ -81,7 +80,6 @@ const transformedData = useMemo(() => (
       standardmaterial: material.standardmaterial ?? false,
       viskositaet: item.qualitaet?.viskositaet ?? 0,
       ppml: item.qualitaet?.ppml ?? 0,
-      deltaE: item.qualitaet?.deltaE,
       saugfaehigkeit: item.qualitaet?.saugfaehigkeit ?? null,
       weissgrad: item.qualitaet?.weissgrad ?? null,
     };
@@ -218,7 +216,6 @@ const transformedData = useMemo(() => (
             <ul>
               <li>Viskosität: {selectedQualitaet.viskositaet}</li>
               <li>PPML: {selectedQualitaet.ppml}</li>
-              <li>Delta E: {selectedQualitaet.deltaE}</li>
               <li>Saugfähigkeit: {selectedQualitaet.saugfaehigkeit}</li>
               <li>Weißgrad: {selectedQualitaet.weissgrad}</li>
             </ul>
