@@ -19,6 +19,12 @@ export const auftragApi = baseApi.injectEndpoints({
       query: () => "/auftraege/abfragen",
       providesTags: ["Auftrag"],
     }),
+    getEinlagerungsAuftraege: builder.query<Auftrag[], void>({
+      query: () => "/auftraege/abfragen/einlagerung",
+    }),
+    getAuslagerungsAuftraege: builder.query<Auftrag[], void>({
+      query: () => "/auftraege/abfragen/auslagerung",
+    }),
 
      getAuftraghistory: builder.query<Auftrag[], void>({
       query: () => "/auftraege/historie/abfragen",

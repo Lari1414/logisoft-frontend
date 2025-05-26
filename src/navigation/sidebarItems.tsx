@@ -9,6 +9,12 @@ import Wareneingang from "@/feature/wareneingang/Wareneingang";
 
 export const NAV_MAIN = [
   {
+    title: "Dashboard",
+    url: "/kennzahlen",
+    icon: IconDashboard,
+    element: <Dashboard />,
+  },
+  {
     title: "Stammdaten",
     url: "/stammdaten",
     icon: IconDatabase,
@@ -43,11 +49,5 @@ export const NAV_MAIN = [
     url: "/auftraege",
     icon: IconClipboardList,
     element: <Auftrag />,
-  },
-  {
-    title: "Kennzahlen",
-    url: "/kennzahlen",
-    icon: IconDashboard,
-    element: <Dashboard />,
-  },
+  }
 ];

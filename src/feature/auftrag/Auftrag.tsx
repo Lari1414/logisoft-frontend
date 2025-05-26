@@ -7,6 +7,9 @@ import AuftragTable, { TransformedAuftrag } from "@/feature/auftrag/AuftragTable
 import AuftraghistoryTable from "@/feature/auftrag/AuftraghistoryTable";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import EinlagerungsAuftraegeTable from "@/feature/auftrag/AuftragEinlagerungTable.tsx";
+import AuslagerungsAuftraegeTable from "@/feature/auftrag/AuftragAuslagerungTable.tsx";
+
 
 const Auftrag = () => {
   const [activeTab, setActiveTab] = useState("offen");
@@ -82,14 +85,28 @@ const handleConfirm = async () => {
           indicatorColor="primary"
         >
           <Tab label="Offene Aufträge" value="offen" />
+          <Tab label="Einlagerungsaufträge" value="einlagerung" />
+          <Tab label="Auslagerungsaufträge" value="auslagerung" />
           <Tab label="Historie" value="historie" />
+
         </Tabs>
 
-        {activeTab === "offen" ? (
-          <AuftragTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch}/>
-        ) : (
+        {activeTab === "offen" && (
+          <AuftragTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} />
+        )}
+
+        {activeTab === "einlagerung" && (
+          <EinlagerungsAuftraegeTable />
+        )}
+
+        {activeTab === "auslagerung" && (
+          <AuslagerungsAuftraegeTable />
+        )}
+
+        {activeTab === "historie" && (
           <AuftraghistoryTable />
         )}
+
 
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogContent>

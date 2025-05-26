@@ -4,10 +4,12 @@ import { wareneingangApi } from "@/api/endpoints/wareneingangApi.ts";
 import { orderApi } from "@/api/endpoints/orderApi.ts"; // Hier deinen Order-API-Slice importieren
 import { BaseContentLayout } from "@/common/BaseContentLayout.tsx";
 import WareneingangTable, { WareneingangData } from "@/feature/wareneingang/WareneingangTable";
+import ReklamationTable, {ReklamationData} from "@/feature/wareneingang/ReklamationTable.tsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
+import { Tabs, Tab } from "@mui/material";
 const Wareneingang = () => {
+  const [activeTab, setActiveTab] = useState("wareneingang");
   const [storeRohmaterial] = wareneingangApi.useStoreRohmaterialMutation();
   const [deleteWareneingang] = wareneingangApi.useDeleteWareneingangMutation();
   const [createWareneingang] = wareneingangApi.useCreateWareneingangMutation();
@@ -41,12 +43,18 @@ const Wareneingang = () => {
 
   type MaterialKey = keyof typeof neuerWareneingang.materialDetails;
   type QualitaetKey = keyof typeof neuerWareneingang.qualitaet;
-
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
+    setActiveTab(newValue);
+  };
   const handleEinlagernClick = () => setModalType("einlagern");
   const handleSperrenClick = () => setModalType("sperren");
 
   const handleSelectionChange = useCallback((rows: WareneingangData[]) => {
     setSelectedRows(rows.filter(Boolean));
+  }, []);
+  const handleReklamationSelection = useCallback((rows: ReklamationData[]) => {
+    // z.B. separat behandeln oder ignorieren
+    console.log("Reklamation selected", rows);
   }, []);
 
   const confirmEinlagerung = async () => {
@@ -77,7 +85,52 @@ const Wareneingang = () => {
   };
 
   return (
-    <BaseContentLayout title="Wareneingang">
+
+
+  <BaseContentLayout title="Wareneingang" >
+  <div className="flex flex-col space-y-4">
+    <Tabs
+      value={activeTab}
+      onChange={handleTabChange}
+      textColor="primary"
+      indicatorColor="primary"
+      className="mb-4"
+    >
+      <Tab label="Wareneingang" value="wareneingang" />
+      <Tab label="Reklamation" value="reklamation" />
+    </Tabs>
+
+    <div>
+      {activeTab === "wareneingang" ? (
+        <>
+        <div className="flex gap-4 mt-4">
+          <WareneingangTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchTable} />
+          <Button onClick={handleEinlagernClick} disabled={selectedRows.length === 0}>
+            <Grid2x2Plus className="mr-2 h-4 w-4" />
+            Einlagern
+          </Button>
+          <Button onClick={handleSperrenClick} disabled={selectedRows.length === 0}>
+            Sperren
+          </Button>
+          <Button onClick={() => setModalType("anlegen")}>
+            Wareneingang anlegen
+          </Button>
+
+        </div>
+
+
+
+        </>
+      ) : (
+        <div className="border p-4 rounded bg-gray-50">
+          {<ReklamationTable onSelectionChange={handleReklamationSelection} setRefetch={setRefetchTable} />}
+
+        </div>
+      )}
+    </div>
+  </div>
+
+    {/* <BaseContentLayout title="Wareneingang" >
       <WareneingangTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchTable} />
 
       <div className="flex gap-4 mt-4">
@@ -91,7 +144,7 @@ const Wareneingang = () => {
         <Button onClick={() => setModalType("anlegen")}>
           Wareneingang anlegen
         </Button>
-      </div>
+      </div>*/}
 
       {/* Einlagern Dialog */}
       <Dialog open={modalType === "einlagern"} onOpenChange={() => setModalType(null)}>

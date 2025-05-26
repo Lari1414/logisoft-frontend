@@ -13,6 +13,13 @@ export const mindestbestandApi = baseApi.injectEndpoints({
         body: { mindestbestand },
       }),
     }),
+    createMindestbestand: builder.mutation<void, { material_ID: number; mindestbestand: number }>({
+      query: ({ material_ID, mindestbestand }) => ({
+        url: `/mindestbestand`,
+        method: "POST",
+        body: { material_ID, mindestbestand },
+      }),
+    }),
 
   }),
 });
