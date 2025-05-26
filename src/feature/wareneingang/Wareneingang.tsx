@@ -18,7 +18,7 @@ const Wareneingang = () => {
 
   const [refetchTable, setRefetchTable] = useState<(() => void) | null>(null);
 
-  
+
   const { data: bestelltOrders, isLoading, error } = orderApi.useGetbestelltOrdersQuery();
 
   const [neuerWareneingang, setNeuerWareneingang] = useState({
@@ -34,7 +34,6 @@ const Wareneingang = () => {
     qualitaet: {
       viskositaet: 0,
       ppml: 0,
-      deltaE: 0,
       saugfaehigkeit: 0,
       weissgrad: 0
     }
@@ -51,35 +50,35 @@ const Wareneingang = () => {
   }, []);
 
   const confirmEinlagerung = async () => {
-  const ids = selectedRows.map(item => item.eingang_ID);
-  try {
-    await storeRohmaterial({ ids });
-    for (const id of ids) {
-      await deleteWareneingang(id);
-    }
-    if (refetchTable) refetchTable(); // Tabelle neu laden
-  } catch (error) {
-    console.error(error);
-  }
-  setModalType(null);
-  setSelectedRows([]);
-};
-
-const confirmSperre = async () => {
-  try {
     const ids = selectedRows.map(item => item.eingang_ID);
-    await sperreWareneingaenge({ ids }).unwrap();
-    if (refetchTable) refetchTable(); // Tabelle neu laden
-  } catch (error) {
-    console.error(error);
-  }
-  setModalType(null);
-  setSelectedRows([]);
-};
+    try {
+      await storeRohmaterial({ ids });
+      for (const id of ids) {
+        await deleteWareneingang(id);
+      }
+      if (refetchTable) refetchTable(); // Tabelle neu laden
+    } catch (error) {
+      console.error(error);
+    }
+    setModalType(null);
+    setSelectedRows([]);
+  };
+
+  const confirmSperre = async () => {
+    try {
+      const ids = selectedRows.map(item => item.eingang_ID);
+      await sperreWareneingaenge({ ids }).unwrap();
+      if (refetchTable) refetchTable(); // Tabelle neu laden
+    } catch (error) {
+      console.error(error);
+    }
+    setModalType(null);
+    setSelectedRows([]);
+  };
 
   return (
     <BaseContentLayout title="Wareneingang">
-      <WareneingangTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchTable}  />
+      <WareneingangTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchTable} />
 
       <div className="flex gap-4 mt-4">
         <Button onClick={handleEinlagernClick} disabled={selectedRows.length === 0}>
@@ -259,7 +258,7 @@ const confirmSperre = async () => {
                 await createWareneingang(neuerWareneingang);
                 setModalType(null);
                 console.log("Wareneingang erfolgreich angelegt.");
-                if (refetchTable) refetchTable(); 
+                if (refetchTable) refetchTable();
               } catch (error) {
                 console.error("Fehler beim Anlegen:", error);
               }
