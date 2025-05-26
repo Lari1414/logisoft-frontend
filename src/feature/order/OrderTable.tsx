@@ -1,12 +1,16 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { ColumnDef, RowSelectionState, Updater } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table";
-import { orderApi } from "@/api/endpoints/orderApi";
+import { orderApi } from "@/api/endpoints/orderApi.ts";
 import { Order } from "@/models/order";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Store, Send } from "lucide-react";
+import { wareneingangApi } from "@/api/endpoints/wareneingangApi.ts";
 
 interface OrderTableProps {
   onSelectionChange?: (selectedRows: (Order & { id: string })[]) => void;
-  setRefetch?: (fn: () => void) => void; // NEU: Funktion zum Weitergeben von refetch
+  setRefetch?: (fn: () => void) => void;
 }
 
 const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }) => {
@@ -34,10 +38,228 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
       ),
     },
     { accessorKey: "materialbestellung_ID", header: "Materialbestellung-ID" },
-    { accessorKey: "material.material_ID", header: "Materialnummer" },
-    { accessorKey: "lieferant.lieferant_ID", header: "Lieferantennummer" },
+    { accessorKey: "lieferant.firmenname", header: "Lieferantname" },
+    { accessorKey: "material.category", header: "Category" },
+    {
+      accessorKey: "material.farbe",
+      header: "Farbe",
+      cell: ({ getValue }) => {
+        const color = getValue() as string;
+        return (
+          <div className="flex items-center gap-2">
+            <div
+              className="w-4 h-4 rounded-full border"
+              style={{ backgroundColor: color }}
+            />
+            <span>{color}</span>
+          </div>
+        );
+      },
+    },
+    { accessorKey: "material.typ", header: "Typ" },
+    { accessorKey: "material.groesse", header: "Größe" },
     { accessorKey: "menge", header: "Menge" },
-    { accessorKey: "status", header: "Status" },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ getValue }) => {
+        const status = getValue() as string;
+
+        let bgColor = "";
+        let textColor = "text-white";
+
+        if (status === "offen") {
+          bgColor = "bg-yellow-500";
+        } else if (status === "bestellt") {
+          bgColor = "bg-green-600";
+        } else {
+          bgColor = "bg-gray-400";
+        }
+
+        return (
+          <span className={`px-2 py-1 rounded ${bgColor} ${textColor}`}>
+            {status}
+          </span>
+        );
+      },
+    },
+    {
+      id: "actions",
+      header: "Aktionen",
+      cell: ({ row }) => {
+        const order = row.original;
+
+        const [openDialog, setOpenDialog] = useState(false);
+
+        const [guterMenge, setGuterMenge] = useState<number>(0);
+        const [gesperrtMenge, setGesperrtMenge] = useState<number>(0);
+        const [reklamiertMenge, setReklamiertMenge] = useState<number>(0);
+        const [menge, setMenge] = useState<number>(order.menge);
+
+        const [guterSaugfaehigkeit, setGuterSaugfaehigkeit] = useState<number>(0);
+        const [guterWeissgrad, setGuterWeissgrad] = useState<number>(0);
+
+        const [gesperrtSaugfaehigkeit, setGesperrtSaugfaehigkeit] = useState<number>(0);
+        const [gesperrtWeissgrad, setGesperrtWeissgrad] = useState<number>(0);
+
+        useEffect(() => {
+          const sum = guterMenge + gesperrtMenge + reklamiertMenge;
+          setMenge(sum);
+        }, [guterMenge, gesperrtMenge, reklamiertMenge]);
+
+        const [updateStatus, { isLoading: isUpdating }] = orderApi.useUpdateMultipleOrdersStatusMutation();
+        const [createWareneingang, { isLoading: isCreating }] = wareneingangApi.useCreateWareneingangMutation();
+
+        const handleSingleAbsenden = async () => {
+          try {
+            const response = await updateStatus({ ids: [Number(order.materialbestellung_ID)] }).unwrap();
+            console.log(`Erfolgreich aktualisiert: ${response.updatedCount} Bestellung`);
+            if (typeof refetch === "function") {
+              await refetch();
+            }
+          } catch (error) {
+            console.error("Fehler beim Absenden:", error);
+            alert(`Fehler beim Absenden der Bestellung ${order.materialbestellung_ID}!`);
+          }
+        };
+
+        const handleWareneingang = async () => {
+          try {
+            await createWareneingang({
+              materialbestellung_ID: order.materialbestellung_ID,
+              lieferdatum: new Date().toISOString().split("T")[0], 
+              menge: menge,
+              guterTeil: {
+                menge: guterMenge,
+                qualitaet: {
+                  viskositaet: 0,
+                  ppml: 0,
+                  saugfaehigkeit: guterSaugfaehigkeit,
+                  weissgrad: guterWeissgrad,
+                },
+              },
+              gesperrterTeil: {
+                menge: gesperrtMenge,
+                qualitaet: {
+                  viskositaet: 0,
+                  ppml: 0,
+                  saugfaehigkeit: gesperrtSaugfaehigkeit,
+                  weissgrad: gesperrtWeissgrad,
+                },
+              },
+              reklamierterTeil: {
+                menge: reklamiertMenge,
+              },
+            });
+            setOpenDialog(false);
+          } catch (error) {
+            console.error("Fehler beim Anlegen:", error);
+          }
+        };
+
+        return (
+          <div className="flex gap-2">
+            <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center gap-2">
+              <Send size={18} />
+            </Button>
+
+            {order.status === "bestellt" && (
+              <>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setMenge(order.menge);  // hier setzt du die Menge beim Öffnen zurück
+                  setOpenDialog(true);
+                }}
+                disabled={isCreating}
+              >
+                <Store className="h-5 w-5" />
+              </Button>
+                <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                 <DialogContent>
+  <DialogHeader>
+    <DialogTitle>Wareneingang anlegen</DialogTitle>
+  </DialogHeader>
+
+  <label>eingetroffene Menge</label>
+  <input
+    type="number"
+    value={menge}
+    onChange={(e) => setMenge(Number(e.target.value))}
+    className="mb-4 w-full"
+  />
+
+  <div className="mb-4 p-2 border rounded">
+    <h3 className="font-semibold mb-2">Guter Teil</h3>
+    <label>Menge</label>
+    <input
+      type="number"
+      value={guterMenge}
+      onChange={(e) => setGuterMenge(Number(e.target.value))}
+      className="mb-2 w-full"
+    />
+    <label>Saugfähigkeit</label>
+    <input
+      type="number"
+      value={guterSaugfaehigkeit}
+      onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
+      className="mb-2 w-full"
+    />
+    <label>Weißgrad</label>
+    <input
+      type="number"
+      value={guterWeissgrad}
+      onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
+      className="mb-2 w-full"
+    />
+  </div>
+
+  <div className="mb-4 p-2 border rounded">
+    <h3 className="font-semibold mb-2">Gesperrter Teil</h3>
+    <label>Menge</label>
+    <input
+      type="number"
+      value={gesperrtMenge}
+      onChange={(e) => setGesperrtMenge(Number(e.target.value))}
+      className="mb-2 w-full"
+    />
+    <label>Saugfähigkeit</label>
+    <input
+      type="number"
+      value={gesperrtSaugfaehigkeit}
+      onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
+      className="mb-2 w-full"
+    />
+    <label>Weißgrad</label>
+    <input
+      type="number"
+      value={gesperrtWeissgrad}
+      onChange={(e) => setGesperrtWeissgrad(Number(e.target.value))}
+      className="mb-2 w-full"
+    />
+  </div>
+
+  <div className="mb-4 p-2 border rounded">
+    <h3 className="font-semibold mb-2">Reklamierter Teil</h3>
+    <label>Menge</label>
+    <input
+      type="number"
+      value={reklamiertMenge}
+      onChange={(e) => setReklamiertMenge(Number(e.target.value))}
+      className="mb-2 w-full"
+    />
+  </div>
+
+  <Button onClick={handleWareneingang}>Anlegen</Button>
+</DialogContent>
+
+                </Dialog>
+              </>
+            )}
+          </div>
+        );
+      },
+    },
   ];
 
   const handleRowSelectionChange = useCallback(
@@ -55,7 +277,6 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
     onSelectionChange?.(selected);
   }, [rowSelection, transformedData, onSelectionChange]);
 
-  // NEU: refetch-Funktion an Parent weitergeben
   useEffect(() => {
     if (setRefetch) {
       setRefetch(() => refetch);

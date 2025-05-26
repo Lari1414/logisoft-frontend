@@ -3,6 +3,7 @@ import { ColumnDef, RowSelectionState, Updater } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table";
 import { fertigmateriallagerApi } from "@/api/endpoints/fertigmateriallagerApi";
 import { Button } from "@/components/ui/button";
+import { IoExit } from "react-icons/io5";
 
 // Typ für transformierte Zeile
 export interface TransformedData {
@@ -125,13 +126,13 @@ const FertigMateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernCli
       header: "Aktion",
       cell: ({ row }) => (
         <Button 
-          variant="secondary" 
+          variant="ghost" 
           size="sm" 
           onClick={() => {
             if (onAuslagernClick) onAuslagernClick(row.original);
           }}
         >
-          Auslagern
+         <IoExit className="h-5 w-5" />
         </Button>
       ),
     },
