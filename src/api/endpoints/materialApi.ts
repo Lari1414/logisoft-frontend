@@ -3,12 +3,18 @@ import { baseApi } from "@/api/baseApi.ts";
 
 
 export interface CreateMaterialRequest {
-  lager_ID: number;     
-  category: string;        
-  farbe: string;           
-  typ: string;             
-  groesse: string;         
-  url: string;          
+  lager_ID: number;
+  category: string;
+  farbe_json: {
+    cyan: number;
+    magenta: number;
+    yellow: number;
+    black: number;
+  };
+  standardmaterial: boolean;
+  typ: string;
+  groesse: string;
+  url: string;
 }
 
 export const materialApi = baseApi.injectEndpoints({
