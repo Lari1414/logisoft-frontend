@@ -1,4 +1,5 @@
 import { baseApi } from "@/api/baseApi.ts";
+import { Adresse } from "@/models/adresse.ts";  
 
 export const adresseApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
@@ -19,6 +20,14 @@ export const adresseApi = baseApi.injectEndpoints({
           method: "DELETE",
         }),
       }),
+
+      updateAdresse: builder.mutation<Adresse, { id: number; data: Partial<Adresse> }>({
+            query: ({ id, data }) => ({
+              url: `/adressen/${id}`,
+              method: "PUT",
+              body: data,
+            }),
+          }),
 
     }),
     

@@ -8,13 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Store, Send } from "lucide-react";
 import { wareneingangApi } from "@/api/endpoints/wareneingangApi.ts";
 
-interface OrderTableProps {
+interface OrderOffenTableProps {
   onSelectionChange?: (selectedRows: (Order & { id: string })[]) => void;
   setRefetch?: (fn: () => void) => void;
 }
 
-const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }) => {
-  const { data, isLoading, error, refetch } = orderApi.useGetOrdersQuery();
+const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, setRefetch }) => {
+  const { data, isLoading, error, refetch } = orderApi.useGetOpenOrdersQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [, setSelectedOrders] = useState<(Order & { id: string })[]>([]);
 
@@ -309,4 +309,4 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
   );
 };
 
-export default OrderTable;
+export default OrderOffenTable;
