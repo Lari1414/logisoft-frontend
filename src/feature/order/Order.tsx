@@ -4,12 +4,15 @@ import { Grid2x2Plus } from "lucide-react";
 import { orderApi } from "@/api/endpoints/orderApi";
 import { lieferantApi } from "@/api/endpoints/lieferantApi.ts";
 import { materialApi } from "@/api/endpoints/materialApi.ts";
-import OrderTable from "@/feature/order/OrderTable";
+import OrderTable from "@/feature/order/OrderTable.tsx";
+import OrderOffenTable from "@/feature/order/OrderOffenTable.tsx";
+import OrderBestelltTable from "@/feature/order/OrderBestelltTable.tsx";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Order as OrderModel } from "@/models/order";
 import { wareneingangApi } from "@/api/endpoints/wareneingangApi.ts";
 import Select from "react-select";
+import { Tabs, Tab } from "@mui/material";
 
 const Order = () => {
   const [createOrder, { isLoading }] = orderApi.useCreateOrderMutation();
@@ -20,7 +23,8 @@ const Order = () => {
   const [createWareneingang, { isLoading: isCreatingWareneingang }] = wareneingangApi.useCreateWareneingangMutation();
   const [wareneingangDialogOpen, setWareneingangDialogOpen] = useState(false);
 
-  const [refetchOrdersFn, setRefetchOrdersFn] = useState<() => void>(() => () => {});
+  const [refetchOrdersFn, setRefetchOrdersFn] = useState<() => void>(() => () => { });
+  const [activeTab, setActiveTab] = useState("alle");
 
   const [formData, setFormData] = useState({
     lieferant_ID: "",
@@ -37,6 +41,11 @@ const Order = () => {
     },
     []
   );
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
+    setActiveTab(newValue);
+    setSelectedOrders([]); // Auswahl beim Tabwechsel zurücksetzen
+  };
 
   const handleOpenModal = () => setModalOpen(true);
   const handleCloseModal = () => {
@@ -164,19 +173,50 @@ const Order = () => {
     }
   };
 
- const materialOptions = materialien
-  .filter((m) => m.lager_ID === 1)
-  .map((m) => ({
-    value: m.material_ID,
-    label: `${m.typ} – ${m.farbe} – ${m.groesse}`,
-    color: m.farbe?.toLowerCase() ?? "transparent",
-  }));
+  const materialOptions = materialien
+    .filter((m) => m.lager_ID === 1)
+    .map((m) => ({
+      value: m.material_ID,
+      label: `${m.typ} – ${m.farbe} – ${m.groesse}`,
+      color: m.farbe?.toLowerCase() ?? "transparent",
+    }));
 
   return (
     <BaseContentLayout title="Bestellungen">
-      <OrderTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchOrdersFn} />
+      <div className="flex flex-col space-y-4">
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          textColor="primary"
+          indicatorColor="primary"
+          className="mb-4"
+        >
+          <Tab label="Alle Bestellungen" value="alle" />
+          <Tab label="Offene Bestellungen" value="offen" />
+          <Tab label="Bestellte Bestellungen" value="bestellt" />
+        </Tabs>
 
-      <div className="flex gap-4 mb-4">
+        <div>
+          {activeTab === "alle" && (
+            <>
+              <OrderTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchOrdersFn} />
+            </>
+          )}
+
+          {activeTab === "offen" && (
+            <>
+              <OrderOffenTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchOrdersFn} />
+            </>
+          )}
+
+          {activeTab === "bestellt" && (
+            <>
+              <OrderBestelltTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchOrdersFn} />
+            </>
+          )}
+        </div>
+      </div>
+      <div className="flex gap-4 mt-6 mb-4">
         <Button onClick={handleOpenModal} disabled={isLoading}>
           <Grid2x2Plus className="mr-2 h-4 w-4" />
           Bestellung anlegen
@@ -189,208 +229,192 @@ const Order = () => {
         </Button>
       </div>
 
-   <Dialog open={wareneingangDialogOpen} onOpenChange={setWareneingangDialogOpen}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Wareneingang für ausgewählte Bestellungen</DialogTitle>
-    </DialogHeader>
-
-    <label>Lieferdatum</label>
-    <input
-      type="date"
-      value={lieferdatum}
-      onChange={(e) => setLieferdatum(e.target.value)}
-      className="mb-4 w-full"
-    />
-
-    <div className="flex flex-wrap gap-4">
-      {selectedOrders.map((order) => (
-        <div
-          key={order.materialbestellung_ID}
-          className="p-4 border rounded w-full sm:w-[48%] md:w-[30%] flex-grow"
-        >
-          <h3 className="font-semibold mb-2">Bestellung {order.materialbestellung_ID}</h3>
-
-          <div className="mb-2">
-            <span className="font-semibold">Guter Teil</span>
-            <label className="block text-sm mt-1">Menge</label>
-            <input
-              type="number"
-              value={eingaben[order.materialbestellung_ID]?.guterMenge || 0}
-              onChange={(e) =>
-                handleInputChange(order.materialbestellung_ID.toString(), "guterMenge", Number(e.target.value))
-              }
-              className="mb-2 w-full"
-            />
-            <label className="block text-sm">Saugfähigkeit</label>
-            <input
-              type="number"
-              value={eingaben[order.materialbestellung_ID]?.guterSaugfaehigkeit || 0}
-              onChange={(e) =>
-                handleInputChange(order.materialbestellung_ID.toString(), "guterSaugfaehigkeit", Number(e.target.value))
-              }
-              className="mb-2 w-full"
-            />
-            <label className="block text-sm">Weißgrad</label>
-            <input
-              type="number"
-              value={eingaben[order.materialbestellung_ID]?.guterWeissgrad || 0}
-              onChange={(e) =>
-                handleInputChange(order.materialbestellung_ID.toString(), "guterWeissgrad", Number(e.target.value))
-              }
-              className="mb-2 w-full"
-            />
-          </div>
-
-          <div className="mb-2 border-t pt-2">
-            <span className="font-semibold">Gesperrter Teil</span>
-            <label className="block text-sm mt-1">Menge</label>
-            <input
-              type="number"
-              value={eingaben[order.materialbestellung_ID]?.gesperrtMenge || 0}
-              onChange={(e) =>
-                handleInputChange(order.materialbestellung_ID.toString(), "gesperrtMenge", Number(e.target.value))
-              }
-              className="mb-2 w-full"
-            />
-            <label className="block text-sm">Saugfähigkeit</label>
-            <input
-              type="number"
-              value={eingaben[order.materialbestellung_ID]?.gesperrtSaugfaehigkeit || 0}
-              onChange={(e) =>
-                handleInputChange(order.materialbestellung_ID.toString(), "gesperrtSaugfaehigkeit", Number(e.target.value))
-              }
-              className="mb-2 w-full"
-            />
-            <label className="block text-sm">Weißgrad</label>
-            <input
-              type="number"
-              value={eingaben[order.materialbestellung_ID]?.gesperrtWeissgrad || 0}
-              onChange={(e) =>
-                handleInputChange(order.materialbestellung_ID.toString(), "gesperrtWeissgrad", Number(e.target.value))
-              }
-              className="mb-2 w-full"
-            />
-          </div>
-
-          <div className="border-t pt-2">
-            <span className="font-semibold">Reklamierter Teil</span>
-            <label className="block text-sm mt-1">Menge</label>
-            <input
-              type="number"
-              value={eingaben[order.materialbestellung_ID]?.reklamiertMenge || 0}
-              onChange={(e) =>
-                handleInputChange(order.materialbestellung_ID.toString(), "reklamiertMenge", Number(e.target.value))
-              }
-              className="mb-2 w-full"
-            />
-          </div>
-        </div>
-      ))}
-    </div>
-
-    <Button onClick={handleMultiWareneingang}>Anlegen</Button>
-  </DialogContent>
-</Dialog>
- {/* Modal zur Bestellungserstellung */}
-      <Dialog open={modalOpen} onOpenChange={handleCloseModal}>
+      {/* Wareneingang Dialog */}
+      <Dialog open={wareneingangDialogOpen} onOpenChange={setWareneingangDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Neue Bestellung anlegen</DialogTitle>
+            <DialogTitle>Wareneingang für ausgewählte Bestellungen</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-4 mt-2">
-            <div>
-              <label className="block mb-1 font-medium">Lieferant auswählen</label>
-              <select
-                name="lieferant_ID"
-                value={formData.lieferant_ID}
-                onChange={handleFormChange}
-                className="w-full border rounded px-2 py-2"
+          <label>Lieferdatum</label>
+          <input
+            type="date"
+            value={lieferdatum}
+            onChange={(e) => setLieferdatum(e.target.value)}
+            className="mb-4 w-full"
+          />
+
+          <div className="flex flex-wrap gap-4">
+            {selectedOrders.map((order) => (
+              <div
+                key={order.materialbestellung_ID}
+                className="p-4 border rounded w-full sm:w-[48%] md:w-[30%] flex-grow"
               >
-                <option value="">Bitte wählen</option>
-                {lieferanten.map((l) => (
-                  <option key={l.lieferant_ID} value={l.lieferant_ID}>
-                    {l.firmenname}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <h3 className="font-semibold mb-2">Bestellung {order.materialbestellung_ID}</h3>
 
-  <div>
-            <label className="block mb-1 font-medium">Material auswählen</label>
-            <Select
-              options={materialOptions}
-              value={materialOptions.find(opt => opt.value === Number(formData.material_ID)) || null}
-              onChange={(selectedOption) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  material_ID: selectedOption ? selectedOption.value.toString() : "",
-                }));
-              }}
-              formatOptionLabel={({ label, color }) => (
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div
-                    style={{
-                      backgroundColor: color,
-                      width: 16,
-                      height: 16,
-                      borderRadius: "50%",
-                      border: "1px solid #ccc",
-                    }}
+                <div className="mb-2">
+                  <span className="font-semibold">Guter Teil</span>
+                  <label className="block text-sm mt-1">Menge</label>
+                  <input
+                    type="number"
+                    value={eingaben[order.materialbestellung_ID]?.guterMenge || 0}
+                    onChange={(e) =>
+                      handleInputChange(order.materialbestellung_ID.toString(), "guterMenge", Number(e.target.value))
+                    }
+                    className="mb-2 w-full"
                   />
-                  <span>{label}</span>
+                  <label className="block text-sm">Saugfähigkeit</label>
+                  <input
+                    type="number"
+                    value={eingaben[order.materialbestellung_ID]?.guterSaugfaehigkeit || 0}
+                    onChange={(e) =>
+                      handleInputChange(order.materialbestellung_ID.toString(), "guterSaugfaehigkeit", Number(e.target.value))
+                    }
+                    className="mb-2 w-full"
+                  />
+                  <label className="block text-sm">Weißgrad</label>
+                  <input
+                    type="number"
+                    value={eingaben[order.materialbestellung_ID]?.guterWeissgrad || 0}
+                    onChange={(e) =>
+                      handleInputChange(order.materialbestellung_ID.toString(), "guterWeissgrad", Number(e.target.value))
+                    }
+                    className="w-full"
+                  />
                 </div>
-              )}
-              isClearable
-            />
-          </div>
-            <div>
-              <label className="block mb-1 font-medium">Menge</label>
-              <input
-                type="number"
-                name="menge"
-                value={formData.menge}
-                onChange={handleFormChange}
-                className="w-full border rounded px-2 py-2"
-                min="1"
-              />
-            </div>
 
-            <Button
-              onClick={handleSubmit}
-              className="mt-2"
-              disabled={!formData.lieferant_ID || !formData.material_ID || !formData.menge}
-            >
-              Speichern
+                <div className="mb-2">
+                  <span className="font-semibold">Gesperrter Teil</span>
+                  <label className="block text-sm mt-1">Menge</label>
+                  <input
+                    type="number"
+                    value={eingaben[order.materialbestellung_ID]?.gesperrtMenge || 0}
+                    onChange={(e) =>
+                      handleInputChange(order.materialbestellung_ID.toString(), "gesperrtMenge", Number(e.target.value))
+                    }
+                    className="mb-2 w-full"
+                  />
+                  <label className="block text-sm">Saugfähigkeit</label>
+                  <input
+                    type="number"
+                    value={eingaben[order.materialbestellung_ID]?.gesperrtSaugfaehigkeit || 0}
+                    onChange={(e) =>
+                      handleInputChange(order.materialbestellung_ID.toString(), "gesperrtSaugfaehigkeit", Number(e.target.value))
+                    }
+                    className="mb-2 w-full"
+                  />
+                  <label className="block text-sm">Weißgrad</label>
+                  <input
+                    type="number"
+                    value={eingaben[order.materialbestellung_ID]?.gesperrtWeissgrad || 0}
+                    onChange={(e) =>
+                      handleInputChange(order.materialbestellung_ID.toString(), "gesperrtWeissgrad", Number(e.target.value))
+                    }
+                    className="w-full"
+                  />
+                </div>
+
+                <div>
+                  <span className="font-semibold">Reklamierter Teil</span>
+                  <label className="block text-sm mt-1">Menge</label>
+                  <input
+                    type="number"
+                    value={eingaben[order.materialbestellung_ID]?.reklamiertMenge || 0}
+                    onChange={(e) =>
+                      handleInputChange(order.materialbestellung_ID.toString(), "reklamiertMenge", Number(e.target.value))
+                    }
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-end mt-6 gap-4">
+            <Button variant="outline" onClick={() => setWareneingangDialogOpen(false)}>
+              Abbrechen
+            </Button>
+            <Button onClick={handleMultiWareneingang} disabled={isCreatingWareneingang}>
+              Wareneingang anlegen
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bestellung anlegen Dialog */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Bestellung anlegen</DialogTitle>
+          </DialogHeader>
+
+          <label htmlFor="lieferant">Lieferant</label>
+          <select
+            id="lieferant"
+            name="lieferant_ID"
+            value={formData.lieferant_ID}
+            onChange={handleFormChange}
+            className="mb-4 w-full"
+          >
+            <option value="">Bitte wählen</option>
+            {lieferanten.map((l) => (
+              <option key={l.lieferant_ID} value={l.lieferant_ID}>
+                {l.firmenname}
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor="material">Material</label>
+          <Select
+            inputId="material"
+            name="material_ID"
+            options={materialOptions}
+            value={materialOptions.find((m) => m.value.toString() === formData.material_ID)}
+            onChange={(selected) =>
+              setFormData((prev) => ({ ...prev, material_ID: selected ? selected.value.toString() : "" }))
+            }
+            className="mb-4"
+          />
+
+          <label htmlFor="menge">Menge</label>
+          <input
+            type="number"
+            id="menge"
+            name="menge"
+            value={formData.menge}
+            onChange={handleFormChange}
+            className="mb-6 w-full"
+            min={1}
+          />
+
+          <div className="flex justify-end gap-4">
+            <Button variant="outline" onClick={handleCloseModal}>
+              Abbrechen
+            </Button>
+            <Button onClick={handleSubmit} disabled={isLoading}>
+              Anlegen
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Absenden Dialog */}
-      <Dialog open={absendenDialogOpen} onOpenChange={() => setAbsendenDialogOpen(false)}>
+      <Dialog open={absendenDialogOpen} onOpenChange={setAbsendenDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Bestellungen absenden</DialogTitle>
           </DialogHeader>
-
-          {selectedOrders.map((item) => (
-            <div key={item.materialbestellung_ID} className="mb-4 p-4 border rounded space-y-1 text-sm">
-              <div className="font-bold">Materialbestellung-ID: {item.materialbestellung_ID}</div>
-              <div>Material-ID: {item.material_ID}</div>
-              <div>Lieferant-ID: {item.lieferant_ID}</div>
-              <div>Status: {item.status ?? "–"}</div>
-            </div>
-          ))}
-
-          <Button onClick={confirmAbsenden} className="mt-4" disabled={selectedOrders.length === 0}>
-            Bestätigen
-          </Button>
+          <p>Sollen die ausgewählten Bestellungen als „Bestellt“ markiert werden?</p>
+          <div className="flex justify-end mt-6 gap-4">
+            <Button variant="outline" onClick={() => setAbsendenDialogOpen(false)}>
+              Abbrechen
+            </Button>
+            <Button onClick={confirmAbsenden}>Ja, absenden</Button>
+          </div>
         </DialogContent>
       </Dialog>
-
     </BaseContentLayout>
+
   );
 };
 

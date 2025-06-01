@@ -27,14 +27,17 @@ export const lieferantApi = baseApi.injectEndpoints({
     }),
 
     // Lieferant aktualisieren
-    updateLieferant: builder.mutation<Lieferant, { id: number; data: Partial<Lieferant> }>({
-      query: ({ id, data }) => ({
-        url: `/lieferanten/${id}`,
-        method: "PUT",
-        body: data,
-      }),
-      invalidatesTags: ["Lieferant"],
-    }),
+updateLieferant: builder.mutation<
+  Lieferant,
+  { id: number; data: Partial<Omit<Lieferant, "adresse">> & { adresse_ID: number } }
+>({
+  query: ({ id, data }) => ({
+    url: `/lieferanten/${id}`,
+    method: "PUT",
+    body: data,
+  }),
+  invalidatesTags: ["Lieferant"],
+}),
 
     // Lieferant löschen
     deleteLieferant: builder.mutation<void, number>({

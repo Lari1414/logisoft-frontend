@@ -1,20 +1,24 @@
-// LieferantTable.tsx
 import { useState, useMemo } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table";
 import { lieferantApi } from "@/api/endpoints/lieferantApi";
 import { adresseApi } from "@/api/endpoints/adresseApi";
-import { Trash } from "react-bootstrap-icons";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Trash, Pencil } from "react-bootstrap-icons";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Lieferant, Adresse } from "@/models/lieferant";
-import { Pencil } from "react-bootstrap-icons";
 
 const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
   const [deleteLieferant] = lieferantApi.useDeleteLieferantMutation();
   const [deleteAdresse] = adresseApi.useDeleteAdresseMutation();
   const [updateLieferant] = lieferantApi.useUpdateLieferantMutation();
+  const [updateAdresse] = adresseApi.useUpdateAdresseMutation(); // Achtung: eigentlich updateAdresse
 
   const [editItem, setEditItem] = useState<Lieferant | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,18 +43,24 @@ const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
     if (!editItem || !formData.adresse) return;
 
     try {
+      // 1. Adresse separat aktualisieren
+      await updateAdresse({
+        id: formData.adresse.adresse_ID!,
+        data: {
+          strasse: formData.adresse.strasse,
+          plz: formData.adresse.plz,
+          ort: formData.adresse.ort,
+        },
+      }).unwrap();
+
+      // 2. Lieferant aktualisieren (nur erlaubte Felder)
       await updateLieferant({
         id: editItem.lieferant_ID,
         data: {
           firmenname: formData.firmenname!,
           kontaktperson: formData.kontaktperson!,
-          adresse_ID: formData.adresse.adresse_ID,
-          adresse: {
-            strasse: formData.adresse.strasse,
-            plz: formData.adresse.plz,
-            ort: formData.adresse.ort,
-          },
-        } as any, // falls Backend-Schema strikt ist
+          adresse_ID: formData.adresse.adresse_ID!,
+        },
       }).unwrap();
 
       setIsDialogOpen(false);
@@ -92,10 +102,10 @@ const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
       cell: ({ row }) => (
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => openEditDialog(row.original)}>
-              <Pencil size={18} />
+            <Pencil size={18} />
           </Button>
           <button onClick={() => handleDelete(row.original.lieferant_ID)}>
-            <Trash size={18} color="red"/>
+            <Trash size={18} color="red" />
           </button>
         </div>
       ),
@@ -125,12 +135,16 @@ const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
                 <Input
                   placeholder="Firmenname"
                   value={formData.firmenname || ""}
-                  onChange={(e) => handleInputChange("firmenname", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("firmenname", e.target.value)
+                  }
                 />
                 <Input
                   placeholder="Kontaktperson"
                   value={formData.kontaktperson || ""}
-                  onChange={(e) => handleInputChange("kontaktperson", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("kontaktperson", e.target.value)
+                  }
                 />
                 <Input
                   placeholder="Straße"
@@ -141,7 +155,9 @@ const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
                   type="number"
                   placeholder="PLZ"
                   value={formData.adresse?.plz || ""}
-                  onChange={(e) => handleInputChange("plz", Number(e.target.value))}
+                  onChange={(e) =>
+                    handleInputChange("plz", Number(e.target.value))
+                  }
                 />
                 <Input
                   placeholder="Ort"
