@@ -21,6 +21,7 @@ export interface storeMaterialRequest {
   typ : String;
   groesse: String;
   url: String;
+  category: String;
 }
 
 
