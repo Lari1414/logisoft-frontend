@@ -346,83 +346,83 @@ const Stammdaten = () => {
           </select>
         </div>
 
-<div className="col-span-2">
-  <div className="flex items-center space-x-3 mb-2">
-    <label className="block font-medium">Farbe</label>
-    <div
-      style={{
-        width: 24,
-        height: 24,
-        borderRadius: "50%",
-        border: "1px solid #ccc",
-        backgroundColor: (() => {
-          const { r, g, b } = cmykToRgb(
-            Number(materialForm.cyan),
-            Number(materialForm.magenta),
-            Number(materialForm.yellow),
-            Number(materialForm.black)
-          );
-          return `rgb(${r}, ${g}, ${b})`;
-        })(),
-        transition: "background-color 0.3s ease",
-      }}
-    />
-  </div>
-  <div className="flex space-x-4">
-    <div className="flex flex-col w-1/4">
-      <label htmlFor="cyan" className="mb-1 text-sm font-medium">
-        Cyan
-      </label>
-      <Input
-        id="cyan"
-        name="cyan"
-        placeholder="Cyan"
-        value={materialForm.cyan}
-        onChange={handleMaterialChange}
-        className="w-full"
-      />
+    <div className="col-span-2">
+      <div className="flex items-center space-x-3 mb-2">
+        <label className="block font-medium">Farbe</label>
+        <div
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: "50%",
+            border: "1px solid #ccc",
+            backgroundColor: (() => {
+              const { r, g, b } = cmykToRgb(
+                Number(materialForm.cyan),
+                Number(materialForm.magenta),
+                Number(materialForm.yellow),
+                Number(materialForm.black)
+              );
+              return `rgb(${r}, ${g}, ${b})`;
+            })(),
+            transition: "background-color 0.3s ease",
+          }}
+        />
+      </div>
+      <div className="flex space-x-4">
+        <div className="flex flex-col w-1/4">
+          <label htmlFor="cyan" className="mb-1 text-sm font-medium">
+            Cyan
+          </label>
+          <Input
+            id="cyan"
+            name="cyan"
+            placeholder="Cyan"
+            value={materialForm.cyan}
+            onChange={handleMaterialChange}
+            className="w-full"
+          />
+        </div>
+        <div className="flex flex-col w-1/4">
+          <label htmlFor="magenta" className="mb-1 text-sm font-medium">
+            Magenta
+          </label>
+          <Input
+            id="magenta"
+            name="magenta"
+            placeholder="Magenta"
+            value={materialForm.magenta}
+            onChange={handleMaterialChange}
+            className="w-full"
+          />
+        </div>
+        <div className="flex flex-col w-1/4">
+          <label htmlFor="yellow" className="mb-1 text-sm font-medium">
+            Yellow
+          </label>
+          <Input
+            id="yellow"
+            name="yellow"
+            placeholder="Yellow"
+            value={materialForm.yellow}
+            onChange={handleMaterialChange}
+            className="w-full"
+          />
+        </div>
+        <div className="flex flex-col w-1/4">
+          <label htmlFor="black" className="mb-1 text-sm font-medium">
+            Black
+          </label>
+          <Input
+            id="black"
+            name="black"
+            placeholder="Black"
+            value={materialForm.black}
+            onChange={handleMaterialChange}
+            className="w-full"
+          />
+        </div>
+      </div>
     </div>
-    <div className="flex flex-col w-1/4">
-      <label htmlFor="magenta" className="mb-1 text-sm font-medium">
-        Magenta
-      </label>
-      <Input
-        id="magenta"
-        name="magenta"
-        placeholder="Magenta"
-        value={materialForm.magenta}
-        onChange={handleMaterialChange}
-        className="w-full"
-      />
-    </div>
-    <div className="flex flex-col w-1/4">
-      <label htmlFor="yellow" className="mb-1 text-sm font-medium">
-        Yellow
-      </label>
-      <Input
-        id="yellow"
-        name="yellow"
-        placeholder="Yellow"
-        value={materialForm.yellow}
-        onChange={handleMaterialChange}
-        className="w-full"
-      />
-    </div>
-    <div className="flex flex-col w-1/4">
-      <label htmlFor="black" className="mb-1 text-sm font-medium">
-        Black
-      </label>
-      <Input
-        id="black"
-        name="black"
-        placeholder="Black"
-        value={materialForm.black}
-        onChange={handleMaterialChange}
-        className="w-full"
-      />
-    </div>
-  </div>
-</div>
 
         <div className="col-span-2 flex justify-end">
           <Button onClick={handleSubmitMaterial} disabled={isSaveDisabled}>
