@@ -29,6 +29,7 @@ const [materialForm, setMaterialForm] = useState<Record<string, any>>({
   typ: "",
   groesse: "",
   url: "",
+  category: "",
 });
 
 const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,6 +145,7 @@ const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     typ: materialForm.typ,
     groesse: materialForm.groesse,
     url: materialForm.url,
+    category: materialForm.category
   };
 
   try {
@@ -159,6 +161,7 @@ const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       typ: "",
       groesse: "",
       url: "",
+      category: ""
     });
 
     if (refetchTable) refetchTable();
@@ -171,6 +174,20 @@ const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const menge = parseFloat(mengenMap[item.lagerbestand_ID]);
     return isNaN(menge) || menge <= 0 || menge > item.menge;
   });
+
+  function cmykToRgb(c: number, m: number, y: number, k: number) {
+   
+      c /= 100;
+      m /= 100;
+      y /= 100;
+      k /= 100;
+
+      const r = 255 * (1 - c) * (1 - k);
+      const g = 255 * (1 - m) * (1 - k);
+      const b = 255 * (1 - y) * (1 - k);
+
+      return { r: Math.round(r), g: Math.round(g), b: Math.round(b) };
+  }
 
   return (
     <BaseContentLayout title="Fertigmaterial Lager">
@@ -279,44 +296,61 @@ const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         />
       </div>
 
-      {/* Farbe */}
-      <div className="mt-4 font-semibold">Farbe</div>
-      <div className="flex space-x-2 mt-2">
-        <Input
-          name="cyan"
-          placeholder="Cyan"
-          value={materialForm.cyan}
-          onChange={handleMaterialChange}
-          className="w-1/4"
-        />
-        <Input
-          name="magenta"
-          placeholder="Magenta"
-          value={materialForm.magenta}
-          onChange={handleMaterialChange}
-          className="w-1/4"
-        />
-        <Input
-          name="yellow"
-          placeholder="Yellow"
-          value={materialForm.yellow}
-          onChange={handleMaterialChange}
-          className="w-1/4"
-        />
-        <Input
-          name="black"
-          placeholder="Black"
-          value={materialForm.black}
-          onChange={handleMaterialChange}
-          className="w-1/4"
+    {/* Farbe */}
+    <div className="col-span-2">
+      <div className="flex items-center space-x-3 mb-2">
+        <label className="block font-medium">Farbe</label>
+        <div
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: "50%",
+            border: "1px solid #ccc",
+            backgroundColor: (() => {
+              const { r, g, b } = cmykToRgb(
+                Number(materialForm.cyan),
+                Number(materialForm.magenta),
+                Number(materialForm.yellow),
+                Number(materialForm.black)
+              );
+              return `rgb(${r}, ${g}, ${b})`;
+            })(),
+            transition: "background-color 0.3s ease",
+          }}
         />
       </div>
+
+      <div className="flex space-x-4">
+        {[
+          { label: "Cyan", name: "cyan" },
+          { label: "Magenta", name: "magenta" },
+          { label: "Yellow", name: "yellow" },
+          { label: "Black", name: "black" },
+        ].map(({ label, name }) => (
+          <div key={name} className="flex flex-col w-1/4">
+            <label htmlFor={name} className="mb-1 text-sm font-medium">
+              {label}
+            </label>
+            <Input
+              id={name}
+              name={name}
+              value={materialForm[name]}
+              onChange={handleMaterialChange}
+              className="w-full"
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+
+
 
       {/* Typ, Größe, URL */}
       {[
         ["typ", "Typ"],
         ["groesse", "Größe"],
         ["url", "Bild-URL"],
+        ["category", "Kategorie"],
       ].map(([field, label]) => (
         <div key={field} className="flex flex-col space-y-1">
           <label htmlFor={field} className="text-sm font-medium text-gray-700">

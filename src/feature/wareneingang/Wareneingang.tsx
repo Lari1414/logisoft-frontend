@@ -14,12 +14,15 @@ const Wareneingang = () => {
   const [deleteWareneingang] = wareneingangApi.useDeleteWareneingangMutation();
   const [createWareneingang] = wareneingangApi.useCreateWareneingangMutation();
   const [sperreWareneingaenge] = wareneingangApi.useSperreWareneingaengeMutation();
+  const [entsperreWareneingang] = wareneingangApi.useEntsperreWareneingangMutation();
+
 
   const [selectedRows, setSelectedRows] = useState<WareneingangData[]>([]);
-  const [modalType, setModalType] = useState<"einlagern" | "sperren" | "anlegen" | null>(null);
+  const [modalType, setModalType] = useState<"einlagern" | "sperren" | "entsperren" | "anlegen" | null>(null);
 
   const [refetchTable, setRefetchTable] = useState<(() => void) | null>(null);
-
+  const einlagerbareRows = selectedRows.filter(row => row.status === "eingetroffen");
+  const entsperrbareRows = selectedRows.filter(row => row.status === "gesperrt");
 
   const { data: bestelltOrders, isLoading, error } = orderApi.useGetbestelltOrdersQuery();
 
@@ -58,13 +61,49 @@ const Wareneingang = () => {
   }, []);
 
   const confirmEinlagerung = async () => {
-    const ids = selectedRows.map(item => item.eingang_ID);
+  const gefilterteRows = selectedRows.filter(row => row.status === "eingetroffen");
+
+  if (gefilterteRows.length === 0) {
+    alert("die gesperrten Materialen können nicht einlagert werden");
+    return;
+  }
+
+  const ids = gefilterteRows.map(item => item.eingang_ID);
+
+  try {
+    await storeRohmaterial({ ids });
+    for (const id of ids) {
+      await deleteWareneingang(id);
+    }
+    if (refetchTable) refetchTable();
+  } catch (error) {
+    console.error("Fehler beim Einlagern:", error);
+  }
+
+  setModalType(null);
+  setSelectedRows([]);
+
+  /**   const ids = selectedRows.map(item => item.eingang_ID);
     try {
       await storeRohmaterial({ ids });
       for (const id of ids) {
         await deleteWareneingang(id);
       }
-      if (refetchTable) refetchTable(); // Tabelle neu laden
+      if (refetchTable) refetchTable(); 
+    } catch (error) {
+      console.error(error);
+    }
+    setModalType(null);
+    setSelectedRows([]);
+    */
+  };
+
+  const confirmSperre = async () => {
+    try {
+      const ids = selectedRows.map(item => item.eingang_ID);
+      console.log("selectedRows", selectedRows);
+      await sperreWareneingaenge({ ids }).unwrap();
+      if (refetchTable) refetchTable(); 
     } catch (error) {
       console.error(error);
     }
@@ -72,17 +111,51 @@ const Wareneingang = () => {
     setSelectedRows([]);
   };
 
-  const confirmSperre = async () => {
-    try {
-      const ids = selectedRows.map(item => item.eingang_ID);
-      await sperreWareneingaenge({ ids }).unwrap();
-      if (refetchTable) refetchTable(); // Tabelle neu laden
-    } catch (error) {
-      console.error(error);
-    }
-    setModalType(null);
-    setSelectedRows([]);
-  };
+const handleEntsperrenClick = () => setModalType("entsperren");
+
+const confirmEntsperren = async () => {
+  const ids = selectedRows.map(item => item.eingang_ID);
+  console.log("Entsperren:", ids);
+  try {
+    const result = await entsperreWareneingang({ ids }).unwrap();
+    console.log("Entsperren erfolgreich:", result);
+    if (refetchTable) refetchTable();
+  } catch (error) {
+    console.error("Fehler beim Entsperren:", error);
+  }
+  setModalType(null);
+  setSelectedRows([]);
+};
+
+const handleEntsperrenRow = async (row: WareneingangData) => {
+  try {
+    await entsperreWareneingang({ ids: [row.eingang_ID] }).unwrap();
+    if (refetchTable) refetchTable();
+  
+  } catch (error) {
+    console.error("Fehler beim Entsperren:", error);
+  }
+};
+
+
+  const handleEinlagernRow = async (row: WareneingangData) => {
+  try {
+    await storeRohmaterial({ ids: [row.eingang_ID] });
+    await deleteWareneingang(row.eingang_ID);
+    if (refetchTable) refetchTable();
+  } catch (error) {
+    console.error("Fehler beim Einlagern:", error);
+  }
+};
+
+const handleSperrenRow = async (row: WareneingangData) => {
+  try {
+    await sperreWareneingaenge({ ids: [row.eingang_ID] }).unwrap();
+    if (refetchTable) refetchTable();
+  } catch (error) {
+    console.error("Fehler beim Sperren:", error);
+  }
+};
 
   return (
 
@@ -104,13 +177,17 @@ const Wareneingang = () => {
       {activeTab === "wareneingang" ? (
         <>
         <div className="flex gap-4 mt-4">
-          <WareneingangTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchTable} />
-          <Button onClick={handleEinlagernClick} disabled={selectedRows.length === 0}>
+          <WareneingangTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchTable}  onEinlagernRow={handleEinlagernRow}
+          onSperrenRow={handleSperrenRow}  onEntsperrenRow={handleEntsperrenRow} />
+          <Button onClick={handleEinlagernClick} disabled={einlagerbareRows.length === 0}>
             <Grid2x2Plus className="mr-2 h-4 w-4" />
             Einlagern
           </Button>
-          <Button onClick={handleSperrenClick} disabled={selectedRows.length === 0}>
+          <Button onClick={handleSperrenClick} disabled={entsperrbareRows.length === 0}>
             Sperren
+          </Button>
+          <Button onClick={handleEntsperrenClick} disabled={entsperrbareRows.length === 0}>
+            Entsperren
           </Button>
           <Button onClick={() => setModalType("anlegen")}>
             Wareneingang anlegen
@@ -152,17 +229,18 @@ const Wareneingang = () => {
           <DialogHeader>
             <DialogTitle>Waren einlagern</DialogTitle>
           </DialogHeader>
-          {selectedRows.map((item) => (
+      
+          {selectedRows.filter(row => row.status === "eingetroffen").map((item) => (
             <div key={item.material_ID} className="mb-4 p-4 border rounded space-y-1 text-sm">
               <div className="font-bold">Material-ID: {item.material_ID}</div>
               <div>Menge: {item.menge}</div>
-              <div>Farbe: {item.farbe}</div>
-              <div>Typ: {item.typ}</div>
-              <div>Größe: {item.groesse}</div>
-              <div>Kategorie: {item.category}</div>
+              <div>Farbe: {item.material?.farbe ?? ""}</div>
+              <div>Typ: {item.material?.typ ?? ""}</div>
+              <div>Größe: {item.material?.groesse ?? ""}</div>
+              <div>Kategorie: {item.material?.category ?? ""}</div>
               <div>Qualität-ID: {item.qualitaet_ID}</div>
               <div>
-                Bild: <a href={item.url} target="_blank" rel="noreferrer" className="text-blue-600 underline">Link</a>
+                Bild: <a href={item.material?.url ?? ""} target="_blank" rel="noreferrer" className="text-blue-600 underline">Link</a>
               </div>
             </div>
           ))}
@@ -178,22 +256,48 @@ const Wareneingang = () => {
           <DialogHeader>
             <DialogTitle>Waren sperren</DialogTitle>
           </DialogHeader>
-          {selectedRows.map((item) => (
+          {selectedRows.filter(row => row.status === "eingetroffen").map((item) => (
             <div key={item.material_ID} className="mb-4 p-4 border rounded space-y-1 text-sm">
-              <div className="font-bold">Material-ID: {item.material_ID}</div>
+               <div className="font-bold">Material-ID: {item.material_ID}</div>
               <div>Menge: {item.menge}</div>
-              <div>Farbe: {item.farbe}</div>
-              <div>Typ: {item.typ}</div>
-              <div>Größe: {item.groesse}</div>
-              <div>Kategorie: {item.category}</div>
+              <div>Farbe: {item.material?.farbe ?? ""}</div>
+              <div>Typ: {item.material?.typ ?? ""}</div>
+              <div>Größe: {item.material?.groesse ?? ""}</div>
+              <div>Kategorie: {item.material?.category ?? ""}</div>
               <div>Qualität-ID: {item.qualitaet_ID}</div>
               <div>
-                Bild: <a href={item.url} target="_blank" rel="noreferrer" className="text-blue-600 underline">Link</a>
+                Bild: <a href={item.material?.url ?? ""} target="_blank" rel="noreferrer" className="text-blue-600 underline">Link</a>
               </div>
             </div>
           ))}
           <Button onClick={confirmSperre} className="mt-4" disabled={selectedRows.length === 0}>
             Sperren bestätigen
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* Entsperren Dialog */}
+      <Dialog open={modalType === "entsperren"} onOpenChange={() => setModalType(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Waren entsperren</DialogTitle>
+          </DialogHeader>
+           {selectedRows.filter(row => row.status === "gesperrt").map((item) => (
+            <div key={item.material_ID} className="mb-4 p-4 border rounded space-y-1 text-sm">
+             <div className="font-bold">Material-ID: {item.material_ID}</div>
+              <div>Menge: {item.menge}</div>
+              <div>Farbe: {item.material?.farbe ?? ""}</div>
+              <div>Typ: {item.material?.typ ?? ""}</div>
+              <div>Größe: {item.material?.groesse ?? ""}</div>
+              <div>Kategorie: {item.material?.category ?? ""}</div>
+              <div>Qualität-ID: {item.qualitaet_ID}</div>
+              <div>
+                Bild: <a href={item.material?.url ?? ""} target="_blank" rel="noreferrer" className="text-blue-600 underline">Link</a>
+              </div>
+            </div>
+          ))}
+          <Button onClick={confirmEntsperren} className="mt-4" disabled={selectedRows.length === 0}>
+            Entsperren bestätigen
           </Button>
         </DialogContent>
       </Dialog>
@@ -216,12 +320,21 @@ const Wareneingang = () => {
               ) : (
                 <select
                   value={neuerWareneingang.materialbestellung_ID}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const selectedId = Number(e.target.value);
+                    const selectedOrder = bestelltOrders?.find(order => order.materialbestellung_ID === selectedId);
+
                     setNeuerWareneingang({
                       ...neuerWareneingang,
-                      materialbestellung_ID: Number(e.target.value),
-                    })
-                  }
+                      materialbestellung_ID: selectedId,
+                      materialDetails: {
+                        category: selectedOrder?.material?.category ?? "",
+                        farbe: selectedOrder?.material?.farbe ?? "",
+                        typ: selectedOrder?.material?.typ ?? "",
+                        groesse: selectedOrder?.material?.groesse ?? "",
+                      }
+                    });
+                  }}
                   className="w-full border rounded p-2"
                 >
                   <option value={0} disabled>
@@ -259,7 +372,6 @@ const Wareneingang = () => {
                 className="w-full border rounded p-2"
               />
             </div>
-
             <h4 className="font-bold mt-4">Materialdetails</h4>
 
             {(Object.keys(neuerWareneingang.materialDetails) as MaterialKey[]).map((key) => (
@@ -270,13 +382,8 @@ const Wareneingang = () => {
                 <input
                   type="text"
                   value={neuerWareneingang.materialDetails[key]}
-                  onChange={(e) =>
-                    setNeuerWareneingang({
-                      ...neuerWareneingang,
-                      materialDetails: { ...neuerWareneingang.materialDetails, [key]: e.target.value },
-                    })
-                  }
-                  className="w-full border rounded p-2"
+                  disabled 
+                  className="w-full border rounded p-2 bg-gray-100 text-gray-500"
                 />
               </div>
             ))}

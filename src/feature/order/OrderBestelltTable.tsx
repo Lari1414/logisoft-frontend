@@ -5,7 +5,7 @@ import { orderApi } from "@/api/endpoints/orderApi.ts";
 import { Order } from "@/models/order";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Store, Send } from "lucide-react";
+import { Store } from "lucide-react";
 import { wareneingangApi } from "@/api/endpoints/wareneingangApi.ts";
 
 interface OrderBestelltTableProps {
@@ -107,21 +107,10 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
           setMenge(sum);
         }, [guterMenge, gesperrtMenge, reklamiertMenge]);
 
-        const [updateStatus, { isLoading: isUpdating }] = orderApi.useUpdateMultipleOrdersStatusMutation();
+    
         const [createWareneingang, { isLoading: isCreating }] = wareneingangApi.useCreateWareneingangMutation();
 
-        const handleSingleAbsenden = async () => {
-          try {
-            const response = await updateStatus({ ids: [Number(order.materialbestellung_ID)] }).unwrap();
-            console.log(`Erfolgreich aktualisiert: ${response.updatedCount} Bestellung`);
-            if (typeof refetch === "function") {
-              await refetch();
-            }
-          } catch (error) {
-            console.error("Fehler beim Absenden:", error);
-            alert(`Fehler beim Absenden der Bestellung ${order.materialbestellung_ID}!`);
-          }
-        };
+     
 
         const handleWareneingang = async () => {
           try {
@@ -159,19 +148,17 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
 
         return (
           <div className="flex gap-2">
-            <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center gap-2">
-              <Send size={18} />
-            </Button>
-
+          
             {order.status === "bestellt" && (
               <>
               <Button
                 variant="ghost"
                 onClick={() => {
-                  setMenge(order.menge);  // hier setzt du die Menge beim Öffnen zurück
+                  setMenge(order.menge);  
                   setOpenDialog(true);
                 }}
                 disabled={isCreating}
+                className="flex items-center hover:bg-yellow-100 gap-2"
               >
                 <Store className="h-5 w-5" />
               </Button>

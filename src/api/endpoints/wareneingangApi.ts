@@ -61,7 +61,6 @@ export const wareneingangApi = baseApi.injectEndpoints({
     
     }),
 
-    
     updateWareneingang: builder.mutation<Wareneingang, { id: number; data: Partial<Wareneingang> }>({
       query: ({ id, data }) => ({
         url: `/wareneingaenge/${id}`,
@@ -71,16 +70,13 @@ export const wareneingangApi = baseApi.injectEndpoints({
     
     }),
 
-    // Material löschen
+   // Material löschen
     deleteWareneingang: builder.mutation<void, number>({
       query: (id) => ({
         url: `/wareneingaenge/${id}`,
         method: "DELETE",
       }),
-
-
-   
-    }),
+   }),
 
     sperreWareneingaenge: builder.mutation<{ updatedCount: number }, { ids: number[] }>({
         query: (data) => ({
@@ -89,5 +85,13 @@ export const wareneingangApi = baseApi.injectEndpoints({
           body: data,
       }),
     }),
+    entsperreWareneingang: builder.mutation<{ updatedCount: number }, { ids: number[] }>({
+        query: (data) => ({
+          url: "/wareneingaenge/entsperren",
+          method: "PUT",
+          body: data,
+      }),
+    }),
+
   }),
 });
