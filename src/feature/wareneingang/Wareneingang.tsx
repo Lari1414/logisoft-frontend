@@ -374,19 +374,52 @@ const handleSperrenRow = async (row: WareneingangData) => {
             </div>
             <h4 className="font-bold mt-4">Materialdetails</h4>
 
-            {(Object.keys(neuerWareneingang.materialDetails) as MaterialKey[]).map((key) => (
+          {(Object.keys(neuerWareneingang.materialDetails) as MaterialKey[]).map((key) => {
+            const value = neuerWareneingang.materialDetails[key];
+
+            if (key === "farbe") {
+              // Hier wird angenommen, dass value eine hex- oder rgb-Farbe ist (z. B. "#ff0000" oder "rgb(255,0,0)")
+              return (
+                <div key={key}>
+                  <div className="flex items-center space-x-3 mb-1">
+                    <label className="block font-medium">
+                      {key.charAt(0).toUpperCase() + key.slice(1)}
+                    </label>
+                    <div
+                      style={{
+                        width: 20,
+                        height: 20,
+                        borderRadius: "50%",
+                        border: "1px solid #ccc",
+                        backgroundColor: value, // Direkt die Farbe als CSS-Wert
+                      }}
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    value={value}
+                    disabled
+                    className="w-full border rounded p-2 bg-gray-100 text-gray-500"
+                  />
+                </div>
+              );
+            }
+
+            // Standardfall für andere Felder
+            return (
               <div key={key}>
                 <label className="block font-medium mb-1">
                   {key.charAt(0).toUpperCase() + key.slice(1)}
                 </label>
                 <input
                   type="text"
-                  value={neuerWareneingang.materialDetails[key]}
-                  disabled 
+                  value={value}
+                  disabled
                   className="w-full border rounded p-2 bg-gray-100 text-gray-500"
                 />
               </div>
-            ))}
+            );
+          })}
 
             <h4 className="font-bold mt-4">Qualität</h4>
 

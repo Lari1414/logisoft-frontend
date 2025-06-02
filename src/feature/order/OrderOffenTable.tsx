@@ -159,10 +159,12 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
 
         return (
           <div className="flex gap-2">
+            {row.original.status === "offen" && (
             <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center hover:bg-green-100 gap-2">
               <Send size={18} />
             </Button>
-
+            )}
+            
             {order.status === "bestellt" && (
               <>
               <Button
