@@ -40,7 +40,8 @@ const Wareneingang = () => {
       viskositaet: 0,
       ppml: 0,
       saugfaehigkeit: 0,
-      weissgrad: 0
+      weissgrad: 0,
+      deltaE: 0
     }
   });
 
@@ -199,7 +200,7 @@ const handleSperrenRow = async (row: WareneingangData) => {
 
         </>
       ) : (
-        <div className="border p-4 rounded bg-gray-50">
+        <div className="flex gap-4 mt-4">
           {<ReklamationTable onSelectionChange={handleReklamationSelection} setRefetch={setRefetchTable} />}
 
         </div>

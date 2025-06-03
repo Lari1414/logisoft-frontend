@@ -6,6 +6,7 @@ export interface Qualitaet {
   ppml: number; 
   saugfaehigkeit: number; 
   weissgrad: number; 
+  deltaE: number;
 }
 
 export const qualitaetApi = baseApi.injectEndpoints({

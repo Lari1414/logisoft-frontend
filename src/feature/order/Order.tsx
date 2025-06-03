@@ -149,6 +149,7 @@ const Order = () => {
               ppml: 0,
               saugfaehigkeit: e.guterSaugfaehigkeit,
               weissgrad: e.guterWeissgrad,
+              deltaE: 0
             },
           },
           gesperrterTeil: {
@@ -158,6 +159,7 @@ const Order = () => {
               ppml: 0,
               saugfaehigkeit: e.gesperrtSaugfaehigkeit,
               weissgrad: e.gesperrtWeissgrad,
+               deltaE: 0
             },
           },
           reklamierterTeil: {

@@ -136,6 +136,7 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
                   ppml: 0,
                   saugfaehigkeit: guterSaugfaehigkeit,
                   weissgrad: guterWeissgrad,
+                  deltaE: 0
                 },
               },
               gesperrterTeil: {
@@ -145,6 +146,7 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
                   ppml: 0,
                   saugfaehigkeit: gesperrtSaugfaehigkeit,
                   weissgrad: gesperrtWeissgrad,
+                  deltaE: 0
                 },
               },
               reklamierterTeil: {

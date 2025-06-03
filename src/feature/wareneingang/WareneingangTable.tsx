@@ -47,7 +47,7 @@ const WareneingangTable: React.FC<WareneingangTableProps> = ({ onSelectionChange
   const { data: qualitaeten } = qualitaetApi.useGetQualitaetQuery();
   const [selectedQualitaet, setSelectedQualitaet] = useState<any | null>(null);
   const [isQualitaetDialogOpen, setIsQualitaetDialogOpen] = useState(false);
-
+  const [createReklamation] = wareneingangApi.useCreateReklamationMutation();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [, setSelectedRows] = useState<TransformedWareneingang[]>([]);
 
@@ -193,12 +193,13 @@ const WareneingangTable: React.FC<WareneingangTableProps> = ({ onSelectionChange
         return date.toLocaleDateString("de-DE");
       },
     },
-    {
-      id: "aktionen",
-      header: "Aktionen",
-      cell: ({ row }) => (
-        <div className="flex gap-2">
-            {row.original.status === "eingetroffen" && (
+  {
+  id: "aktionen",
+  header: "Aktionen",
+  cell: ({ row }) => (
+    <div className="flex gap-2">
+      {row.original.status === "eingetroffen" && (
+        <>
           <button
             onClick={() => onEinlagernRow?.(row.original)}
             className="p-2 text-green-600 hover:bg-green-100 rounded"
@@ -206,8 +207,6 @@ const WareneingangTable: React.FC<WareneingangTableProps> = ({ onSelectionChange
           >
             <Archive className="w-4 h-4" />
           </button>
-            )}
-            {row.original.status === "eingetroffen" && (
           <button
             onClick={() => onSperrenRow?.(row.original)}
             className="p-2 text-yellow-600 hover:bg-yellow-100 rounded"
@@ -215,19 +214,43 @@ const WareneingangTable: React.FC<WareneingangTableProps> = ({ onSelectionChange
           >
             <Lock className="w-4 h-4" />
           </button>
-          )}
-          {row.original.status === "gesperrt" && (
-        <button
-          onClick={() => onEntsperrenRow?.(row.original)}
-          className="p-2 text-blue-600 hover:bg-blue-100 rounded"
-          title="Entsperren"
-        >
-        <Unlock className="w-4 h-4" />
-        </button>
+        </>
       )}
-        </div>
-      ),
-    }
+
+      {row.original.status === "gesperrt" && (
+        <>
+          <button
+            onClick={() => onEntsperrenRow?.(row.original)}
+            className="p-2 text-blue-600 hover:bg-blue-100 rounded"
+            title="Entsperren"
+          >
+            <Unlock className="w-4 h-4" />
+          </button>
+         <button
+          onClick={async () => {
+            try {
+              await createReklamation({
+                wareneingang_ID: row.original.eingang_ID,
+                menge: row.original.menge,
+              }).unwrap(); // unwrap gibt dir Zugriff auf das Ergebnis oder wirft im Fehlerfall
+
+              refetch(); // Tabelle neu laden
+            } catch (error) {
+              console.error("Reklamation fehlgeschlagen:", error);
+              // Optional: Zeige eine Fehlermeldung
+            }
+          }}
+          className="p-2 text-red-600 hover:bg-red-100 rounded"
+          title="Reklamieren"
+        >
+          ❗
+        </button>
+        </>
+      )}
+    </div>
+  ),
+}
+
   ];
 
   if (isLoading) return <div>Lädt...</div>;
