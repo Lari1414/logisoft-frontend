@@ -159,9 +159,11 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
 
         return (
           <div className="flex gap-2">
+            {row.original.status === "offen" && (
             <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center gap-2">
               <Send size={18} />
             </Button>
+            )}
 
             {order.status === "bestellt" && (
               <>
