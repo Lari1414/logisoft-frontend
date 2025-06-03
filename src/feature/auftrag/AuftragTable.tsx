@@ -67,7 +67,11 @@ const AuftragTable = ({ onSelectionChange, onRefetch }: AuftragTableProps) => {
     { accessorKey: "auftrag_ID", header: "Auftrag-ID" },
     { accessorKey: "material_ID", header: "Material-ID" },
     { accessorKey: "menge", header: "Menge" },
-    { accessorKey: "status", header: "Status" },
+    { accessorKey: "status", header: "Status",cell: ({ getValue }) => (
+        <span className="px-2 py-1 rounded bg-yellow-400 text-black">
+          {getValue() as string}
+        </span>
+      ), },
     { accessorKey: "lagerbestand_ID", header: "Lagerbestand-ID" },
     { accessorKey: "bestellposition", header: "Bestellposition" },
     { accessorKey: "angefordertVon", header: "Angefordert Von" },
