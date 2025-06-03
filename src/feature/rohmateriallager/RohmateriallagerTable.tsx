@@ -30,6 +30,7 @@ export interface TransformedData {
   ppml: number;
   saugfaehigkeit: number | null;
   weissgrad: number | null;
+  deltaE: number;
 }
 
 // Type for the onSelectionChange function prop
@@ -83,6 +84,7 @@ const transformedData = useMemo(() => (
       ppml: item.qualitaet?.ppml ?? 0,
       saugfaehigkeit: item.qualitaet?.saugfaehigkeit ?? null,
       weissgrad: item.qualitaet?.weissgrad ?? null,
+      deltaE: item.qualitaet?.deltaE ?? 0
     };
   })
 ), [data]);
@@ -219,6 +221,7 @@ const transformedData = useMemo(() => (
               <li>PPML: {selectedQualitaet.ppml}</li>
               <li>Saugfähigkeit: {selectedQualitaet.saugfaehigkeit}</li>
               <li>Weißgrad: {selectedQualitaet.weissgrad}</li>
+              <li>deltaE: {selectedQualitaet.deltaE}</li>
             </ul>
           )}
 

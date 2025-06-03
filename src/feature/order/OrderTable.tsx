@@ -136,6 +136,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                   ppml: 0,
                   saugfaehigkeit: guterSaugfaehigkeit,
                   weissgrad: guterWeissgrad,
+                  deltaE: 0
                 },
               },
               gesperrterTeil: {
@@ -145,6 +146,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                   ppml: 0,
                   saugfaehigkeit: gesperrtSaugfaehigkeit,
                   weissgrad: gesperrtWeissgrad,
+                  deltaE: 0
                 },
               },
               reklamierterTeil: {
@@ -152,6 +154,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
               },
             });
             setOpenDialog(false);
+            await refetch();
           } catch (error) {
             console.error("Fehler beim Anlegen:", error);
           }
@@ -160,7 +163,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
         return (
           <div className="flex gap-2">
             {row.original.status === "offen" && (
-            <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center gap-2">
+            <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center hover:bg-green-100 gap-2">
               <Send size={18} />
             </Button>
             )}
@@ -170,10 +173,11 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
               <Button
                 variant="ghost"
                 onClick={() => {
-                  setMenge(order.menge);  // hier setzt du die Menge beim Öffnen zurück
+                  setMenge(order.menge);  
                   setOpenDialog(true);
                 }}
                 disabled={isCreating}
+                className="flex items-center hover:bg-yellow-100 gap-2"
               >
                 <Store className="h-5 w-5" />
               </Button>

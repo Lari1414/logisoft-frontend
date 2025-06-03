@@ -125,6 +125,7 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                   ppml: 0,
                   saugfaehigkeit: guterSaugfaehigkeit,
                   weissgrad: guterWeissgrad,
+                  deltaE: 0
                 },
               },
               gesperrterTeil: {
@@ -134,6 +135,7 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                   ppml: 0,
                   saugfaehigkeit: gesperrtSaugfaehigkeit,
                   weissgrad: gesperrtWeissgrad,
+                  deltaE: 0
                 },
               },
               reklamierterTeil: {

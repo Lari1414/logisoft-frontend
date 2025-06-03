@@ -20,5 +20,6 @@ export interface Rohmateriallager {
     ppml: number;
     saugfaehigkeit: number;
     weissgrad: number;
+    deltaE?: number;
   };
 }
