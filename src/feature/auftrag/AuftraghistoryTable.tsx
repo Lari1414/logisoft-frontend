@@ -15,7 +15,6 @@ const AuftraghistoryTable = () => {
     id: item.auftrag_ID.toString(),
   }));
 
-
   const columns: ColumnDef<Auftrag & { id: string }>[] = [
     { accessorKey: "auftrag_ID", header: "Auftrag-ID" },
     { accessorKey: "material_ID", header: "Material-ID" },
