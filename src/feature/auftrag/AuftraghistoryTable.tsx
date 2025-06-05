@@ -12,8 +12,9 @@ const AuftraghistoryTable = () => {
 
   const transformedData = (data || []).map((item: Auftrag) => ({
     ...item,
-    id: item.material_ID.toString(),
+    id: item.auftrag_ID.toString(),
   }));
+
 
   const columns: ColumnDef<Auftrag & { id: string }>[] = [
     { accessorKey: "auftrag_ID", header: "Auftrag-ID" },
