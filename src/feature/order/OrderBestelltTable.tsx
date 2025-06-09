@@ -167,6 +167,7 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                 }}
                 disabled={isCreating}
                 className="flex items-center hover:bg-yellow-100 gap-2"
+                title="Einlagern"
               >
                 <Store className="h-5 w-5" />
               </Button>

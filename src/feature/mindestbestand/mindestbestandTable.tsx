@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Pencil } from "react-bootstrap-icons";
 
 export interface TransformedMindestbestand extends Mindestbestand {
   id: string;
@@ -99,8 +100,8 @@ const MindestbestandTable = () => {
       id: "aktionen",
       header: "Aktionen",
       cell: ({ row }) => (
-        <Button variant="outline" onClick={() => openEditDialog(row.original)}>
-          Bearbeiten
+        <Button variant="ghost" onClick={() => openEditDialog(row.original)} className="hover:bg-blue-100 rounded" title="Bearbeiten">
+            <Pencil size={18} />
         </Button>
       ),
     },

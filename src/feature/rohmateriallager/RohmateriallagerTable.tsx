@@ -178,6 +178,7 @@ const transformedData = useMemo(() => (
           onClick={() => {
             if (onAuslagernClick) onAuslagernClick(row.original);
           }}
+          title="Auslagern"
         >
            <IoExit className="h-5 w-5" />
         </Button>

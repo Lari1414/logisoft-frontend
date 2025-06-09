@@ -168,10 +168,10 @@ const handleColorChange = (colorField: keyof Material["farbe_json"], value: stri
       header: "Aktionen",
       cell: ({ row }) => (
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => openEditDialog(row.original)}>
+          <Button variant="ghost" onClick={() => openEditDialog(row.original)} className="p-2 text-blue-600 hover:bg-blue-100 rounded" title="Bearbeiten">
            <Pencil size={18} />
           </Button>
-          <button onClick={() => handleDelete(row.original.material_ID)}>
+          <button onClick={() => handleDelete(row.original.material_ID)} className=" hover:bg-red-100 rounded" title="Löschen">
             <Trash size={20} color="red" />
           </button>
         </div>
