@@ -153,18 +153,7 @@ const transformedData = useMemo(() => (
       },
     { accessorKey: "typ", header: "Typ" },
     { accessorKey: "groesse", header: "Größe" },
-    {
-      accessorKey: "url",
-      header: "URL",
-      cell: ({ getValue }) => {
-        const url = getValue() as string;
-        return (
-          <a href={url} target="_blank" rel="noopener noreferrer">
-            Link
-          </a>
-        );
-      },
-    },
+    { accessorKey: "url", header: "Url" },
     { accessorKey: "menge", header: "Menge" },
 
     {

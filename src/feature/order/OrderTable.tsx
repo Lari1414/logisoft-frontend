@@ -98,9 +98,15 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
 
         const [guterSaugfaehigkeit, setGuterSaugfaehigkeit] = useState<number>(0);
         const [guterWeissgrad, setGuterWeissgrad] = useState<number>(0);
+        const [guterViskositaet, setGuterViskositaet] = useState<number>(0);
+        const [guterPpml, setGuterPpml] = useState<number>(0);
+        const [guterDeltaE, setGuterDeltaE] = useState<number>(0);
 
         const [gesperrtSaugfaehigkeit, setGesperrtSaugfaehigkeit] = useState<number>(0);
         const [gesperrtWeissgrad, setGesperrtWeissgrad] = useState<number>(0);
+        const [gesperrtViskositaet, setGesperrtViskositaet] = useState<number>(0);
+        const [gesperrtPpml, setGesperrtPpml] = useState<number>(0);
+        const [gesperrtDeltaE, setGesperrtDeltaE] = useState<number>(0);
 
         useEffect(() => {
           const sum = guterMenge + gesperrtMenge + reklamiertMenge;
@@ -182,77 +188,140 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                 <Store className="h-5 w-5" />
               </Button>
              <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-  <DialogContent className="max-w-5xl w-full">
-    <DialogHeader>
-      <DialogTitle>Wareneingang anlegen</DialogTitle>
-    </DialogHeader>
+      <DialogContent className="max-w-5xl w-full">
+  <DialogHeader>
+    <DialogTitle>Wareneingang anlegen</DialogTitle>
+  </DialogHeader>
 
-    {/* Eingetroffene Menge */}
+  {/* bestellte Menge */}
+  <div className="mb-4">
+    <label className="block mb-1 font-medium">Die bestellte Menge</label>
+    <div className="w-full border rounded p-2 bg-gray-100">
+      {order.menge}
+    </div>
+  </div>
+ {/* Eingetroffene Menge */}
     <div className="mb-4">
-      <label className="block mb-1">eingetroffene Menge</label>
+    <label className="block mb-1">eingetroffene Menge</label>
+    <input
+      type="number"
+      onChange={(e) => setMenge(Number(e.target.value))}
+      className="w-full border rounded p-2"
+    />
+  </div>
+
+  {/* Drei Teile nebeneinander */}
+  <div className="flex flex-row gap-4">
+    {/* Guter Teil */}
+    <div className="flex-1 p-4 border rounded">
+      <h3 className="font-semibold mb-2">Guter Teil</h3>
+      <label className="block">Menge</label>
       <input
         type="number"
-        value={menge}
-        onChange={(e) => setMenge(Number(e.target.value))}
-        className="w-full border rounded p-2"
+        value={guterMenge}
+        onChange={(e) => setGuterMenge(Number(e.target.value))}
+        className="w-full mb-2 border rounded p-2"
       />
+
+      {order.material.category.toLowerCase() === "t-shirt" ? (
+        <>
+          <label className="block">Saugfähigkeit</label>
+          <input
+            type="number"
+            value={guterSaugfaehigkeit}
+            onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
+            className="w-full mb-2 border rounded p-2"
+          />
+          <label className="block">Weißgrad</label>
+          <input
+            type="number"
+            value={guterWeissgrad}
+            onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
+            className="w-full border rounded p-2"
+          />
+        </>
+      ) : (
+        <>
+          <label className="block">Viskosität</label>
+          <input
+            type="number"
+            value={guterViskositaet}
+            onChange={(e) => setGuterViskositaet(Number(e.target.value))}
+            className="w-full mb-2 border rounded p-2"
+          />
+          <label className="block">Ppml</label>
+          <input
+            type="number"
+            value={guterPpml}
+            onChange={(e) => setGuterPpml(Number(e.target.value))}
+            className="w-full mb-2 border rounded p-2"
+          />
+          <label className="block">DeltaE</label>
+          <input
+            type="number"
+            value={guterDeltaE}
+            onChange={(e) => setGuterDeltaE(Number(e.target.value))}
+            className="w-full border rounded p-2"
+          />
+        </>
+      )}
     </div>
 
-    {/* Drei Teile nebeneinander */}
-    <div className="flex flex-row gap-4">
-      {/* Guter Teil */}
-      <div className="flex-1 p-4 border rounded">
-        <h3 className="font-semibold mb-2">Guter Teil</h3>
-        <label className="block">Menge</label>
-        <input
-          type="number"
-          value={guterMenge}
-          onChange={(e) => setGuterMenge(Number(e.target.value))}
-          className="w-full mb-2 border rounded p-2"
-        />
-        <label className="block">Saugfähigkeit</label>
-        <input
-          type="number"
-          value={guterSaugfaehigkeit}
-          onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
-          className="w-full mb-2 border rounded p-2"
-        />
-        <label className="block">Weißgrad</label>
-        <input
-          type="number"
-          value={guterWeissgrad}
-          onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
-          className="w-full border rounded p-2"
-        />
-      </div>
+    {/* Gesperrter Teil */}
+    <div className="flex-1 p-4 border rounded">
+      <h3 className="font-semibold mb-2">Gesperrter Teil</h3>
+      <label className="block">Menge</label>
+      <input
+        type="number"
+        value={gesperrtMenge}
+        onChange={(e) => setGesperrtMenge(Number(e.target.value))}
+        className="w-full mb-2 border rounded p-2"
+      />
 
-      {/* Gesperrter Teil */}
-      <div className="flex-1 p-4 border rounded">
-        <h3 className="font-semibold mb-2">Gesperrter Teil</h3>
-        <label className="block">Menge</label>
-        <input
-          type="number"
-          value={gesperrtMenge}
-          onChange={(e) => setGesperrtMenge(Number(e.target.value))}
-          className="w-full mb-2 border rounded p-2"
-        />
-        <label className="block">Saugfähigkeit</label>
-        <input
-          type="number"
-          value={gesperrtSaugfaehigkeit}
-          onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
-          className="w-full mb-2 border rounded p-2"
-        />
-        <label className="block">Weißgrad</label>
-        <input
-          type="number"
-          value={gesperrtWeissgrad}
-          onChange={(e) => setGesperrtWeissgrad(Number(e.target.value))}
-          className="w-full border rounded p-2"
-        />
-      </div>
+      {order.material.category.toLowerCase() === "t-shirt" ? (
+        <>
+          <label className="block">Saugfähigkeit</label>
+          <input
+            type="number"
+            value={gesperrtSaugfaehigkeit}
+            onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
+            className="w-full mb-2 border rounded p-2"
+          />
+          <label className="block">Weißgrad</label>
+          <input
+            type="number"
+            value={gesperrtWeissgrad}
+            onChange={(e) => setGesperrtWeissgrad(Number(e.target.value))}
+            className="w-full border rounded p-2"
+          />
+        </>
+      ) : (
+        <>
+          <label className="block">Viskosität</label>
+          <input
+            type="number"
+            value={gesperrtViskositaet}
+            onChange={(e) => setGesperrtViskositaet(Number(e.target.value))}
+            className="w-full mb-2 border rounded p-2"
+          />
+          <label className="block">Ppml</label>
+          <input
+            type="number"
+            value={gesperrtPpml}
+            onChange={(e) => setGesperrtPpml(Number(e.target.value))}
+            className="w-full mb-2 border rounded p-2"
+          />
+          <label className="block">DeltaE</label>
+          <input
+            type="number"
+            value={gesperrtDeltaE}
+            onChange={(e) => setGesperrtDeltaE(Number(e.target.value))}
+            className="w-full border rounded p-2"
+          />
+        </>
+      )}
+    </div>
 
-      {/* Reklamierter Teil */}
       <div className="flex-1 p-4 border rounded">
         <h3 className="font-semibold mb-2">Reklamierter Teil</h3>
         <label className="block">Menge</label>
@@ -263,13 +332,15 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
           className="w-full border rounded p-2"
         />
       </div>
-    </div>
 
-    <div className="mt-6">
-      <Button onClick={handleWareneingang}>Anlegen</Button>
-    </div>
-  </DialogContent>
-</Dialog>
+  </div>
+
+  <div className="mt-6">
+    <Button onClick={handleWareneingang}>Anlegen</Button>
+  </div>
+</DialogContent>
+
+      </Dialog>
 
               </>
             )}

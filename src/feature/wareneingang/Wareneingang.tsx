@@ -8,6 +8,9 @@ import ReklamationTable, {ReklamationData} from "@/feature/wareneingang/Reklamat
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, Tab } from "@mui/material";
+
+
+
 const Wareneingang = () => {
   const [activeTab, setActiveTab] = useState("wareneingang");
   const [storeRohmaterial] = wareneingangApi.useStoreRohmaterialMutation();
@@ -46,7 +49,24 @@ const Wareneingang = () => {
   });
 
   type MaterialKey = keyof typeof neuerWareneingang.materialDetails;
-  type QualitaetKey = keyof typeof neuerWareneingang.qualitaet;
+
+
+  const [guterMenge, setGuterMenge] = useState<number>(0);
+  const [gesperrtMenge, setGesperrtMenge] = useState<number>(0);
+  const [reklamiertMenge, setReklamiertMenge] = useState<number>(0);
+  const [guterSaugfaehigkeit, setGuterSaugfaehigkeit] = useState<number>(0);
+  const [guterWeissgrad, setGuterWeissgrad] = useState<number>(0);
+  const [guterViskositaet, setGuterViskositaet] = useState<number>(0);
+  const [guterPpml, setGuterPpml] = useState<number>(0);
+  const [guterDeltaE, setGuterDeltaE] = useState<number>(0);
+
+  const [gesperrtSaugfaehigkeit, setGesperrtSaugfaehigkeit] = useState<number>(0);
+  const [gesperrtWeissgrad, setGesperrtWeissgrad] = useState<number>(0);
+  const [gesperrtViskositaet, setGesperrtViskositaet] = useState<number>(0);
+  const [gesperrtPpml, setGesperrtPpml] = useState<number>(0);
+  const [gesperrtDeltaE, setGesperrtDeltaE] = useState<number>(0);
+
+
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setActiveTab(newValue);
   };
@@ -84,19 +104,6 @@ const Wareneingang = () => {
   setModalType(null);
   setSelectedRows([]);
 
-  /**   const ids = selectedRows.map(item => item.eingang_ID);
-    try {
-      await storeRohmaterial({ ids });
-      for (const id of ids) {
-        await deleteWareneingang(id);
-      }
-      if (refetchTable) refetchTable(); 
-    } catch (error) {
-      console.error(error);
-    }
-    setModalType(null);
-    setSelectedRows([]);
-    */
   };
 
   const confirmSperre = async () => {
@@ -148,6 +155,62 @@ const handleEntsperrenRow = async (row: WareneingangData) => {
     console.error("Fehler beim Einlagern:", error);
   }
 };
+
+const handleCreateWareneingang = async () => {
+  try {
+    await createWareneingang({
+      materialbestellung_ID: neuerWareneingang.materialbestellung_ID,
+      lieferdatum: new Date().toISOString().split("T")[0], 
+      menge: neuerWareneingang.menge,
+      guterTeil: {
+        menge: guterMenge,
+        qualitaet: {
+          viskositaet: guterViskositaet,
+          ppml: guterPpml,
+          saugfaehigkeit: guterSaugfaehigkeit,
+          weissgrad: guterWeissgrad,
+          deltaE: guterDeltaE
+        },
+      },
+      gesperrterTeil: {
+        menge: gesperrtMenge,
+        qualitaet: {
+          viskositaet: gesperrtViskositaet,
+          ppml: gesperrtPpml,
+          saugfaehigkeit: gesperrtSaugfaehigkeit,
+          weissgrad: gesperrtWeissgrad,
+          deltaE: gesperrtDeltaE
+        },
+      },
+      reklamierterTeil: {
+        menge: reklamiertMenge,
+      },
+    });
+
+    setModalType(null);
+    if (refetchTable) refetchTable();
+    
+    // Eingabefelder zurücksetzen
+    setNeuerWareneingang({
+      materialbestellung_ID: 0,
+      menge: 0,
+      lieferdatum: "",
+      materialDetails: { category: "", farbe: "", typ: "", groesse: "" },
+      qualitaet: { viskositaet: 0, ppml: 0, saugfaehigkeit: 0, weissgrad: 0, deltaE: 0 }
+    });
+    setGuterMenge(0);
+    setGesperrtMenge(0);
+    setReklamiertMenge(0);
+    setGuterSaugfaehigkeit(0);
+    setGuterWeissgrad(0);
+    setGesperrtSaugfaehigkeit(0);
+    setGesperrtWeissgrad(0);
+
+  } catch (error) {
+    console.error("Fehler beim Anlegen:", error);
+  }
+};
+
 
 const handleSperrenRow = async (row: WareneingangData) => {
   try {
@@ -208,25 +271,9 @@ const handleSperrenRow = async (row: WareneingangData) => {
     </div>
   </div>
 
-    {/* <BaseContentLayout title="Wareneingang" >
-      <WareneingangTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchTable} />
-
-      <div className="flex gap-4 mt-4">
-        <Button onClick={handleEinlagernClick} disabled={selectedRows.length === 0}>
-          <Grid2x2Plus className="mr-2 h-4 w-4" />
-          Einlagern
-        </Button>
-        <Button onClick={handleSperrenClick} disabled={selectedRows.length === 0}>
-          Sperren
-        </Button>
-        <Button onClick={() => setModalType("anlegen")}>
-          Wareneingang anlegen
-        </Button>
-      </div>*/}
-
       {/* Einlagern Dialog */}
       <Dialog open={modalType === "einlagern"} onOpenChange={() => setModalType(null)}>
-        <DialogContent>
+         <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
           <DialogHeader>
             <DialogTitle>Waren einlagern</DialogTitle>
           </DialogHeader>
@@ -253,7 +300,7 @@ const handleSperrenRow = async (row: WareneingangData) => {
 
       {/* Sperren Dialog */}
       <Dialog open={modalType === "sperren"} onOpenChange={() => setModalType(null)}>
-        <DialogContent>
+          <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
           <DialogHeader>
             <DialogTitle>Waren sperren</DialogTitle>
           </DialogHeader>
@@ -279,7 +326,7 @@ const handleSperrenRow = async (row: WareneingangData) => {
 
       {/* Entsperren Dialog */}
       <Dialog open={modalType === "entsperren"} onOpenChange={() => setModalType(null)}>
-        <DialogContent>
+       <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
           <DialogHeader>
             <DialogTitle>Waren entsperren</DialogTitle>
           </DialogHeader>
@@ -305,7 +352,7 @@ const handleSperrenRow = async (row: WareneingangData) => {
 
       {/* Wareneingang anlegen Dialog */}
       <Dialog open={modalType === "anlegen"} onOpenChange={() => setModalType(null)}>
-        <DialogContent className="max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
           <DialogHeader>
             <DialogTitle>Neuen Wareneingang anlegen</DialogTitle>
           </DialogHeader>
@@ -325,11 +372,12 @@ const handleSperrenRow = async (row: WareneingangData) => {
                     const selectedId = Number(e.target.value);
                     const selectedOrder = bestelltOrders?.find(order => order.materialbestellung_ID === selectedId);
 
+                    const category = bestelltOrders?.find(order => order.materialbestellung_ID === selectedId)?.material?.category;
                     setNeuerWareneingang({
                       ...neuerWareneingang,
                       materialbestellung_ID: selectedId,
                       materialDetails: {
-                        category: selectedOrder?.material?.category ?? "",
+                        category: category ?? "", 
                         farbe: selectedOrder?.material?.farbe ?? "",
                         typ: selectedOrder?.material?.typ ?? "",
                         groesse: selectedOrder?.material?.groesse ?? "",
@@ -349,7 +397,15 @@ const handleSperrenRow = async (row: WareneingangData) => {
                 </select>
               )}
             </div>
-
+            {/* bestellte Menge */}
+            <div className="mb-4">
+              <label className="block mb-1 font-medium">Die bestellte Menge</label>
+              <div className="w-full border rounded p-2 bg-gray-100">
+             {
+              bestelltOrders?.find(order => order.materialbestellung_ID === neuerWareneingang.materialbestellung_ID)?.menge ?? "—"
+              }
+              </div>
+            </div>
             <div>
               <label className="block font-medium mb-1">Menge</label>
               <input
@@ -422,45 +478,163 @@ const handleSperrenRow = async (row: WareneingangData) => {
             );
           })}
 
-            <h4 className="font-bold mt-4">Qualität</h4>
+      <h4 className="font-bold mt-4">Qualität</h4>
 
-            {(Object.keys(neuerWareneingang.qualitaet) as QualitaetKey[]).map((key) => (
-              <div key={key}>
-                <label className="block font-medium mb-1">
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
-                </label>
-                <input
-                  type="number"
-                  step="any"
-                  value={neuerWareneingang.qualitaet[key]}
-                  onChange={(e) =>
-                    setNeuerWareneingang({
-                      ...neuerWareneingang,
-                      qualitaet: { ...neuerWareneingang.qualitaet, [key]: parseFloat(e.target.value) },
-                    })
-                  }
-                  className="w-full border rounded p-2"
-                />
-              </div>
-            ))}
+      <div className="flex flex-row gap-4">
+        {/* Guter Teil */}
+        <div className="flex-1 p-4 border rounded">
+          <h3 className="font-semibold mb-2">Guter Teil</h3>
+
+          
+            <>
+              <label className="block">Menge</label>
+              <input
+                type="number"
+                value={guterMenge}
+                onChange={(e) => setGuterMenge(Number(e.target.value))}
+                className="w-full mb-2 border rounded p-2"
+              />
+            </>
+         
+
+          {/* Saugfähigkeit und Weißgrad nur bei T-Shirt */}
+          {neuerWareneingang.materialDetails.category.toLowerCase() === "t-shirt" && (
+            <>
+              <label className="block">Saugfähigkeit</label>
+              <input
+                type="number"
+                value={guterSaugfaehigkeit}
+                onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
+                className="w-full mb-2 border rounded p-2"
+              />
+
+              <label className="block">Weißgrad</label>
+              <input
+                type="number"
+                value={guterWeissgrad}
+                onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
+                className="w-full mb-2 border rounded p-2"
+              />
+            </>
+          )}
+
+          {/* Viskosität, Ppml, DeltaE nur bei Nicht-T-Shirt */}
+          {neuerWareneingang.materialDetails.category.toLowerCase() !== "t-shirt" && (
+            <>
+              <label className="block">Viskosität</label>
+              <input
+                type="number"
+                value={guterViskositaet}
+                onChange={(e) => setGuterViskositaet(Number(e.target.value))}
+                className="w-full mb-2 border rounded p-2"
+              />
+              <label className="block">Ppml</label>
+              <input
+                type="number"
+                value={guterPpml}
+                onChange={(e) => setGuterPpml(Number(e.target.value))}
+                className="w-full mb-2 border rounded p-2"
+              />
+              <label className="block">DeltaE</label>
+              <input
+                type="number"
+                value={guterDeltaE}
+                onChange={(e) => setGuterDeltaE(Number(e.target.value))}
+                className="w-full border rounded p-2"
+              />
+            </>
+          )}
+        </div>
+
+        {/* Gesperrter Teil */}
+        <div className="flex-1 p-4 border rounded">
+          <h3 className="font-semibold mb-2">Gesperrter Teil</h3>
+
+          {neuerWareneingang.materialDetails.category.toLowerCase() !== "t-shirt" && (
+            <>
+              <label className="block">Menge</label>
+              <input
+                type="number"
+                value={gesperrtMenge}
+                onChange={(e) => setGesperrtMenge(Number(e.target.value))}
+                className="w-full mb-2 border rounded p-2"
+              />
+            </>
+          )}
+
+          {/* Saugfähigkeit und Weißgrad nur bei T-Shirt */}
+          {neuerWareneingang.materialDetails.category.toLowerCase() === "t-shirt" && (
+            <>
+              <label className="block">Saugfähigkeit</label>
+              <input
+                type="number"
+                value={gesperrtSaugfaehigkeit}
+                onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
+                className="w-full mb-2 border rounded p-2"
+              />
+
+              <label className="block">Weißgrad</label>
+              <input
+                type="number"
+                value={gesperrtWeissgrad}
+                onChange={(e) => setGesperrtWeissgrad(Number(e.target.value))}
+                className="w-full mb-2 border rounded p-2"
+              />
+            </>
+          )}
+
+          {/* Viskosität, Ppml, DeltaE nur bei Nicht-T-Shirt */}
+          {neuerWareneingang.materialDetails.category.toLowerCase() !== "t-shirt" && (
+            <>
+              <label className="block">Viskosität</label>
+              <input
+                type="number"
+                value={gesperrtViskositaet}
+                onChange={(e) => setGesperrtViskositaet(Number(e.target.value))}
+                className="w-full mb-2 border rounded p-2"
+              />
+              <label className="block">Ppml</label>
+              <input
+                type="number"
+                value={gesperrtPpml}
+                onChange={(e) => setGesperrtPpml(Number(e.target.value))}
+                className="w-full mb-2 border rounded p-2"
+              />
+              <label className="block">DeltaE</label>
+              <input
+                type="number"
+                value={gesperrtDeltaE}
+                onChange={(e) => setGesperrtDeltaE(Number(e.target.value))}
+                className="w-full border rounded p-2"
+              />
+            </>
+          )}
+        </div>
+
+        {/* Reklamierter Teil nur bei Nicht-T-Shirt */}
+        {neuerWareneingang.materialDetails.category.toLowerCase() !== "t-shirt" && (
+          <div className="flex-1 p-4 border rounded">
+            <h3 className="font-semibold mb-2">Reklamierter Teil</h3>
+            <label className="block">Menge</label>
+            <input
+              type="number"
+              value={reklamiertMenge}
+              onChange={(e) => setReklamiertMenge(Number(e.target.value))}
+              className="w-full border rounded p-2"
+            />
           </div>
+        )}
+      </div>
 
-          <Button
-            className="mt-4"
-            onClick={async () => {
-              try {
-                await createWareneingang(neuerWareneingang);
-                setModalType(null);
-                console.log("Wareneingang erfolgreich angelegt.");
-                if (refetchTable) refetchTable();
-              } catch (error) {
-                console.error("Fehler beim Anlegen:", error);
-              }
-            }}
-            disabled={neuerWareneingang.materialbestellung_ID === 0}
-          >
-            Anlegen
-          </Button>
+        </div>
+
+       <Button
+        onClick={handleCreateWareneingang}
+        className="mt-4"
+        disabled={neuerWareneingang.materialbestellung_ID === 0 || neuerWareneingang.menge <= 0}
+        >
+        Anlegen
+      </Button>
         </DialogContent>
       </Dialog>
     </BaseContentLayout>

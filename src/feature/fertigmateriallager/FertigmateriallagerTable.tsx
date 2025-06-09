@@ -106,20 +106,7 @@ const FertigMateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernCli
     },
     { accessorKey: "typ", header: "Typ" },
     { accessorKey: "groesse", header: "Größe" },
-    {
-      accessorKey: "url",
-      header: "URL",
-      cell: ({ getValue }) => {
-        const url = getValue() as string;
-        return url ? (
-          <a href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-            Link
-          </a>
-        ) : (
-          "-"
-        );
-      },
-    },
+    { accessorKey: "url", header: "Url" },
     { accessorKey: "menge", header: "Menge" },
      {
       id: "auslagern",
