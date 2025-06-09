@@ -169,7 +169,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
         return (
           <div className="flex gap-2">
             {row.original.status === "offen" && (
-            <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center hover:bg-green-100 gap-2">
+            <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center hover:bg-green-100 gap-2" title="Absenden">
               <Send size={18} />
             </Button>
             )}
@@ -184,6 +184,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                 }}
                 disabled={isCreating}
                 className="flex items-center hover:bg-yellow-100 gap-2"
+                title="Einlagern"
               >
                 <Store className="h-5 w-5" />
               </Button>
