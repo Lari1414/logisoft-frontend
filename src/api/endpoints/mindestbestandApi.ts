@@ -20,6 +20,12 @@ export const mindestbestandApi = baseApi.injectEndpoints({
         body: { material_ID, mindestbestand },
       }),
     }),
-
+    deleteMindestbestand: builder.mutation<void, number>({
+      query: (id) => ({
+        url: `/mindestbestand/${id}`,
+        method: "DELETE",
+      }),
+  
+    }),
   }),
 });
