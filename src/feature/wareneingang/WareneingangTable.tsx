@@ -44,7 +44,7 @@ interface WareneingangTableProps {
 
 const WareneingangTable: React.FC<WareneingangTableProps> = ({ onSelectionChange, setRefetch, onEinlagernRow, onSperrenRow, onEntsperrenRow }) => {
   const { data, isLoading, error, refetch } = wareneingangApi.useGetWareneingangQuery();
-  const { data: qualitaeten } = qualitaetApi.useGetQualitaetQuery();
+  const { data: qualitaeten, isLoading: isQualitaetLoading  } = qualitaetApi.useGetQualitaetQuery();
   const [selectedQualitaet, setSelectedQualitaet] = useState<any | null>(null);
   const [isQualitaetDialogOpen, setIsQualitaetDialogOpen] = useState(false);
   const [createReklamation] = wareneingangApi.useCreateReklamationMutation();
@@ -270,16 +270,19 @@ const WareneingangTable: React.FC<WareneingangTableProps> = ({ onSelectionChange
             <DialogTitle>Qualitätswerte</DialogTitle>
           </DialogHeader>
 
-          {selectedQualitaet ? (
-            <ul className="space-y-1">
-              <li><strong>Viskosität:</strong> {selectedQualitaet.viskositaet}</li>
-              <li><strong>PPML:</strong> {selectedQualitaet.ppml}</li>
-              <li><strong>Saugfähigkeit:</strong> {selectedQualitaet.saugfaehigkeit}</li>
-              <li><strong>Weißgrad:</strong> {selectedQualitaet.weissgrad}</li>
-            </ul>
-          ) : (
-            <p>Keine Qualitätsdaten gefunden.</p>
-          )}
+        {isQualitaetLoading ? (
+          <p>Lädt Qualitätsdaten...</p>
+        ) : selectedQualitaet ? (
+          <ul className="space-y-1">
+            <li><strong>Viskosität:</strong> {selectedQualitaet.viskositaet}</li>
+            <li><strong>PPML:</strong> {selectedQualitaet.ppml}</li>
+            <li><strong>Saugfähigkeit:</strong> {selectedQualitaet.saugfaehigkeit}</li>
+            <li><strong>Weißgrad:</strong> {selectedQualitaet.weissgrad}</li>
+            <li><strong>DeltaE:</strong> {selectedQualitaet.deltaE}</li>
+          </ul>
+        ) : (
+          <p>Keine Qualitätsdaten gefunden.</p>
+        )}
 
           <Button onClick={() => setIsQualitaetDialogOpen(false)} className="mt-4">
             Schließen

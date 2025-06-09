@@ -202,8 +202,8 @@ const Stammdaten = () => {
 
  <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
   <DialogContent
-    style={{ maxWidth: "800px", width: "90vw" }} // Breiter machen
-    className="grid grid-cols-2 gap-4" // 2 Spalten Layout mit Abstand
+    style={{ maxWidth: "800px", width: "90vw" }} 
+    className="grid grid-cols-2 gap-4" 
   >
     <DialogHeader className="col-span-2">
       <DialogTitle>
@@ -290,32 +290,54 @@ const Stammdaten = () => {
 
         <div>
           <label className="block font-medium mb-1">Kategorie</label>
-          <Input
-            name="category"
-            placeholder="Kategorie"
-            value={materialForm.category}
-            onChange={handleMaterialChange}
-          />
+         <select
+          name="category"
+          value={materialForm.category}
+          onChange={handleMaterialChange}
+          className="w-full border rounded p-2"
+          >
+          <option value="">Bitte auswählen</option>
+          <option value="T-Shirt">T-Shirt</option>
+          <option value="Farbe">Farbe</option>
+          <option value="Druckfolie">Druckfolie</option>
+           <option value="Verpackung">Verpackung</option>
+        </select>
+
         </div>
 
         <div>
           <label className="block font-medium mb-1">Typ</label>
-          <Input
-            name="typ"
-            placeholder="Typ"
-            value={materialForm.typ}
-            onChange={handleMaterialChange}
-          />
+         <select
+          name="typ"
+          value={materialForm.typ}
+          onChange={handleMaterialChange}
+          className="w-full border rounded p-2"
+          >
+          <option value="">Bitte auswählen</option>
+          <option value="Sport">Sport</option>
+          <option value="Top">Top</option>
+          <option value="Rundhals">Rundhals</option>
+          <option value="Oversize">Oversize</option>
+          <option value="Standardfarbe">Standardfarbe</option>
+        </select>
         </div>
 
         <div>
           <label className="block font-medium mb-1">Größe</label>
-          <Input
-            name="groesse"
-            placeholder="Größe"
-            value={materialForm.groesse}
-            onChange={handleMaterialChange}
-          />
+          <select
+          name="groesse"
+          value={materialForm.groesse}
+          onChange={handleMaterialChange}
+          className="w-full border rounded p-2"
+          >
+          <option value="">Bitte auswählen</option>
+          <option value="XS">XS</option>
+          <option value="S">S</option>
+          <option value="M">M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+        </select>
         </div>
 
         <div>
@@ -425,7 +447,7 @@ const Stammdaten = () => {
     </div>
 
         <div className="col-span-2 flex justify-end">
-          <Button onClick={handleSubmitMaterial} disabled={isSaveDisabled}>
+          <Button onClick={handleSubmitMaterial}>
             Speichern
           </Button>
         </div>
