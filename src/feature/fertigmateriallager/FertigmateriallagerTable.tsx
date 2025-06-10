@@ -4,6 +4,7 @@ import { DataTable } from "@/components/sidebar/data-table";
 import { fertigmateriallagerApi } from "@/api/endpoints/fertigmateriallagerApi";
 import { Button } from "@/components/ui/button";
 import { IoExit } from "react-icons/io5";
+import { Input } from "@/components/ui/input";
 
 // Typ für transformierte Zeile
 export interface TransformedData {
@@ -35,6 +36,7 @@ interface FertigMateriallagerTableProps {
 const FertigMateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick }: FertigMateriallagerTableProps) => {
   const { data, isLoading, error, refetch } = fertigmateriallagerApi.useGetFertigmaterialQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [searchTerm, setSearchTerm] = useState("");
 
   const transformedData = useMemo(() => {
     return (data || []).map((item) => ({
@@ -52,6 +54,18 @@ const FertigMateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernCli
       url: item.material?.url ?? ""
     }));
   }, [data]);
+
+  const filteredData = useMemo(() => {
+    return transformedData.filter((row) => {
+      const term = searchTerm.toLowerCase();
+      return (
+        row.category.toLowerCase().includes(term) ||
+        row.farbe.toLowerCase().includes(term) ||
+        row.typ.toLowerCase().includes(term) ||
+        (row.groesse?.toLowerCase().includes(term) ?? false)
+      );
+    });
+  }, [searchTerm, transformedData]);
 
   useEffect(() => {
     if (onRefetch && refetch) {
@@ -131,12 +145,26 @@ const FertigMateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernCli
   if (error) return <div>Fehler beim Laden der Daten.</div>;
 
   return (
-    <DataTable
-      data={transformedData}
-      columns={columns}
-      rowSelection={rowSelection}
-      onRowSelectionChange={handleRowSelectionChange}
-    />
+    <>
+      <div className="flex flex-col gap-4">
+        <Input
+          placeholder="Fertigmaterial  suchen..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="
+        w-40 focus:w-72 transition-all duration-300 ease-in-out
+        px-2 py-1 text-sm focus:shadow-md
+      "
+        />
+        <DataTable
+          data={filteredData}
+          columns={columns}
+          rowSelection={rowSelection}
+          onRowSelectionChange={handleRowSelectionChange}
+
+        />
+      </div>
+    </>
   );
 };
 
