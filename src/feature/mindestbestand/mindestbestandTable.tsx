@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "react-bootstrap-icons";
-import Select, { components } from "react-select"; 
+import Select, { components } from "react-select";
 import { Trash } from "react-bootstrap-icons";
 
 
@@ -56,7 +56,7 @@ const MindestbestandTable = () => {
         farbe: material?.farbe || "",
         typ: material?.typ || "",
         groesse: material?.groesse || "",
-       
+
       };
     });
   }, [data, materialsData]);
@@ -105,7 +105,7 @@ const MindestbestandTable = () => {
     }
   };
 
-    const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number) => {
     try {
       await deleteMindestbestand(id).unwrap();
       refetch();
@@ -114,45 +114,45 @@ const MindestbestandTable = () => {
     }
   };
   const materialOptions =
-  materialsData?.map((m) => ({
-    value: m.material_ID,
-    label: `${m.typ} – ${m.farbe} – ${m.groesse}`,
-    color: m.farbe?.toLowerCase() ?? "transparent",
-  })) || [];
+    materialsData?.map((m) => ({
+      value: m.material_ID,
+      label: `${m.typ} – ${m.farbe} – ${m.groesse}`,
+      color: m.farbe?.toLowerCase() ?? "transparent",
+    })) || [];
 
-const ColourOption = (props: any) => (
-  <components.Option {...props}>
-    <div className="flex items-center space-x-2">
-      <div
-        style={{
-          width: 16,
-          height: 16,
-          borderRadius: "50%",
-          backgroundColor: props.data.color || "#ccc",
-          border: "1px solid #999",
-        }}
-      />
-      <span>{props.label}</span>
-    </div>
-  </components.Option>
-);
+  const ColourOption = (props: any) => (
+    <components.Option {...props}>
+      <div className="flex items-center space-x-2">
+        <div
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            backgroundColor: props.data.color || "#ccc",
+            border: "1px solid #999",
+          }}
+        />
+        <span>{props.label}</span>
+      </div>
+    </components.Option>
+  );
 
-const ColourSingleValue = (props: any) => (
-  <components.SingleValue {...props}>
-    <div className="flex items-center space-x-2">
-      <div
-        style={{
-          width: 16,
-          height: 16,
-          borderRadius: "50%",
-          backgroundColor: props.data.color || "#ccc",
-          border: "1px solid #999",
-        }}
-      />
-      <span>{props.data.label}</span>
-    </div>
-  </components.SingleValue>
-);
+  const ColourSingleValue = (props: any) => (
+    <components.SingleValue {...props}>
+      <div className="flex items-center space-x-2">
+        <div
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            backgroundColor: props.data.color || "#ccc",
+            border: "1px solid #999",
+          }}
+        />
+        <span>{props.data.label}</span>
+      </div>
+    </components.SingleValue>
+  );
 
 
   const columns: ColumnDef<TransformedMindestbestand>[] = [
@@ -172,20 +172,20 @@ const ColourSingleValue = (props: any) => (
       header: "Kategorie",
     },
     {
-        accessorKey: "farbe",
-        header: "Farbe",
-        cell: ({ getValue }) => {
-          const color = getValue() as string;
-          return (
-            <div className="flex items-center gap-2">
-              <div
-                className="w-4 h-4 rounded-full border"
-                style={{ backgroundColor: color }}
-              />
-              <span>{color}</span>
-            </div>
-          );
-        },
+      accessorKey: "farbe",
+      header: "Farbe",
+      cell: ({ getValue }) => {
+        const color = getValue() as string;
+        return (
+          <div className="flex items-center gap-2">
+            <div
+              className="w-4 h-4 rounded-full border"
+              style={{ backgroundColor: color }}
+            />
+            <span>{color}</span>
+          </div>
+        );
+      },
     },
     {
       accessorFn: (row) => row.typ,
@@ -207,11 +207,11 @@ const ColourSingleValue = (props: any) => (
       header: "Aktionen",
       cell: ({ row }) => (
         <div className="flex gap-2">
-        <Button variant="ghost" onClick={() => openEditDialog(row.original)} className="hover:bg-blue-100 rounded" title="Bearbeiten">
+          <Button variant="ghost" onClick={() => openEditDialog(row.original)} className="hover:bg-blue-100 rounded" title="Bearbeiten">
             <Pencil size={18} />
-        </Button>
-         <button onClick={() => handleDelete(row.original.mindestbestand_ID)} className=" hover:bg-red-100 rounded" title="Löschen">
-                <Trash size={20} color="red" />
+          </Button>
+          <button onClick={() => handleDelete(row.original.mindestbestand_ID)} className=" hover:bg-red-100 rounded" title="Löschen">
+            <Trash size={20} color="red" />
           </button>
         </div>
       ),
@@ -263,21 +263,21 @@ const ColourSingleValue = (props: any) => (
             <DialogTitle>Neuen Mindestbestand anlegen</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-           <div>
-            <label className="text-sm font-medium block mb-1">Material</label>
-            <Select
-              inputId="material"
-              name="material_ID"
-              options={materialOptions}
-              value={materialOptions.find((m) => m.value.toString() === newMaterialId)}
-              onChange={(selected) => {
-              const value = selected ? selected.value.toString() : "";
-              setNewMaterialId(value);
-            }}
-              components={{ Option: ColourOption, SingleValue: ColourSingleValue }}
-              className="mb-4"
-            />
-          </div>
+            <div>
+              <label className="text-sm font-medium block mb-1">Material</label>
+              <Select
+                inputId="material"
+                name="material_ID"
+                options={materialOptions}
+                value={materialOptions.find((m) => m.value.toString() === newMaterialId)}
+                onChange={(selected) => {
+                  const value = selected ? selected.value.toString() : "";
+                  setNewMaterialId(value);
+                }}
+                components={{ Option: ColourOption, SingleValue: ColourSingleValue }}
+                className="mb-4"
+              />
+            </div>
 
             <div>
               <label className="text-sm font-medium block mb-1">Mindestbestand</label>

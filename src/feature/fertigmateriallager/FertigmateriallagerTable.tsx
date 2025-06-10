@@ -29,29 +29,29 @@ export interface TransformedData {
 interface FertigMateriallagerTableProps {
   onSelectionChange: (selectedRows: TransformedData[]) => void;
   onRefetch?: (refetchFn: () => void) => void;
-  onAuslagernClick?: (row: TransformedData) => void; 
+  onAuslagernClick?: (row: TransformedData) => void;
 }
 
 const FertigMateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick }: FertigMateriallagerTableProps) => {
   const { data, isLoading, error, refetch } = fertigmateriallagerApi.useGetFertigmaterialQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
- const transformedData = useMemo(() => {
-  return (data || []).map((item) => ({
-    id: item.lagerbestand_ID.toString(),
-    lagerbestand_ID: item.lagerbestand_ID,
-    material_ID: item.material_ID,
-    lager_ID: item.lager_ID,
-    qualitaet_ID: item.qualitaet_ID,  // <-- hier hinzufügen
-    menge: item.menge,
-    category: item.material?.category ?? "",
-    farbe: item.material?.farbe ?? "",
-    farbe_json: (item.material as any)?.farbe_json ?? { cyan: 0, magenta: 0, yellow: 0, black: 0 },
-    typ: item.material?.typ ?? "",
-    groesse: item.material?.groesse ?? "",
-    url: item.material?.url ?? ""
-  }));
-}, [data]);
+  const transformedData = useMemo(() => {
+    return (data || []).map((item) => ({
+      id: item.lagerbestand_ID.toString(),
+      lagerbestand_ID: item.lagerbestand_ID,
+      material_ID: item.material_ID,
+      lager_ID: item.lager_ID,
+      qualitaet_ID: item.qualitaet_ID,  // <-- hier hinzufügen
+      menge: item.menge,
+      category: item.material?.category ?? "",
+      farbe: item.material?.farbe ?? "",
+      farbe_json: (item.material as any)?.farbe_json ?? { cyan: 0, magenta: 0, yellow: 0, black: 0 },
+      typ: item.material?.typ ?? "",
+      groesse: item.material?.groesse ?? "",
+      url: item.material?.url ?? ""
+    }));
+  }, [data]);
 
   useEffect(() => {
     if (onRefetch && refetch) {
@@ -108,23 +108,23 @@ const FertigMateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernCli
     { accessorKey: "groesse", header: "Größe" },
     { accessorKey: "url", header: "Url" },
     { accessorKey: "menge", header: "Menge" },
-     {
+    {
       id: "auslagern",
       header: "Aktion",
       cell: ({ row }) => (
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => {
             if (onAuslagernClick) onAuslagernClick(row.original);
           }}
           title="Auslagern"
         >
-         <IoExit className="h-5 w-5" />
+          <IoExit className="h-5 w-5" />
         </Button>
       ),
     }
-    
+
   ];
 
   if (isLoading) return <div>Lädt...</div>;

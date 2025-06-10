@@ -32,7 +32,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
       label: `${m.typ} – ${m.farbe} – ${m.groesse}`,
       color: m.farbe?.toLowerCase() ?? "transparent",
     }));
-const ColourOption = (props: any) => (
+  const ColourOption = (props: any) => (
     <components.Option {...props}>
       <div className="flex items-center space-x-2">
         <div
@@ -238,6 +238,7 @@ const ColourOption = (props: any) => (
               },
             });
             setOpenDialog(false);
+            console.log("Wareneingang angelegt materialbestellung_ID: " + order.materialbestellung_ID);
             await refetch();
           } catch (error) {
             console.error("Fehler beim Anlegen:", error);
@@ -300,9 +301,9 @@ const ColourOption = (props: any) => (
                           options={materialOptions}
                           value={materialOptions.find((m) => m.value.toString() === materialId.toString())}
                           onChange={(selected) =>
-                            setMaterialId(selected ? Number(selected.value) : 0) 
+                            setMaterialId(selected ? Number(selected.value) : 0)
                           }
-                        components={{ Option: ColourOption, SingleValue: ColourSingleValue }}
+                          components={{ Option: ColourOption, SingleValue: ColourSingleValue }}
                           className="w-full"
                         />
                       </div>

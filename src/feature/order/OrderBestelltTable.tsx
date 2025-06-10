@@ -113,16 +113,16 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
           setMenge(sum);
         }, [guterMenge, gesperrtMenge, reklamiertMenge]);
 
-    
+
         const [createWareneingang, { isLoading: isCreating }] = wareneingangApi.useCreateWareneingangMutation();
 
-     
+
 
         const handleWareneingang = async () => {
           try {
             await createWareneingang({
               materialbestellung_ID: order.materialbestellung_ID,
-              lieferdatum: new Date().toISOString().split("T")[0], 
+              lieferdatum: new Date().toISOString().split("T")[0],
               menge: menge,
               guterTeil: {
                 menge: guterMenge,
@@ -156,174 +156,174 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
 
         return (
           <div className="flex gap-2">
-          
+
             {order.status === "bestellt" && (
               <>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setMenge(order.menge);  
-                  setOpenDialog(true);
-                }}
-                disabled={isCreating}
-                className="flex items-center hover:bg-yellow-100 gap-2"
-                title="Einlagern"
-              >
-                <Store className="h-5 w-5" />
-              </Button>
-             <Dialog open={openDialog} onOpenChange={setOpenDialog}>
- <DialogContent className="max-w-5xl w-full">
-  <DialogHeader>
-    <DialogTitle>Wareneingang anlegen</DialogTitle>
-  </DialogHeader>
-  {/* bestellte Menge */}
-  <div className="mb-4">
-    <label className="block mb-1 font-medium">Die bestellte Menge</label>
-    <div className="w-full border rounded p-2 bg-gray-100">
-      {order.menge}
-    </div>
-  </div>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setMenge(order.menge);
+                    setOpenDialog(true);
+                  }}
+                  disabled={isCreating}
+                  className="flex items-center hover:bg-yellow-100 gap-2"
+                  title="Einlagern"
+                >
+                  <Store className="h-5 w-5" />
+                </Button>
+                <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                  <DialogContent className="max-w-5xl w-full">
+                    <DialogHeader>
+                      <DialogTitle>Wareneingang anlegen</DialogTitle>
+                    </DialogHeader>
+                    {/* bestellte Menge */}
+                    <div className="mb-4">
+                      <label className="block mb-1 font-medium">Die bestellte Menge</label>
+                      <div className="w-full border rounded p-2 bg-gray-100">
+                        {order.menge}
+                      </div>
+                    </div>
 
-  {/* Eingetroffene Menge */}
-  <div className="mb-4">
-    <label className="block mb-1">eingetroffene Menge</label>
-    <input
-      type="number"
-      onChange={(e) => setMenge(Number(e.target.value))}
-      className="w-full border rounded p-2"
-    />
-  </div>
+                    {/* Eingetroffene Menge */}
+                    <div className="mb-4">
+                      <label className="block mb-1">eingetroffene Menge</label>
+                      <input
+                        type="number"
+                        onChange={(e) => setMenge(Number(e.target.value))}
+                        className="w-full border rounded p-2"
+                      />
+                    </div>
 
-  {/* Drei Teile nebeneinander */}
-  <div className="flex flex-row gap-4">
-    {/* Guter Teil */}
-    <div className="flex-1 p-4 border rounded">
-      <h3 className="font-semibold mb-2">Guter Teil</h3>
-      <label className="block">Menge</label>
-      <input
-        type="number"
-        value={guterMenge}
-        onChange={(e) => setGuterMenge(Number(e.target.value))}
-        className="w-full mb-2 border rounded p-2"
-      />
+                    {/* Drei Teile nebeneinander */}
+                    <div className="flex flex-row gap-4">
+                      {/* Guter Teil */}
+                      <div className="flex-1 p-4 border rounded">
+                        <h3 className="font-semibold mb-2">Guter Teil</h3>
+                        <label className="block">Menge</label>
+                        <input
+                          type="number"
+                          value={guterMenge}
+                          onChange={(e) => setGuterMenge(Number(e.target.value))}
+                          className="w-full mb-2 border rounded p-2"
+                        />
 
-      {order.material.category.toLowerCase() === "t-shirt" ? (
-        <>
-          <label className="block">Saugfähigkeit</label>
-          <input
-            type="number"
-            value={guterSaugfaehigkeit}
-            onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
-            className="w-full mb-2 border rounded p-2"
-          />
-          <label className="block">Weißgrad</label>
-          <input
-            type="number"
-            value={guterWeissgrad}
-            onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
-            className="w-full border rounded p-2"
-          />
-        </>
-      ) : (
-        <>
-          <label className="block">Viskosität</label>
-          <input
-            type="number"
-            value={guterViskositaet}
-            onChange={(e) => setGuterViskositaet(Number(e.target.value))}
-            className="w-full mb-2 border rounded p-2"
-          />
-          <label className="block">Ppml</label>
-          <input
-            type="number"
-            value={guterPpml}
-            onChange={(e) => setGuterPpml(Number(e.target.value))}
-            className="w-full mb-2 border rounded p-2"
-          />
-          <label className="block">DeltaE</label>
-          <input
-            type="number"
-            value={guterDeltaE}
-            onChange={(e) => setGuterDeltaE(Number(e.target.value))}
-            className="w-full border rounded p-2"
-          />
-        </>
-      )}
-    </div>
+                        {order.material.category.toLowerCase() === "t-shirt" ? (
+                          <>
+                            <label className="block">Saugfähigkeit</label>
+                            <input
+                              type="number"
+                              value={guterSaugfaehigkeit}
+                              onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
+                              className="w-full mb-2 border rounded p-2"
+                            />
+                            <label className="block">Weißgrad</label>
+                            <input
+                              type="number"
+                              value={guterWeissgrad}
+                              onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
+                              className="w-full border rounded p-2"
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <label className="block">Viskosität</label>
+                            <input
+                              type="number"
+                              value={guterViskositaet}
+                              onChange={(e) => setGuterViskositaet(Number(e.target.value))}
+                              className="w-full mb-2 border rounded p-2"
+                            />
+                            <label className="block">Ppml</label>
+                            <input
+                              type="number"
+                              value={guterPpml}
+                              onChange={(e) => setGuterPpml(Number(e.target.value))}
+                              className="w-full mb-2 border rounded p-2"
+                            />
+                            <label className="block">DeltaE</label>
+                            <input
+                              type="number"
+                              value={guterDeltaE}
+                              onChange={(e) => setGuterDeltaE(Number(e.target.value))}
+                              className="w-full border rounded p-2"
+                            />
+                          </>
+                        )}
+                      </div>
 
-    {/* Gesperrter Teil */}
-    <div className="flex-1 p-4 border rounded">
-      <h3 className="font-semibold mb-2">Gesperrter Teil</h3>
-      <label className="block">Menge</label>
-      <input
-        type="number"
-        value={gesperrtMenge}
-        onChange={(e) => setGesperrtMenge(Number(e.target.value))}
-        className="w-full mb-2 border rounded p-2"
-      />
+                      {/* Gesperrter Teil */}
+                      <div className="flex-1 p-4 border rounded">
+                        <h3 className="font-semibold mb-2">Gesperrter Teil</h3>
+                        <label className="block">Menge</label>
+                        <input
+                          type="number"
+                          value={gesperrtMenge}
+                          onChange={(e) => setGesperrtMenge(Number(e.target.value))}
+                          className="w-full mb-2 border rounded p-2"
+                        />
 
-      {order.material.category.toLowerCase() === "t-shirt" ? (
-        <>
-          <label className="block">Saugfähigkeit</label>
-          <input
-            type="number"
-            value={gesperrtSaugfaehigkeit}
-            onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
-            className="w-full mb-2 border rounded p-2"
-          />
-          <label className="block">Weißgrad</label>
-          <input
-            type="number"
-            value={gesperrtWeissgrad}
-            onChange={(e) => setGesperrtWeissgrad(Number(e.target.value))}
-            className="w-full border rounded p-2"
-          />
-        </>
-      ) : (
-        <>
-          <label className="block">Viskosität</label>
-          <input
-            type="number"
-            value={gesperrtViskositaet}
-            onChange={(e) => setGesperrtViskositaet(Number(e.target.value))}
-            className="w-full mb-2 border rounded p-2"
-          />
-          <label className="block">Ppml</label>
-          <input
-            type="number"
-            value={gesperrtPpml}
-            onChange={(e) => setGesperrtPpml(Number(e.target.value))}
-            className="w-full mb-2 border rounded p-2"
-          />
-          <label className="block">DeltaE</label>
-          <input
-            type="number"
-            value={gesperrtDeltaE}
-            onChange={(e) => setGesperrtDeltaE(Number(e.target.value))}
-            className="w-full border rounded p-2"
-          />
-        </>
-      )}
-    </div>
+                        {order.material.category.toLowerCase() === "t-shirt" ? (
+                          <>
+                            <label className="block">Saugfähigkeit</label>
+                            <input
+                              type="number"
+                              value={gesperrtSaugfaehigkeit}
+                              onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
+                              className="w-full mb-2 border rounded p-2"
+                            />
+                            <label className="block">Weißgrad</label>
+                            <input
+                              type="number"
+                              value={gesperrtWeissgrad}
+                              onChange={(e) => setGesperrtWeissgrad(Number(e.target.value))}
+                              className="w-full border rounded p-2"
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <label className="block">Viskosität</label>
+                            <input
+                              type="number"
+                              value={gesperrtViskositaet}
+                              onChange={(e) => setGesperrtViskositaet(Number(e.target.value))}
+                              className="w-full mb-2 border rounded p-2"
+                            />
+                            <label className="block">Ppml</label>
+                            <input
+                              type="number"
+                              value={gesperrtPpml}
+                              onChange={(e) => setGesperrtPpml(Number(e.target.value))}
+                              className="w-full mb-2 border rounded p-2"
+                            />
+                            <label className="block">DeltaE</label>
+                            <input
+                              type="number"
+                              value={gesperrtDeltaE}
+                              onChange={(e) => setGesperrtDeltaE(Number(e.target.value))}
+                              className="w-full border rounded p-2"
+                            />
+                          </>
+                        )}
+                      </div>
 
-      <div className="flex-1 p-4 border rounded">
-        <h3 className="font-semibold mb-2">Reklamierter Teil</h3>
-        <label className="block">Menge</label>
-        <input
-          type="number"
-          value={reklamiertMenge}
-          onChange={(e) => setReklamiertMenge(Number(e.target.value))}
-          className="w-full border rounded p-2"
-        />
-      </div>
+                      <div className="flex-1 p-4 border rounded">
+                        <h3 className="font-semibold mb-2">Reklamierter Teil</h3>
+                        <label className="block">Menge</label>
+                        <input
+                          type="number"
+                          value={reklamiertMenge}
+                          onChange={(e) => setReklamiertMenge(Number(e.target.value))}
+                          className="w-full border rounded p-2"
+                        />
+                      </div>
 
-  </div>
+                    </div>
 
-  <div className="mt-6">
-    <Button onClick={handleWareneingang}>Anlegen</Button>
-  </div>
-</DialogContent>
-</Dialog>
+                    <div className="mt-6">
+                      <Button onClick={handleWareneingang}>Anlegen</Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
 
               </>
             )}
