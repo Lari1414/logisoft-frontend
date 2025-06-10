@@ -42,6 +42,8 @@ const MaterialTable = ({ onRefetch }: MaterialTableProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<Material>>({});
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const { data: lagerList = [] } = useGetLagerQuery();
   useEffect(() => {
     if (onRefetch && refetch) {
@@ -180,17 +182,44 @@ const MaterialTable = ({ onRefetch }: MaterialTableProps) => {
   ];
 
   const transformedData = useMemo(() => {
-    return (data || []).map((item) => ({
+    const allData = (data || []).map((item) => ({
       ...item,
       id: item.material_ID.toString(),
     }));
-  }, [data]);
+
+    if (!searchTerm.trim()) return allData;
+
+    return allData.filter((item) => {
+      const search = searchTerm.toLowerCase();
+      return [
+        item.category,
+        item.typ,
+        item.groesse,
+        item.url,
+        lagerMap[item.lager_ID],
+        item.farbe
+      ]
+        .filter(Boolean)
+        .some((val) => val.toLowerCase().includes(search));
+    });
+  }, [data, searchTerm, lagerMap]);
 
   if (isLoading) return <div>Lädt...</div>;
   if (error) return <div>Fehler beim Laden der Materialien.</div>;
 
   return (
     <>
+      <div className="mb-4">
+        <Input
+          placeholder="Material suchen..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="
+        w-40 focus:w-72 transition-all duration-300 ease-in-out
+        px-2 py-1 text-sm focus:shadow-md
+      "
+        />
+      </div>
       <DataTable data={transformedData} columns={columns} />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Eye } from "react-bootstrap-icons";
 import { IoExit } from "react-icons/io5";
+import { Input } from "@/components/ui/input";
 
 // Define the type for the transformed data
 export interface TransformedData {
@@ -45,8 +46,10 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [selectedQualitaet, setSelectedQualitaet] = useState<TransformedData | null>(null);
   const [isQualitaetDialogOpen, setIsQualitaetDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Transform the data into the correct shape
+
+
   const transformedData = useMemo(() => (
     (data || []).map((item) => {
       // type assertion: material als erweitertes Objekt mit farbe_json
@@ -88,6 +91,19 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick 
       };
     })
   ), [data]);
+
+  const filteredData = useMemo(() => {
+    return transformedData.filter((row) => {
+      const term = searchTerm.toLowerCase();
+      return (
+        row.category.toLowerCase().includes(term) ||
+        row.farbe.toLowerCase().includes(term) ||
+        row.typ.toLowerCase().includes(term) ||
+        (row.groesse?.toLowerCase().includes(term) ?? false)
+      );
+    });
+  }, [searchTerm, transformedData]);
+
   useEffect(() => {
     if (onRefetch && refetch) {
       onRefetch(refetch);
@@ -191,13 +207,24 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick 
 
   return (
     <>
-      <DataTable
-        data={transformedData}
-        columns={columns}
-        rowSelection={rowSelection}
-        onRowSelectionChange={handleRowSelectionChange}
-      />
+      <div className="flex flex-col gap-4">
+        <Input
+          placeholder="Rohrmaterial  suchen..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="
+        w-40 focus:w-72 transition-all duration-300 ease-in-out
+        px-2 py-1 text-sm focus:shadow-md
+      "
+        />
 
+        <DataTable
+          data={filteredData}
+          columns={columns}
+          rowSelection={rowSelection}
+          onRowSelectionChange={handleRowSelectionChange}
+        />
+      </div>
       {/* Qualitätswerte Dialog */}
       <Dialog open={isQualitaetDialogOpen} onOpenChange={setIsQualitaetDialogOpen}>
         <DialogContent>
