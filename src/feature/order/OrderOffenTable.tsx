@@ -5,8 +5,12 @@ import { orderApi } from "@/api/endpoints/orderApi.ts";
 import { Order } from "@/models/order";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Store, Send } from "lucide-react";
+import Select from "react-select";
+import { Store, Send, Edit } from "lucide-react";
 import { wareneingangApi } from "@/api/endpoints/wareneingangApi.ts";
+import { lieferantApi } from "@/api/endpoints/lieferantApi.ts";
+import { materialApi } from "@/api/endpoints/materialApi.ts";
+import { components } from "react-select";
 
 interface OrderOffenTableProps {
   onSelectionChange?: (selectedRows: (Order & { id: string })[]) => void;
@@ -17,6 +21,49 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
   const { data, isLoading, error, refetch } = orderApi.useGetOpenOrdersQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [, setSelectedOrders] = useState<(Order & { id: string })[]>([]);
+  const { data: lieferanten = [] } = lieferantApi.useGetLieferantQuery();
+    const { data: materialien = [] } = materialApi.useGetMaterialQuery();
+  
+    const materialOptions = materialien
+      .filter((m) => m.lager_ID === 1)
+      .map((m) => ({
+        value: m.material_ID,
+        label: `${m.typ} – ${m.farbe} – ${m.groesse}`,
+        color: m.farbe?.toLowerCase() ?? "transparent",
+      }));
+  const ColourOption = (props: any) => (
+      <components.Option {...props}>
+        <div className="flex items-center space-x-2">
+          <div
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: "50%",
+              backgroundColor: props.data.color || "#ccc",
+              border: "1px solid #999",
+            }}
+          />
+          <span>{props.label}</span>
+        </div>
+      </components.Option>
+    );
+  
+    const ColourSingleValue = (props: any) => (
+      <components.SingleValue {...props}>
+        <div className="flex items-center space-x-2">
+          <div
+            style={{
+              width: 16,
+              height: 16,
+              borderRadius: "50%",
+              backgroundColor: props.data.color || "#ccc",
+              border: "1px solid #999",
+            }}
+          />
+          <span>{props.data.label}</span>
+        </div>
+      </components.SingleValue>
+    );
 
   const transformedData = useMemo(() => {
     return (data || []).map((item) => ({
@@ -91,6 +138,13 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
 
         const [openDialog, setOpenDialog] = useState(false);
 
+          //Bearbeiten
+                const [openEditDialog, setOpenEditDialog] = useState(false);
+                const [lieferantId, setLieferantId] = useState(order.lieferant_ID);
+                const [materialId, setMaterialId] = useState(order.material_ID);
+                const [updateOrder] = orderApi.useUpdateOrderMutation();
+        
+
         const [guterMenge, setGuterMenge] = useState<number>(0);
         const [gesperrtMenge, setGesperrtMenge] = useState<number>(0);
         const [reklamiertMenge, setReklamiertMenge] = useState<number>(0);
@@ -122,6 +176,34 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
             alert(`Fehler beim Absenden der Bestellung ${order.materialbestellung_ID}!`);
           }
         };
+
+         //bearbeiten
+                useEffect(() => {
+                  if (openEditDialog) {
+                    setLieferantId(order.lieferant_ID);
+                    setMaterialId(order.material_ID);
+                    setMenge(order.menge);
+                  }
+                }, [openEditDialog, order]);
+        
+                const handleSave = async () => {
+                  try {
+                    await updateOrder({
+                      id: order.materialbestellung_ID,
+                      data: {
+                        lieferant_ID: lieferantId,
+                        material_ID: materialId,
+                        menge: menge,
+                      },
+                    }).unwrap();
+                    setOpenEditDialog(false);
+        
+                  } catch (error) {
+                    console.log({ lieferantId, materialId, menge });
+        
+                  }
+                };
+        
 
         const handleWareneingang = async () => {
           try {
@@ -162,9 +244,82 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
         return (
           <div className="flex gap-2">
             {row.original.status === "offen" && (
+              <>
             <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center hover:bg-green-100 gap-2" title="Absenden">
               <Send size={18} />
             </Button>
+            <Button
+                  variant="ghost"
+                  onClick={() => setOpenEditDialog(true)}
+                  className="flex items-center hover:bg-blue-100 gap-2"
+                  title="Bearbeiten"
+                >
+                  <Edit size={18} />
+                </Button>
+                {/** Bestellung bearbeiten */}
+                <Dialog open={openEditDialog} onOpenChange={setOpenEditDialog}>
+                  <DialogContent className="max-w-md w-full">
+                    <DialogHeader>
+                      <DialogTitle>Bestellung bearbeiten</DialogTitle>
+                    </DialogHeader>
+
+                    <div className="flex flex-col gap-4 mt-4">
+                      {/* Lieferant Select */}
+                      <div>
+                        <label className="block mb-1 font-medium" htmlFor="lieferant_ID">Lieferant</label>
+                        <select
+                          id="lieferant_ID"
+                          value={lieferantId}
+                          onChange={(e) => setLieferantId(Number(e.target.value))}
+                          className="w-full border rounded p-2"
+                        >
+                          <option value="">Bitte wählen</option>
+                          {lieferanten.map((l) => (
+                            <option key={l.lieferant_ID} value={l.lieferant_ID}>
+                              {l.firmenname}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Material Select mit react-select */}
+                      <div>
+                        <label className="block mb-1 font-medium" htmlFor="material_ID">Material</label>
+                        <Select
+                          inputId="material_ID"
+                          name="material_ID"
+                          options={materialOptions}
+                          value={materialOptions.find((m) => m.value.toString() === materialId.toString())}
+                          onChange={(selected) =>
+                            setMaterialId(selected ? Number(selected.value) : 0) 
+                          }
+                        components={{ Option: ColourOption, SingleValue: ColourSingleValue }}
+                          className="w-full"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block mb-1 font-medium">Menge</label>
+                        <input
+                          type="number"
+                          value={menge}
+                          onChange={(e) => setMenge(Number(e.target.value))}
+                          className="w-full border rounded p-2"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end gap-2">
+                      <Button variant="secondary" onClick={() => setOpenEditDialog(false)}>
+                        Abbrechen
+                      </Button>
+                      <Button onClick={handleSave} disabled={isUpdating}>
+                        {isUpdating ? "Speichern..." : "Speichern"}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </>
             )}
             
             {order.status === "bestellt" && (
