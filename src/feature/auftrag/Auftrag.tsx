@@ -14,11 +14,11 @@ import AuslagerungsAuftraegeTable from "@/feature/auftrag/AuftragAuslagerungTabl
 const Auftrag = () => {
   const [activeTab, setActiveTab] = useState("offen");
   //const [createAuftrag, { isLoading }] = auftragApi.useCreateAuftragMutation();
-  const [storeMaterial,{ isLoading }] = auftragApi.useStoreMaterialMutation();
+  const [storeMaterial, { isLoading }] = auftragApi.useStoreMaterialMutation();
   const [outsourceMaterial] = auftragApi.useOutsourceMaterialMutation();
   const [selectedRows, setSelectedRows] = useState<TransformedAuftrag[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const [refetchTable, setRefetchTable] = useState<(() => void) | null>(null);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
@@ -26,9 +26,9 @@ const Auftrag = () => {
   };
 
   const handleSetRefetch = useCallback((refetchFn: () => void) => {
-      setRefetchTable(() => refetchFn);
+    setRefetchTable(() => refetchFn);
   }, []);
-  
+
   const handleSelectionChange = useCallback((rows: TransformedAuftrag[]) => {
     setSelectedRows(rows.filter(row => row !== undefined));
   }, []);
@@ -38,33 +38,33 @@ const Auftrag = () => {
     setIsModalOpen(true);
   };
 
-const handleConfirm = async () => {
-  const einlagerungAuftraege = selectedRows.filter(a => a.status === "Einlagerung angefordert");
-  const auslagerungAuftraege = selectedRows.filter(a => a.status === "Auslagerung angefordert");
+  const handleConfirm = async () => {
+    const einlagerungAuftraege = selectedRows.filter(a => a.status === "einlagerung angefordert");
+    const auslagerungAuftraege = selectedRows.filter(a => a.status === "auslagerung angefordert");
 
-  try {
-    if (einlagerungAuftraege.length > 0) {
-      const auftragIds = einlagerungAuftraege.map(a => a.auftrag_ID);
-      await storeMaterial({ auftragIds });
-      console.log("Einlagerungsaufträge ausgeführt:", auftragIds);
+    try {
+      if (einlagerungAuftraege.length > 0) {
+        const auftragIds = einlagerungAuftraege.map(a => a.auftrag_ID);
+        await storeMaterial({ auftragIds });
+        console.log("Einlagerungsaufträge ausgeführt:", auftragIds);
+      }
+
+      if (auslagerungAuftraege.length > 0) {
+        const auftragIds = auslagerungAuftraege.map(a => a.auftrag_ID);
+        await outsourceMaterial({ auftragIds });
+        console.log("Auslagerungsaufträge ausgeführt:", auftragIds);
+      }
+
+
+
+    } catch (error) {
+      console.error("Fehler beim Ausführen der Aufträge:", error);
     }
 
-    if (auslagerungAuftraege.length > 0) {
-      const auftragIds = auslagerungAuftraege.map(a => a.auftrag_ID);
-      await outsourceMaterial({ auftragIds });
-      console.log("Auslagerungsaufträge ausgeführt:", auftragIds);
-    }
-
-
-
-  } catch (error) {
-    console.error("Fehler beim Ausführen der Aufträge:", error);
-  }
-
-  setIsModalOpen(false);
-  setSelectedRows([]);
-   if (refetchTable) refetchTable();
-};
+    setIsModalOpen(false);
+    setSelectedRows([]);
+    if (refetchTable) refetchTable();
+  };
 
 
   return (
