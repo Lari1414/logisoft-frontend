@@ -43,15 +43,12 @@ export const orderApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Order"],
     }),
-    //
-    updateOrder: builder.mutation<
-      Order,
-      { id: string; status: Order["status"] }
-    >({
-      query: ({ id, status }) => ({
-        url: `/materialbestellungen/${id}`,
-        method: "PATCH",
-        body: { status },
+    // Betstellung Aktualisieren
+    updateOrder: builder.mutation<Order, { id: number; data: Partial<CreateOrderRequest> }>({
+        query: ({ id, data }) => ({
+       url: `/materialbestellungen/${id}`,
+       method: "PUT",
+       body: data,  
       }),
       invalidatesTags: ["Order"],
     }),
