@@ -1,34 +1,148 @@
-import { ColumnDef } from "@tanstack/react-table";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { ColumnDef, RowSelectionState, Updater } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table";
-import { auftragApi } from "@/api/endpoints/auftragApi.ts";
+import { auftragApi } from "@/api/endpoints/auftragApi";
 import { Auftrag } from "@/models/auftrag";
+import { materialApi } from "@/api/endpoints/materialApi";
 
-const AuftragAuslagerungTable = () => {
-  const { data, isLoading, error } = auftragApi.useGetAuslagerungsAuftraegeQuery();
+// Zusätzlicher Typ für die transformierten Daten
+export interface TransformedAuftrag extends Auftrag {
+  id: string;
+  category: string;
+  farbe: string;
+  typ: string;
+  groesse: string;
+}
 
-  if (isLoading) return <div>Lädt...</div>;
-  if (error) return <div>Fehler beim Laden der Daten.</div>;
+// Props für Übergabe der ausgewählten Zeilen
+interface AuftragTableProps {
+  onSelectionChange: (selectedRows: TransformedAuftrag[]) => void;
+  onRefetch?: (refetchFn: () => void) => void;
+}
 
-  const transformedData = (data || []).map((item: Auftrag) => ({
-    ...item,
-    id: item.auftrag_ID.toString(), // besser als material_ID, weil eindeutiger
-  }));
+const AuftragAuslagerungTable = ({ onSelectionChange, onRefetch }: AuftragTableProps) => {
+  const { data, isLoading, error, refetch } = auftragApi.useGetAuslagerungsAuftraegeQuery();
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const { data: materialsData } = materialApi.useGetMaterialQuery();
 
-  const columns: ColumnDef<Auftrag & { id: string }>[] = [
+  const transformedData: TransformedAuftrag[] = useMemo(() => {
+    if (!data || !materialsData) return [];
+
+    const seen = new Set<number>();
+
+    return data
+      .filter((item) => {
+        if (seen.has(item.auftrag_ID)) return false;
+        seen.add(item.auftrag_ID);
+        return true;
+      })
+      .map((item: Auftrag) => {
+        const material = materialsData.find((m) => m.material_ID === item.material_ID);
+
+        return {
+          ...item,
+          id: item.auftrag_ID.toString(),
+          category: material?.category ?? "",
+          farbe: material?.farbe ?? "",
+          typ: material?.typ ?? "",
+          groesse: material?.groesse ?? "",
+        };
+      });
+  }, [data, materialsData]);
+
+
+  // Auswahländerungen weiterreichen
+  useEffect(() => {
+    const selected = transformedData.filter(row => rowSelection[row.id]);
+    onSelectionChange(selected);
+  }, [rowSelection, transformedData, onSelectionChange]);
+
+  useEffect(() => {
+    if (onRefetch && refetch) {
+      onRefetch(refetch);
+    }
+  }, [onRefetch, refetch]);
+
+  const handleRowSelectionChange = useCallback(
+    (updater: Updater<RowSelectionState>) => {
+      setRowSelection((prev) =>
+        typeof updater === "function" ? updater(prev) : updater
+      );
+    },
+    []
+  );
+
+  const columns: ColumnDef<TransformedAuftrag>[] = [
+    {
+      id: "select",
+      header: () => null,
+      cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={row.getIsSelected()}
+          onChange={() => row.toggleSelected()}
+        />
+      ),
+    },
     { accessorKey: "auftrag_ID", header: "Auftrag-ID" },
     { accessorKey: "material_ID", header: "Material-ID" },
+    {
+      accessorFn: (row) => row.category,
+      id: "category",
+      header: "Kategorie",
+    },
+    {
+      accessorKey: "farbe",
+      header: "Farbe",
+      cell: ({ getValue }) => {
+        const color = getValue() as string;
+        return (
+          <div className="flex items-center gap-2">
+            <div
+              className="w-4 h-4 rounded-full border"
+              style={{ backgroundColor: color }}
+            />
+            <span>{color}</span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorFn: (row) => row.typ,
+      id: "typ",
+      header: "Typ",
+    },
+    {
+      accessorFn: (row) => row.groesse,
+      id: "groesse",
+      header: "Größe",
+    },
     { accessorKey: "menge", header: "Menge" },
-    { accessorKey: "status", header: "Status",cell: ({ getValue }) => (
+    {
+      accessorKey: "status", header: "Status", cell: ({ getValue }) => (
         <span className="px-2 py-1 rounded bg-yellow-400 text-black">
           {getValue() as string}
         </span>
-      ), },
+      ),
+    },
     { accessorKey: "lagerbestand_ID", header: "Lagerbestand-ID" },
     { accessorKey: "bestellposition", header: "Bestellposition" },
     { accessorKey: "angefordertVon", header: "Angefordert Von" },
   ];
 
-  return <DataTable data={transformedData} columns={columns} />;
+  if (isLoading) return <div>Lädt...</div>;
+  if (error) return <div>Fehler beim Laden der Daten.</div>;
+
+  return (
+    <DataTable
+      data={transformedData}
+      columns={columns}
+      rowSelection={rowSelection}
+      onRowSelectionChange={handleRowSelectionChange}
+    />
+  );
 };
 
 export default AuftragAuslagerungTable;
+
+

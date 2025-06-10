@@ -96,11 +96,11 @@ const Auftrag = () => {
         )}
 
         {activeTab === "einlagerung" && (
-          <EinlagerungsAuftraegeTable />
+          <EinlagerungsAuftraegeTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} />
         )}
 
         {activeTab === "auslagerung" && (
-          <AuslagerungsAuftraegeTable />
+          <AuslagerungsAuftraegeTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} />
         )}
 
         {activeTab === "historie" && (

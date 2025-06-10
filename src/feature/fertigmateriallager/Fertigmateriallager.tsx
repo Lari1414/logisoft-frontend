@@ -19,26 +19,26 @@ const FertigMateriallager = () => {
   const [mengenMap, setMengenMap] = useState<Record<number, string>>({});
 
 
-const [materialForm, setMaterialForm] = useState<Record<string, any>>({
-  cyan: 0,
-  magenta: 0,
-  yellow: 0,
-  black: 0,
-  menge: 0,
-  standardmaterial: false,
-  typ: "",
-  groesse: "",
-  url: "",
-  category: "",
-});
+  const [materialForm, setMaterialForm] = useState<Record<string, any>>({
+    cyan: 0,
+    magenta: 0,
+    yellow: 0,
+    black: 0,
+    menge: 0,
+    standardmaterial: false,
+    typ: "",
+    groesse: "",
+    url: "",
+    category: "",
+  });
 
-const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value } = e.target;
-  setMaterialForm((prev) => ({
-    ...prev,
-    [name]: value,
-  }));
-};
+  const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setMaterialForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const [einzelAuslagerung, setEinzelAuslagerung] = useState<TransformedData | null>(null);
   const [mengeEinzel, setMengeEinzel] = useState<string>("");
@@ -95,80 +95,80 @@ const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   };
 
   const handleEinzelAuslagernClick = (row: TransformedData) => {
-      setEinzelAuslagerung(row);
-      setMengeEinzel("");
-      setIsModalOpen(true);
-    };
-  
-    // Confirm für Einzel-Auslagerung
-    const confirmEinzelAuslagerung = async () => {
-      if (!einzelAuslagerung) return;
-      const menge = parseFloat(mengeEinzel);
-      if (isNaN(menge) || menge <= 0 || menge > einzelAuslagerung.menge) {
-        alert("Ungültige Menge");
-        return;
-      }
-  
-      try {
-        await outsourceFertigmaterial({
-          lagerbestand_ID: einzelAuslagerung.lagerbestand_ID,
-          menge: menge,
-        });
-        if (refetchTable) refetchTable();
-      } catch (error) {
-        console.error("Fehler beim Auslagern:", error);
-      }
-  
-      setIsModalOpen(false);
-      setEinzelAuslagerung(null);
-      setMengeEinzel("");
-    };
-
- /* const handleNewMaterialChange = (field: keyof storeMaterialRequest, value: string | number) => {
-    setNewMaterial((prev) => ({
-      ...prev,
-      [field]: typeof prev[field] === "number" ? Number(value) : value,
-    }));
-  }; */
-
- const handleStoreMaterial = async () => {
-  const newMaterial: storeMaterialRequest = {
-    lager_ID: 2,
-    menge: Number(materialForm.menge),
-    farbe_json: {
-      cyan: Number(materialForm.cyan),
-      magenta: Number(materialForm.magenta),
-      yellow: Number(materialForm.yellow),
-      black: Number(materialForm.black),
-    },
-    standardmaterial: materialForm.standardmaterial,
-    typ: materialForm.typ,
-    groesse: materialForm.groesse,
-    url: materialForm.url,
-    category: materialForm.category
+    setEinzelAuslagerung(row);
+    setMengeEinzel("");
+    setIsModalOpen(true);
   };
 
-  try {
-    await storeMaterial(newMaterial);
-    setIsEinlagernModalOpen(false);
-    setMaterialForm({
-      cyan: 0,
-      magenta: 0,
-      yellow: 0,
-      black: 0,
-      menge: 0,
-      standardmaterial: false,
-      typ: "",
-      groesse: "",
-      url: "",
-      category: ""
-    });
+  // Confirm für Einzel-Auslagerung
+  const confirmEinzelAuslagerung = async () => {
+    if (!einzelAuslagerung) return;
+    const menge = parseFloat(mengeEinzel);
+    if (isNaN(menge) || menge <= 0 || menge > einzelAuslagerung.menge) {
+      alert("Ungültige Menge");
+      return;
+    }
 
-    if (refetchTable) refetchTable();
-  } catch (error) {
-    console.error("Fehler beim Einlagern:", error);
-  }
-};
+    try {
+      await outsourceFertigmaterial({
+        lagerbestand_ID: einzelAuslagerung.lagerbestand_ID,
+        menge: menge,
+      });
+      if (refetchTable) refetchTable();
+    } catch (error) {
+      console.error("Fehler beim Auslagern:", error);
+    }
+
+    setIsModalOpen(false);
+    setEinzelAuslagerung(null);
+    setMengeEinzel("");
+  };
+
+  /* const handleNewMaterialChange = (field: keyof storeMaterialRequest, value: string | number) => {
+     setNewMaterial((prev) => ({
+       ...prev,
+       [field]: typeof prev[field] === "number" ? Number(value) : value,
+     }));
+   }; */
+
+  const handleStoreMaterial = async () => {
+    const newMaterial: storeMaterialRequest = {
+      lager_ID: 2,
+      menge: Number(materialForm.menge),
+      farbe_json: {
+        cyan: Number(materialForm.cyan),
+        magenta: Number(materialForm.magenta),
+        yellow: Number(materialForm.yellow),
+        black: Number(materialForm.black),
+      },
+      standardmaterial: materialForm.standardmaterial,
+      typ: materialForm.typ,
+      groesse: materialForm.groesse,
+      url: materialForm.url,
+      category: materialForm.category
+    };
+
+    try {
+      await storeMaterial(newMaterial);
+      setIsEinlagernModalOpen(false);
+      setMaterialForm({
+        cyan: 0,
+        magenta: 0,
+        yellow: 0,
+        black: 0,
+        menge: 0,
+        standardmaterial: false,
+        typ: "",
+        groesse: "",
+        url: "",
+        category: ""
+      });
+
+      if (refetchTable) refetchTable();
+    } catch (error) {
+      console.error("Fehler beim Einlagern:", error);
+    }
+  };
 
   const isConfirmDisabled = selectedRows.some((item) => {
     const menge = parseFloat(mengenMap[item.lagerbestand_ID]);
@@ -176,22 +176,22 @@ const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   });
 
   function cmykToRgb(c: number, m: number, y: number, k: number) {
-   
-      c /= 100;
-      m /= 100;
-      y /= 100;
-      k /= 100;
 
-      const r = 255 * (1 - c) * (1 - k);
-      const g = 255 * (1 - m) * (1 - k);
-      const b = 255 * (1 - y) * (1 - k);
+    c /= 100;
+    m /= 100;
+    y /= 100;
+    k /= 100;
 
-      return { r: Math.round(r), g: Math.round(g), b: Math.round(b) };
+    const r = 255 * (1 - c) * (1 - k);
+    const g = 255 * (1 - m) * (1 - k);
+    const b = 255 * (1 - y) * (1 - k);
+
+    return { r: Math.round(r), g: Math.round(g), b: Math.round(b) };
   }
 
   return (
     <BaseContentLayout title="Fertigmaterial Lager">
-      <FertigMateriallagerTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch}  onAuslagernClick={handleEinzelAuslagernClick}/>
+      <FertigMateriallagerTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} onAuslagernClick={handleEinzelAuslagernClick} />
       <div className="flex gap-4 mb-4">
         <Button onClick={() => setIsEinlagernModalOpen(true)} disabled={isStoring}>
           <Grid2x2Plus className="mr-2 h-4 w-4" />
@@ -210,7 +210,7 @@ const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             {einzelAuslagerung ? "Material auslagern" : "Materialien auslagern"}
           </DialogHeader>
 
-         {einzelAuslagerung ? (
+          {einzelAuslagerung ? (
             <div className="mb-4 p-4 border rounded">
               <div className="font-bold">
                 {einzelAuslagerung.category} - {einzelAuslagerung.farbe} (Lagerbestand-ID: {einzelAuslagerung.lagerbestand_ID} / Material-ID: {einzelAuslagerung.material_ID})
@@ -275,124 +275,124 @@ const handleMaterialChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       </Dialog>
 
       {/* Einlagern Dialog */}
-   <Dialog open={isEinlagernModalOpen} onOpenChange={setIsEinlagernModalOpen}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Material einlagern</DialogTitle>
-    </DialogHeader>
+      <Dialog open={isEinlagernModalOpen} onOpenChange={setIsEinlagernModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Material einlagern</DialogTitle>
+          </DialogHeader>
 
-    <div className="space-y-4">
-      {/* Menge */}
-      <div className="flex flex-col space-y-1">
-        <label htmlFor="menge" className="text-sm font-medium text-gray-700">
-          Menge
-        </label>
-        <Input
-          name="menge"
-          type="number"
-          placeholder="Menge"
-          value={materialForm.menge}
-          onChange={handleMaterialChange}
-        />
-      </div>
+          <div className="space-y-4">
+            {/* Menge */}
+            <div className="flex flex-col space-y-1">
+              <label htmlFor="menge" className="text-sm font-medium text-gray-700">
+                Menge
+              </label>
+              <Input
+                name="menge"
+                type="number"
+                placeholder="Menge"
+                value={materialForm.menge}
+                onChange={handleMaterialChange}
+              />
+            </div>
 
-    {/* Farbe */}
-    <div className="col-span-2">
-      <div className="flex items-center space-x-3 mb-2">
-        <label className="block font-medium">Farbe</label>
-        <div
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: "50%",
-            border: "1px solid #ccc",
-            backgroundColor: (() => {
-              const { r, g, b } = cmykToRgb(
-                Number(materialForm.cyan),
-                Number(materialForm.magenta),
-                Number(materialForm.yellow),
-                Number(materialForm.black)
-              );
-              return `rgb(${r}, ${g}, ${b})`;
-            })(),
-            transition: "background-color 0.3s ease",
-          }}
-        />
-      </div>
+            {/* Farbe */}
+            <div className="col-span-2">
+              <div className="flex items-center space-x-3 mb-2">
+                <label className="block font-medium">Farbe</label>
+                <div
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: "50%",
+                    border: "1px solid #ccc",
+                    backgroundColor: (() => {
+                      const { r, g, b } = cmykToRgb(
+                        Number(materialForm.cyan),
+                        Number(materialForm.magenta),
+                        Number(materialForm.yellow),
+                        Number(materialForm.black)
+                      );
+                      return `rgb(${r}, ${g}, ${b})`;
+                    })(),
+                    transition: "background-color 0.3s ease",
+                  }}
+                />
+              </div>
 
-      <div className="flex space-x-4">
-        {[
-          { label: "Cyan", name: "cyan" },
-          { label: "Magenta", name: "magenta" },
-          { label: "Yellow", name: "yellow" },
-          { label: "Black", name: "black" },
-        ].map(({ label, name }) => (
-          <div key={name} className="flex flex-col w-1/4">
-            <label htmlFor={name} className="mb-1 text-sm font-medium">
-              {label}
-            </label>
-            <Input
-              id={name}
-              name={name}
-              value={materialForm[name]}
-              onChange={handleMaterialChange}
-              className="w-full"
-            />
+              <div className="flex space-x-4">
+                {[
+                  { label: "Cyan", name: "cyan" },
+                  { label: "Magenta", name: "magenta" },
+                  { label: "Yellow", name: "yellow" },
+                  { label: "Black", name: "black" },
+                ].map(({ label, name }) => (
+                  <div key={name} className="flex flex-col w-1/4">
+                    <label htmlFor={name} className="mb-1 text-sm font-medium">
+                      {label}
+                    </label>
+                    <Input
+                      id={name}
+                      name={name}
+                      value={materialForm[name]}
+                      onChange={handleMaterialChange}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+
+
+            {/* Typ, Größe, URL */}
+            {[
+              ["typ", "Typ"],
+              ["groesse", "Größe"],
+              ["url", "Bild-URL"],
+              ["category", "Kategorie"],
+            ].map(([field, label]) => (
+              <div key={field} className="flex flex-col space-y-1">
+                <label htmlFor={field} className="text-sm font-medium text-gray-700">
+                  {label}
+                </label>
+                <Input
+                  name={field}
+                  type="text"
+                  placeholder={label}
+                  value={materialForm[field]}
+                  onChange={handleMaterialChange}
+                />
+              </div>
+            ))}
+
+            {/* Standard Material */}
+            <div className="flex flex-col space-y-1">
+              <label htmlFor="standardmaterial" className="text-sm font-medium text-gray-700">
+                Standard Material
+              </label>
+              <select
+                name="standardmaterial"
+                value={materialForm.standardmaterial ? "true" : "false"}
+                onChange={(e) =>
+                  setMaterialForm((prev) => ({
+                    ...prev,
+                    standardmaterial: e.target.value === "true",
+                  }))
+                }
+                className="border rounded px-2 py-1"
+              >
+                <option value="false">Nein</option>
+                <option value="true">Ja</option>
+              </select>
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
 
-
-
-      {/* Typ, Größe, URL */}
-      {[
-        ["typ", "Typ"],
-        ["groesse", "Größe"],
-        ["url", "Bild-URL"],
-        ["category", "Kategorie"],
-      ].map(([field, label]) => (
-        <div key={field} className="flex flex-col space-y-1">
-          <label htmlFor={field} className="text-sm font-medium text-gray-700">
-            {label}
-          </label>
-          <Input
-            name={field}
-            type="text"
-            placeholder={label}
-            value={materialForm[field]}
-            onChange={handleMaterialChange}
-          />
-        </div>
-      ))}
-
-      {/* Standard Material */}
-      <div className="flex flex-col space-y-1">
-        <label htmlFor="standardmaterial" className="text-sm font-medium text-gray-700">
-          Standard Material
-        </label>
-        <select
-          name="standardmaterial"
-          value={materialForm.standardmaterial ? "true" : "false"}
-          onChange={(e) =>
-            setMaterialForm((prev) => ({
-              ...prev,
-              standardmaterial: e.target.value === "true",
-            }))
-          }
-          className="border rounded px-2 py-1"
-        >
-          <option value="false">Nein</option>
-          <option value="true">Ja</option>
-        </select>
-      </div>
-    </div>
-
-    <Button onClick={handleStoreMaterial} disabled={isStoring} className="mt-6">
-      Einlagern
-    </Button>
-  </DialogContent>
-</Dialog>
+          <Button onClick={handleStoreMaterial} disabled={isStoring} className="mt-6">
+            Einlagern
+          </Button>
+        </DialogContent>
+      </Dialog>
 
 
     </BaseContentLayout>

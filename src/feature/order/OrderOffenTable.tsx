@@ -22,48 +22,48 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [, setSelectedOrders] = useState<(Order & { id: string })[]>([]);
   const { data: lieferanten = [] } = lieferantApi.useGetLieferantQuery();
-    const { data: materialien = [] } = materialApi.useGetMaterialQuery();
-  
-    const materialOptions = materialien
-      .filter((m) => m.lager_ID === 1)
-      .map((m) => ({
-        value: m.material_ID,
-        label: `${m.typ} – ${m.farbe} – ${m.groesse}`,
-        color: m.farbe?.toLowerCase() ?? "transparent",
-      }));
+  const { data: materialien = [] } = materialApi.useGetMaterialQuery();
+
+  const materialOptions = materialien
+    .filter((m) => m.lager_ID === 1)
+    .map((m) => ({
+      value: m.material_ID,
+      label: `${m.typ} – ${m.farbe} – ${m.groesse}`,
+      color: m.farbe?.toLowerCase() ?? "transparent",
+    }));
   const ColourOption = (props: any) => (
-      <components.Option {...props}>
-        <div className="flex items-center space-x-2">
-          <div
-            style={{
-              width: 16,
-              height: 16,
-              borderRadius: "50%",
-              backgroundColor: props.data.color || "#ccc",
-              border: "1px solid #999",
-            }}
-          />
-          <span>{props.label}</span>
-        </div>
-      </components.Option>
-    );
-  
-    const ColourSingleValue = (props: any) => (
-      <components.SingleValue {...props}>
-        <div className="flex items-center space-x-2">
-          <div
-            style={{
-              width: 16,
-              height: 16,
-              borderRadius: "50%",
-              backgroundColor: props.data.color || "#ccc",
-              border: "1px solid #999",
-            }}
-          />
-          <span>{props.data.label}</span>
-        </div>
-      </components.SingleValue>
-    );
+    <components.Option {...props}>
+      <div className="flex items-center space-x-2">
+        <div
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            backgroundColor: props.data.color || "#ccc",
+            border: "1px solid #999",
+          }}
+        />
+        <span>{props.label}</span>
+      </div>
+    </components.Option>
+  );
+
+  const ColourSingleValue = (props: any) => (
+    <components.SingleValue {...props}>
+      <div className="flex items-center space-x-2">
+        <div
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            backgroundColor: props.data.color || "#ccc",
+            border: "1px solid #999",
+          }}
+        />
+        <span>{props.data.label}</span>
+      </div>
+    </components.SingleValue>
+  );
 
   const transformedData = useMemo(() => {
     return (data || []).map((item) => ({
@@ -138,12 +138,12 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
 
         const [openDialog, setOpenDialog] = useState(false);
 
-          //Bearbeiten
-                const [openEditDialog, setOpenEditDialog] = useState(false);
-                const [lieferantId, setLieferantId] = useState(order.lieferant_ID);
-                const [materialId, setMaterialId] = useState(order.material_ID);
-                const [updateOrder] = orderApi.useUpdateOrderMutation();
-        
+        //Bearbeiten
+        const [openEditDialog, setOpenEditDialog] = useState(false);
+        const [lieferantId, setLieferantId] = useState(order.lieferant_ID);
+        const [materialId, setMaterialId] = useState(order.material_ID);
+        const [updateOrder] = orderApi.useUpdateOrderMutation();
+
 
         const [guterMenge, setGuterMenge] = useState<number>(0);
         const [gesperrtMenge, setGesperrtMenge] = useState<number>(0);
@@ -177,39 +177,39 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
           }
         };
 
-         //bearbeiten
-                useEffect(() => {
-                  if (openEditDialog) {
-                    setLieferantId(order.lieferant_ID);
-                    setMaterialId(order.material_ID);
-                    setMenge(order.menge);
-                  }
-                }, [openEditDialog, order]);
-        
-                const handleSave = async () => {
-                  try {
-                    await updateOrder({
-                      id: order.materialbestellung_ID,
-                      data: {
-                        lieferant_ID: lieferantId,
-                        material_ID: materialId,
-                        menge: menge,
-                      },
-                    }).unwrap();
-                    setOpenEditDialog(false);
-        
-                  } catch (error) {
-                    console.log({ lieferantId, materialId, menge });
-        
-                  }
-                };
-        
+        //bearbeiten
+        useEffect(() => {
+          if (openEditDialog) {
+            setLieferantId(order.lieferant_ID);
+            setMaterialId(order.material_ID);
+            setMenge(order.menge);
+          }
+        }, [openEditDialog, order]);
+
+        const handleSave = async () => {
+          try {
+            await updateOrder({
+              id: order.materialbestellung_ID,
+              data: {
+                lieferant_ID: lieferantId,
+                material_ID: materialId,
+                menge: menge,
+              },
+            }).unwrap();
+            setOpenEditDialog(false);
+
+          } catch (error) {
+            console.log({ lieferantId, materialId, menge });
+
+          }
+        };
+
 
         const handleWareneingang = async () => {
           try {
             await createWareneingang({
               materialbestellung_ID: order.materialbestellung_ID,
-              lieferdatum: new Date().toISOString().split("T")[0], 
+              lieferdatum: new Date().toISOString().split("T")[0],
               menge: menge,
               guterTeil: {
                 menge: guterMenge,
@@ -245,10 +245,10 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
           <div className="flex gap-2">
             {row.original.status === "offen" && (
               <>
-            <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center hover:bg-green-100 gap-2" title="Absenden">
-              <Send size={18} />
-            </Button>
-            <Button
+                <Button onClick={handleSingleAbsenden} disabled={isUpdating} variant="ghost" className="flex items-center hover:bg-green-100 gap-2" title="Absenden">
+                  <Send size={18} />
+                </Button>
+                <Button
                   variant="ghost"
                   onClick={() => setOpenEditDialog(true)}
                   className="flex items-center hover:bg-blue-100 gap-2"
@@ -291,9 +291,9 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
                           options={materialOptions}
                           value={materialOptions.find((m) => m.value.toString() === materialId.toString())}
                           onChange={(selected) =>
-                            setMaterialId(selected ? Number(selected.value) : 0) 
+                            setMaterialId(selected ? Number(selected.value) : 0)
                           }
-                        components={{ Option: ColourOption, SingleValue: ColourSingleValue }}
+                          components={{ Option: ColourOption, SingleValue: ColourSingleValue }}
                           className="w-full"
                         />
                       </div>
@@ -321,108 +321,108 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
                 </Dialog>
               </>
             )}
-            
+
             {order.status === "bestellt" && (
               <>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setMenge(order.menge);  // hier setzt du die Menge beim Öffnen zurück
-                  setOpenDialog(true);
-                }}
-                disabled={isCreating}
-              >
-                <Store className="h-5 w-5" />
-              </Button>
-             <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-  <DialogContent className="max-w-5xl w-full">
-    <DialogHeader>
-      <DialogTitle>Wareneingang anlegen</DialogTitle>
-    </DialogHeader>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setMenge(order.menge);  // hier setzt du die Menge beim Öffnen zurück
+                    setOpenDialog(true);
+                  }}
+                  disabled={isCreating}
+                >
+                  <Store className="h-5 w-5" />
+                </Button>
+                <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                  <DialogContent className="max-w-5xl w-full">
+                    <DialogHeader>
+                      <DialogTitle>Wareneingang anlegen</DialogTitle>
+                    </DialogHeader>
 
-    {/* Eingetroffene Menge */}
-    <div className="mb-4">
-      <label className="block mb-1">eingetroffene Menge</label>
-      <input
-        type="number"
-        value={menge}
-        onChange={(e) => setMenge(Number(e.target.value))}
-        className="w-full border rounded p-2"
-      />
-    </div>
+                    {/* Eingetroffene Menge */}
+                    <div className="mb-4">
+                      <label className="block mb-1">eingetroffene Menge</label>
+                      <input
+                        type="number"
+                        value={menge}
+                        onChange={(e) => setMenge(Number(e.target.value))}
+                        className="w-full border rounded p-2"
+                      />
+                    </div>
 
-    {/* Drei Teile nebeneinander */}
-    <div className="flex flex-row gap-4">
-      {/* Guter Teil */}
-      <div className="flex-1 p-4 border rounded">
-        <h3 className="font-semibold mb-2">Guter Teil</h3>
-        <label className="block">Menge</label>
-        <input
-          type="number"
-          value={guterMenge}
-          onChange={(e) => setGuterMenge(Number(e.target.value))}
-          className="w-full mb-2 border rounded p-2"
-        />
-        <label className="block">Saugfähigkeit</label>
-        <input
-          type="number"
-          value={guterSaugfaehigkeit}
-          onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
-          className="w-full mb-2 border rounded p-2"
-        />
-        <label className="block">Weißgrad</label>
-        <input
-          type="number"
-          value={guterWeissgrad}
-          onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
-          className="w-full border rounded p-2"
-        />
-      </div>
+                    {/* Drei Teile nebeneinander */}
+                    <div className="flex flex-row gap-4">
+                      {/* Guter Teil */}
+                      <div className="flex-1 p-4 border rounded">
+                        <h3 className="font-semibold mb-2">Guter Teil</h3>
+                        <label className="block">Menge</label>
+                        <input
+                          type="number"
+                          value={guterMenge}
+                          onChange={(e) => setGuterMenge(Number(e.target.value))}
+                          className="w-full mb-2 border rounded p-2"
+                        />
+                        <label className="block">Saugfähigkeit</label>
+                        <input
+                          type="number"
+                          value={guterSaugfaehigkeit}
+                          onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
+                          className="w-full mb-2 border rounded p-2"
+                        />
+                        <label className="block">Weißgrad</label>
+                        <input
+                          type="number"
+                          value={guterWeissgrad}
+                          onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
+                          className="w-full border rounded p-2"
+                        />
+                      </div>
 
-      {/* Gesperrter Teil */}
-      <div className="flex-1 p-4 border rounded">
-        <h3 className="font-semibold mb-2">Gesperrter Teil</h3>
-        <label className="block">Menge</label>
-        <input
-          type="number"
-          value={gesperrtMenge}
-          onChange={(e) => setGesperrtMenge(Number(e.target.value))}
-          className="w-full mb-2 border rounded p-2"
-        />
-        <label className="block">Saugfähigkeit</label>
-        <input
-          type="number"
-          value={gesperrtSaugfaehigkeit}
-          onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
-          className="w-full mb-2 border rounded p-2"
-        />
-        <label className="block">Weißgrad</label>
-        <input
-          type="number"
-          value={gesperrtWeissgrad}
-          onChange={(e) => setGesperrtWeissgrad(Number(e.target.value))}
-          className="w-full border rounded p-2"
-        />
-      </div>
+                      {/* Gesperrter Teil */}
+                      <div className="flex-1 p-4 border rounded">
+                        <h3 className="font-semibold mb-2">Gesperrter Teil</h3>
+                        <label className="block">Menge</label>
+                        <input
+                          type="number"
+                          value={gesperrtMenge}
+                          onChange={(e) => setGesperrtMenge(Number(e.target.value))}
+                          className="w-full mb-2 border rounded p-2"
+                        />
+                        <label className="block">Saugfähigkeit</label>
+                        <input
+                          type="number"
+                          value={gesperrtSaugfaehigkeit}
+                          onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
+                          className="w-full mb-2 border rounded p-2"
+                        />
+                        <label className="block">Weißgrad</label>
+                        <input
+                          type="number"
+                          value={gesperrtWeissgrad}
+                          onChange={(e) => setGesperrtWeissgrad(Number(e.target.value))}
+                          className="w-full border rounded p-2"
+                        />
+                      </div>
 
-      {/* Reklamierter Teil */}
-      <div className="flex-1 p-4 border rounded">
-        <h3 className="font-semibold mb-2">Reklamierter Teil</h3>
-        <label className="block">Menge</label>
-        <input
-          type="number"
-          value={reklamiertMenge}
-          onChange={(e) => setReklamiertMenge(Number(e.target.value))}
-          className="w-full border rounded p-2"
-        />
-      </div>
-    </div>
+                      {/* Reklamierter Teil */}
+                      <div className="flex-1 p-4 border rounded">
+                        <h3 className="font-semibold mb-2">Reklamierter Teil</h3>
+                        <label className="block">Menge</label>
+                        <input
+                          type="number"
+                          value={reklamiertMenge}
+                          onChange={(e) => setReklamiertMenge(Number(e.target.value))}
+                          className="w-full border rounded p-2"
+                        />
+                      </div>
+                    </div>
 
-    <div className="mt-6">
-      <Button onClick={handleWareneingang}>Anlegen</Button>
-    </div>
-  </DialogContent>
-</Dialog>
+                    <div className="mt-6">
+                      <Button onClick={handleWareneingang}>Anlegen</Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
 
               </>
             )}

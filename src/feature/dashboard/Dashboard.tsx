@@ -1,6 +1,6 @@
 import { SectionCards } from "@/components/sidebar/section-cards.tsx";
 //import { ChartAreaInteractive } from "@/components/sidebar/chart-area-interactive.tsx";
-import MindestbestandTable  from "@/feature/mindestbestand/mindestbestandTable.tsx";
+import MindestbestandTable from "@/feature/mindestbestand/mindestbestandTable.tsx";
 
 const Dashboard = () => {
   return (

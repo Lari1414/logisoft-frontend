@@ -4,7 +4,7 @@ import { DataTable } from "@/components/sidebar/data-table";
 import { rohmateriallagerApi } from "@/api/endpoints/rohmateriallagerApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Eye  } from "react-bootstrap-icons";
+import { Eye } from "react-bootstrap-icons";
 import { IoExit } from "react-icons/io5";
 
 // Define the type for the transformed data
@@ -37,57 +37,57 @@ export interface TransformedData {
 interface RohmateriallagerTableProps {
   onSelectionChange: (selectedRows: TransformedData[]) => void;
   onRefetch?: (refetchFn: () => void) => void;
-  onAuslagernClick?: (row: TransformedData) => void; 
+  onAuslagernClick?: (row: TransformedData) => void;
 }
 
-const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick  }: RohmateriallagerTableProps) => {
+const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick }: RohmateriallagerTableProps) => {
   const { data, isLoading, error, refetch } = rohmateriallagerApi.useGetRohmaterialQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [selectedQualitaet, setSelectedQualitaet] = useState<TransformedData | null>(null);
   const [isQualitaetDialogOpen, setIsQualitaetDialogOpen] = useState(false);
 
   // Transform the data into the correct shape
-const transformedData = useMemo(() => (
-  (data || []).map((item) => {
-    // type assertion: material als erweitertes Objekt mit farbe_json
-    const material = item.material as {
-      material_ID: number;
-      lager_ID: number;
-      category: string;
-      farbe: string;
-      farbe_json?: {
-        cyan: number;
-        magenta: number;
-        yellow: number;
-        black: number;
+  const transformedData = useMemo(() => (
+    (data || []).map((item) => {
+      // type assertion: material als erweitertes Objekt mit farbe_json
+      const material = item.material as {
+        material_ID: number;
+        lager_ID: number;
+        category: string;
+        farbe: string;
+        farbe_json?: {
+          cyan: number;
+          magenta: number;
+          yellow: number;
+          black: number;
+        };
+        typ: string;
+        groesse: string | null;
+        url: string | null;
+        standardmaterial: boolean;
       };
-      typ: string;
-      groesse: string | null;
-      url: string | null;
-      standardmaterial: boolean;
-    };
 
-    return {
-      id: item.lagerbestand_ID.toString(),
-      lagerbestand_ID: item.lagerbestand_ID,
-      material_ID: item.material_ID,
-      lager_ID: item.lager_ID,
-      menge: item.menge,
-      category: material.category ?? "",
-      farbe: material.farbe ?? "",
-      farbe_json: material.farbe_json ?? { cyan: 0, magenta: 0, yellow: 0, black: 0 },
-      typ: material.typ ?? "",
-      groesse: material.groesse ?? null,
-      url: material.url ?? null,
-      standardmaterial: material.standardmaterial ?? false,
-      viskositaet: item.qualitaet?.viskositaet ?? 0,
-      ppml: item.qualitaet?.ppml ?? 0,
-      saugfaehigkeit: item.qualitaet?.saugfaehigkeit ?? null,
-      weissgrad: item.qualitaet?.weissgrad ?? null,
-      deltaE: item.qualitaet?.deltaE ?? 0
-    };
-  })
-), [data]);
+      return {
+        id: item.lagerbestand_ID.toString(),
+        lagerbestand_ID: item.lagerbestand_ID,
+        material_ID: item.material_ID,
+        lager_ID: item.lager_ID,
+        menge: item.menge,
+        category: material.category ?? "",
+        farbe: material.farbe ?? "",
+        farbe_json: material.farbe_json ?? { cyan: 0, magenta: 0, yellow: 0, black: 0 },
+        typ: material.typ ?? "",
+        groesse: material.groesse ?? null,
+        url: material.url ?? null,
+        standardmaterial: material.standardmaterial ?? false,
+        viskositaet: item.qualitaet?.viskositaet ?? 0,
+        ppml: item.qualitaet?.ppml ?? 0,
+        saugfaehigkeit: item.qualitaet?.saugfaehigkeit ?? null,
+        weissgrad: item.qualitaet?.weissgrad ?? null,
+        deltaE: item.qualitaet?.deltaE ?? 0
+      };
+    })
+  ), [data]);
   useEffect(() => {
     if (onRefetch && refetch) {
       onRefetch(refetch);
@@ -135,22 +135,22 @@ const transformedData = useMemo(() => (
     { accessorKey: "lagerbestand_ID", header: "Lagerbestand-ID" },
     { accessorKey: "material_ID", header: "Material-ID" },
     { accessorKey: "category", header: "Kategorie" },
-   {
-        accessorKey: "farbe",
-        header: "Farbe",
-        cell: ({ getValue }) => {
-          const color = getValue() as string;
-          return (
-            <div className="flex items-center gap-2">
-              <div
-                className="w-4 h-4 rounded-full border"
-                style={{ backgroundColor: color }}
-              />
-              <span>{color}</span>
-            </div>
-          );
-        },
+    {
+      accessorKey: "farbe",
+      header: "Farbe",
+      cell: ({ getValue }) => {
+        const color = getValue() as string;
+        return (
+          <div className="flex items-center gap-2">
+            <div
+              className="w-4 h-4 rounded-full border"
+              style={{ backgroundColor: color }}
+            />
+            <span>{color}</span>
+          </div>
+        );
       },
+    },
     { accessorKey: "typ", header: "Typ" },
     { accessorKey: "groesse", header: "Größe" },
     { accessorKey: "url", header: "Url" },
@@ -164,7 +164,7 @@ const transformedData = useMemo(() => (
           className="text-blue-600 underline"
           onClick={() => openQualitaetDialog(row.original)}
         >
-          <Eye  size={20}  />
+          <Eye size={20} />
         </button>
       ),
     },
@@ -172,15 +172,15 @@ const transformedData = useMemo(() => (
       id: "auslagern",
       header: "Aktion",
       cell: ({ row }) => (
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => {
             if (onAuslagernClick) onAuslagernClick(row.original);
           }}
           title="Auslagern"
         >
-           <IoExit className="h-5 w-5" />
+          <IoExit className="h-5 w-5" />
         </Button>
       ),
     },
