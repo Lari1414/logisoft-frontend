@@ -116,9 +116,10 @@ const MindestbestandTable = () => {
   const materialOptions =
     materialsData?.map((m) => ({
       value: m.material_ID,
-      label: `${m.typ} – ${m.farbe} – ${m.groesse}`,
+      label: `${m.typ ?? ""} – ${m.farbe ?? ""} – ${m.groesse ?? ""}`,
       color: m.farbe?.toLowerCase() ?? "transparent",
     })) || [];
+
 
   const ColourOption = (props: any) => (
     <components.Option {...props}>
