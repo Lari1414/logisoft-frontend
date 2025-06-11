@@ -7,6 +7,7 @@ import { Archive, Lock, Unlock } from "lucide-react";
 import { Eye } from "react-bootstrap-icons";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export interface WareneingangData {
   eingang_ID: number;
@@ -51,12 +52,28 @@ const WareneingangTable: React.FC<WareneingangTableProps> = ({ onSelectionChange
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [, setSelectedRows] = useState<TransformedWareneingang[]>([]);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const transformedData = useMemo(() => {
     return (data || []).map((item) => ({
       ...item,
       id: item.eingang_ID.toString(),
-    }));
+    })) as TransformedWareneingang[];
   }, [data]);
+
+  const filteredData = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+
+    return transformedData.filter((row) =>
+      row.material?.category?.toLowerCase().includes(term) ||
+      row.material?.farbe?.toLowerCase().includes(term) ||
+      row.material?.typ?.toLowerCase().includes(term) ||
+      row.material?.groesse?.toLowerCase().includes(term) ||
+      row.eingang_ID.toString().includes(term) ||
+      row.materialbestellung_ID.toString().includes(term)
+    );
+  }, [searchTerm, transformedData]);
+
 
   const handleRowSelectionChange = useCallback(
     (updater: Updater<RowSelectionState>) => {
@@ -258,12 +275,21 @@ const WareneingangTable: React.FC<WareneingangTableProps> = ({ onSelectionChange
 
   return (
     <div className="space-y-4">
-      <DataTable<TransformedWareneingang>
-        data={transformedData}
-        columns={columns}
-        rowSelection={rowSelection}
-        onRowSelectionChange={handleRowSelectionChange}
-      />
+      <div className="flex flex-col gap-4">
+        <Input
+          placeholder="Suchen..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-40 focus:w-72 transition-all duration-300 ease-in-out px-2 py-1 text-sm focus:shadow-md"
+        />
+
+        <DataTable<TransformedWareneingang>
+          data={filteredData}
+          columns={columns}
+          rowSelection={rowSelection}
+          onRowSelectionChange={handleRowSelectionChange}
+        />
+      </div>
       <Dialog open={isQualitaetDialogOpen} onOpenChange={setIsQualitaetDialogOpen}>
         <DialogContent>
           <DialogHeader>

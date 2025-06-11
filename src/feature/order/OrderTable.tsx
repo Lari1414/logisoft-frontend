@@ -352,7 +352,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
 
                 {/** Wareneingang Anlegen */}
                 <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-                  <DialogContent className="max-w-5xl w-full">
+                  <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
                     <DialogHeader>
                       <DialogTitle>Wareneingang anlegen</DialogTitle>
                     </DialogHeader>
