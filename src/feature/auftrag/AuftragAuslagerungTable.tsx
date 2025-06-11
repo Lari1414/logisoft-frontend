@@ -1,34 +1,90 @@
-import { ColumnDef } from "@tanstack/react-table";
+import { useEffect, useState, useCallback } from "react";
+import { ColumnDef, RowSelectionState, Updater } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table";
 import { auftragApi } from "@/api/endpoints/auftragApi.ts";
 import { Auftrag } from "@/models/auftrag";
+import { TransformedAuftrag } from "./AuftragTable"; // falls du das Interface dort exportierst
 
-const AuftragAuslagerungTable = () => {
-  const { data, isLoading, error } = auftragApi.useGetAuslagerungsAuftraegeQuery();
+type Props = {
+  onSelectionChange?: (rows: TransformedAuftrag[]) => void;
+  onRefetch?: (fn: () => void) => void;
+};
 
-  if (isLoading) return <div>Lädt...</div>;
-  if (error) return <div>Fehler beim Laden der Daten.</div>;
+const AuftragAuslagerungTable = ({ onSelectionChange, onRefetch }: Props) => {
+  const { data, isLoading, error, refetch } = auftragApi.useGetAuslagerungsAuftraegeQuery();
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const transformedData = (data || []).map((item: Auftrag) => ({
+  const transformedData: TransformedAuftrag[] = (data || []).map((item: Auftrag) => ({
     ...item,
-    id: item.auftrag_ID.toString(), // besser als material_ID, weil eindeutiger
+    id: item.auftrag_ID.toString(),
   }));
 
-  const columns: ColumnDef<Auftrag & { id: string }>[] = [
+  useEffect(() => {
+    if (onRefetch) {
+      onRefetch(refetch);
+    }
+  }, [refetch, onRefetch]);
+
+  const handleRowSelectionChange = useCallback(
+    (updater: Updater<RowSelectionState>) => {
+      setRowSelection((prev) => {
+        const newState = typeof updater === "function" ? updater(prev) : updater;
+
+        if (onSelectionChange) {
+          const selectedRows = Object.keys(newState)
+            .filter((key) => newState[key])
+            .map((key) => transformedData.find((row) => row.id === key))
+            .filter(Boolean) as TransformedAuftrag[];
+
+          onSelectionChange(selectedRows);
+        }
+
+        return newState;
+      });
+    },
+    [transformedData, onSelectionChange]
+  );
+
+  const columns: ColumnDef<TransformedAuftrag>[] = [
+    {
+      id: "select",
+      header: () => null,
+      cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={row.getIsSelected()}
+          onChange={() => row.toggleSelected()}
+        />
+      ),
+    },
     { accessorKey: "auftrag_ID", header: "Auftrag-ID" },
     { accessorKey: "material_ID", header: "Material-ID" },
     { accessorKey: "menge", header: "Menge" },
-    { accessorKey: "status", header: "Status",cell: ({ getValue }) => (
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ getValue }) => (
         <span className="px-2 py-1 rounded bg-yellow-400 text-black">
           {getValue() as string}
         </span>
-      ), },
+      ),
+    },
     { accessorKey: "lagerbestand_ID", header: "Lagerbestand-ID" },
     { accessorKey: "bestellposition", header: "Bestellposition" },
     { accessorKey: "angefordertVon", header: "Angefordert Von" },
   ];
 
-  return <DataTable data={transformedData} columns={columns} />;
+  if (isLoading) return <div>Lädt...</div>;
+  if (error) return <div>Fehler beim Laden der Daten.</div>;
+
+  return (
+    <DataTable
+      data={transformedData}
+      columns={columns}
+      rowSelection={rowSelection}
+      onRowSelectionChange={handleRowSelectionChange}
+    />
+  );
 };
 
 export default AuftragAuslagerungTable;

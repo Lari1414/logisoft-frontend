@@ -10,15 +10,14 @@ import { Button } from "@/components/ui/button";
 import EinlagerungsAuftraegeTable from "@/feature/auftrag/AuftragEinlagerungTable.tsx";
 import AuslagerungsAuftraegeTable from "@/feature/auftrag/AuftragAuslagerungTable.tsx";
 
-
 const Auftrag = () => {
   const [activeTab, setActiveTab] = useState("offen");
-  //const [createAuftrag, { isLoading }] = auftragApi.useCreateAuftragMutation();
-  const [storeMaterial,{ isLoading }] = auftragApi.useStoreMaterialMutation();
-  const [outsourceMaterial] = auftragApi.useOutsourceMaterialMutation();
+  const [storeMaterial, { isLoading: isStoring }] = auftragApi.useStoreMaterialMutation();
+  const [outsourceMaterial, { isLoading: isOutsourcing }] = auftragApi.useOutsourceMaterialMutation();
+  const isLoading = isStoring || isOutsourcing;
+
   const [selectedRows, setSelectedRows] = useState<TransformedAuftrag[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
   const [refetchTable, setRefetchTable] = useState<(() => void) | null>(null);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
@@ -26,9 +25,9 @@ const Auftrag = () => {
   };
 
   const handleSetRefetch = useCallback((refetchFn: () => void) => {
-      setRefetchTable(() => refetchFn);
+    setRefetchTable(() => refetchFn);
   }, []);
-  
+
   const handleSelectionChange = useCallback((rows: TransformedAuftrag[]) => {
     setSelectedRows(rows.filter(row => row !== undefined));
   }, []);
@@ -38,34 +37,38 @@ const Auftrag = () => {
     setIsModalOpen(true);
   };
 
-const handleConfirm = async () => {
-  const einlagerungAuftraege = selectedRows.filter(a => a.status === "Einlagerung angefordert");
-  const auslagerungAuftraege = selectedRows.filter(a => a.status === "Auslagerung angefordert");
+  const handleConfirm = async () => {
+    console.log("handleConfirm wurde aufgerufen");
+    //const einlagerungAuftraege = selectedRows.filter(a => a.status === "Einlagerung angefordert");
+    //const auslagerungAuftraege = selectedRows.filter(a => a.status === "Auslagerung angefordert");
+    const einlagerungAuftraege = selectedRows.filter(
+      (a) => a.status?.toLowerCase() === "einlagerung angefordert"
+    );
 
-  try {
-    if (einlagerungAuftraege.length > 0) {
-      const auftragIds = einlagerungAuftraege.map(a => a.auftrag_ID);
-      await storeMaterial({ auftragIds });
-      console.log("Einlagerungsaufträge ausgeführt:", auftragIds);
+    const auslagerungAuftraege = selectedRows.filter(
+      (a) => a.status?.toLowerCase() === "auslagerung angefordert"
+    );
+
+    try {
+      if (einlagerungAuftraege.length > 0) {
+        const auftragIds = einlagerungAuftraege.map(a => a.auftrag_ID);
+        await storeMaterial({ auftragIds });
+        console.log("Einlagerungsaufträge ausgeführt:", auftragIds);
+      }
+
+      if (auslagerungAuftraege.length > 0) {
+        const auftragIds = auslagerungAuftraege.map(a => a.auftrag_ID);
+        await outsourceMaterial({ auftragIds });
+        console.log("Auslagerungsaufträge ausgeführt:", auftragIds);
+      }
+    } catch (error) {
+      console.error("Fehler beim Ausführen der Aufträge:", error);
+    } finally {
+      setIsModalOpen(false);
+      setSelectedRows([]);
+      if (refetchTable) refetchTable();
     }
-
-    if (auslagerungAuftraege.length > 0) {
-      const auftragIds = auslagerungAuftraege.map(a => a.auftrag_ID);
-      await outsourceMaterial({ auftragIds });
-      console.log("Auslagerungsaufträge ausgeführt:", auftragIds);
-    }
-
-
-
-  } catch (error) {
-    console.error("Fehler beim Ausführen der Aufträge:", error);
-  }
-
-  setIsModalOpen(false);
-  setSelectedRows([]);
-   if (refetchTable) refetchTable();
-};
-
+  };
 
   return (
     <BaseContentLayout
@@ -88,7 +91,6 @@ const handleConfirm = async () => {
           <Tab label="Einlagerungsaufträge" value="einlagerung" />
           <Tab label="Auslagerungsaufträge" value="auslagerung" />
           <Tab label="Historie" value="historie" />
-
         </Tabs>
 
         {activeTab === "offen" && (
@@ -96,17 +98,14 @@ const handleConfirm = async () => {
         )}
 
         {activeTab === "einlagerung" && (
-          <EinlagerungsAuftraegeTable />
+          <EinlagerungsAuftraegeTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} />
         )}
 
         {activeTab === "auslagerung" && (
-          <AuslagerungsAuftraegeTable />
+          <AuslagerungsAuftraegeTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} />
         )}
 
-        {activeTab === "historie" && (
-          <AuftraghistoryTable />
-        )}
-
+        {activeTab === "historie" && <AuftraghistoryTable />}
 
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogContent>
@@ -116,9 +115,7 @@ const handleConfirm = async () => {
 
             {selectedRows.map((auftrag) => (
               <div key={auftrag.auftrag_ID} className="mb-4 p-4 border rounded">
-                <div className="font-semibold">
-                  Auftrag-ID: {auftrag.auftrag_ID}
-                </div>
+                <div className="font-semibold">Auftrag-ID: {auftrag.auftrag_ID}</div>
                 <div>Material-ID: {auftrag.material_ID}</div>
                 <div>Menge: {auftrag.menge}</div>
                 <div>Status: {auftrag.status}</div>
@@ -129,9 +126,9 @@ const handleConfirm = async () => {
             <Button
               onClick={handleConfirm}
               className="mt-4"
-              disabled={selectedRows.length === 0}
+              disabled={selectedRows.length === 0 || isLoading}
             >
-              Bestätigen
+              {isLoading ? "Wird ausgeführt..." : "Bestätigen"}
             </Button>
           </DialogContent>
         </Dialog>
