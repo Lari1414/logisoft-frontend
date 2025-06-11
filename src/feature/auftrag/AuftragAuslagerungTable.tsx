@@ -1,9 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { ColumnDef, RowSelectionState, Updater } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table";
-import { auftragApi } from "@/api/endpoints/auftragApi.ts";
+import { auftragApi } from "@/api/endpoints/auftragApi";
 import { Auftrag } from "@/models/auftrag";
-import { TransformedAuftrag } from "./AuftragTable"; // falls du das Interface dort exportierst
+import {TransformedAuftrag} from "./AuftragTable.tsx";
+
+
 
 type Props = {
   onSelectionChange?: (rows: TransformedAuftrag[]) => void;
@@ -14,9 +16,18 @@ const AuftragAuslagerungTable = ({ onSelectionChange, onRefetch }: Props) => {
   const { data, isLoading, error, refetch } = auftragApi.useGetAuslagerungsAuftraegeQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
+  /*const transformedData: TransformedAuftrag[] = (data || []).map((item: Auftrag) => ({
+    ...item,
+    id: item.auftrag_ID.toString(),
+     category, farbe, typ, groesse bleiben undefined – kein Fehler wegen optionalen Feldern
+  }));*/
   const transformedData: TransformedAuftrag[] = (data || []).map((item: Auftrag) => ({
     ...item,
     id: item.auftrag_ID.toString(),
+    category: "",
+    farbe: "",
+    typ: "",
+    groesse: "",
   }));
 
   useEffect(() => {

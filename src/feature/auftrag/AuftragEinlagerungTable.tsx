@@ -3,7 +3,8 @@ import { ColumnDef, RowSelectionState, Updater } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table";
 import { auftragApi } from "@/api/endpoints/auftragApi";
 import { Auftrag } from "@/models/auftrag";
-import { TransformedAuftrag } from "./AuftragTable"; // falls du das Interface dort exportierst
+import {TransformedAuftrag} from "./AuftragTable.tsx";
+
 
 type Props = {
   onSelectionChange?: (rows: TransformedAuftrag[]) => void;
@@ -14,10 +15,19 @@ const AuftragEinlagerungTable = ({ onSelectionChange, onRefetch }: Props) => {
   const { data, isLoading, error, refetch } = auftragApi.useGetEinlagerungsAuftraegeQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
+  /*const transformedData: TransformedAuftrag[] = (data || []).map((item: Auftrag) => ({
+    ...item,
+    id: item.auftrag_ID.toString(),
+  }));*/
   const transformedData: TransformedAuftrag[] = (data || []).map((item: Auftrag) => ({
     ...item,
     id: item.auftrag_ID.toString(),
+    category: "",  // oder passende Daten, wenn du Material-Infos dort auch hast
+    farbe: "",
+    typ: "",
+    groesse: "",
   }));
+
 
   useEffect(() => {
     if (onRefetch) {
