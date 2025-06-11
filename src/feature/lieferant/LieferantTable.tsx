@@ -23,6 +23,7 @@ const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
   const [editItem, setEditItem] = useState<Lieferant | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<Lieferant>>({});
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleDelete = async (id: number) => {
     try {
@@ -101,10 +102,10 @@ const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
       header: "Aktionen",
       cell: ({ row }) => (
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => openEditDialog(row.original)}>
+          <Button variant="ghost" className="p-2 text-blue-600 hover:bg-blue-100 rounded" onClick={() => openEditDialog(row.original)} title="Bearbeiten">
             <Pencil size={18} />
           </Button>
-          <button onClick={() => handleDelete(row.original.lieferant_ID)}>
+          <button onClick={() => handleDelete(row.original.lieferant_ID)} className="hover:bg-red-100 rounded" title="Löschen">
             <Trash size={18} color="red" />
           </button>
         </div>
@@ -119,9 +120,45 @@ const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
     }));
   }, [lieferanten]);
 
+  const filteredData = useMemo(() => {
+    if (!searchTerm.trim()) return transformedData;
+
+    const term = searchTerm.toLowerCase();
+    return transformedData.filter((item) => {
+      return (
+        item.firmenname.toLowerCase().includes(term) ||
+        item.kontaktperson.toLowerCase().includes(term) ||
+        item.adresse.strasse.toLowerCase().includes(term) ||
+        item.adresse.ort.toLowerCase().includes(term) ||
+        item.adresse.plz.toString().includes(term)
+      );
+    });
+  }, [searchTerm, transformedData]);
+
   return (
     <>
-      <DataTable data={transformedData} columns={columns} />
+      {/* Suchfeld */}
+      <div className="mb-4">
+        <Input
+          placeholder="Lieferant suchen..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="
+            w-40                 
+            focus:w-72            
+            transition-all   
+            duration-300
+            ease-in-out
+            px-2 py-1             
+            text-sm               
+            focus:shadow-md       
+          "
+        />
+      </div>
+
+
+      <DataTable data={filteredData} columns={columns} />
+
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>

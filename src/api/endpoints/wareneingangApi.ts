@@ -13,6 +13,7 @@ export interface CreateWareneingangRequest {
       ppml: number;
       saugfaehigkeit: number;
       weissgrad: number;
+      deltaE: number;
     };
   };
   gesperrterTeil?: {
@@ -22,6 +23,7 @@ export interface CreateWareneingangRequest {
       ppml: number;
       saugfaehigkeit: number;
       weissgrad: number;
+      deltaE: number;
     };
   };
   reklamierterTeil?: {
@@ -29,6 +31,10 @@ export interface CreateWareneingangRequest {
   };
 }
 
+export interface ReklamtionRequest {
+  wareneingang_ID: number;
+  menge: number;
+}
 
 export interface storeMaterialRequest {
  ids: number[];        
@@ -93,5 +99,12 @@ export const wareneingangApi = baseApi.injectEndpoints({
       }),
     }),
 
+    createReklamation: builder.mutation<Wareneingang, ReklamtionRequest>({
+      query: (data) => ({
+        url: "/wareneingaenge/reklamation",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });

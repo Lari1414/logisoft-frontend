@@ -13,6 +13,7 @@ import { Order as OrderModel } from "@/models/order";
 import { wareneingangApi } from "@/api/endpoints/wareneingangApi.ts";
 import Select from "react-select";
 import { Tabs, Tab } from "@mui/material";
+import { components } from "react-select";
 
 const Order = () => {
   const [createOrder, { isLoading }] = orderApi.useCreateOrderMutation();
@@ -149,6 +150,7 @@ const Order = () => {
               ppml: 0,
               saugfaehigkeit: e.guterSaugfaehigkeit,
               weissgrad: e.guterWeissgrad,
+              deltaE: 0
             },
           },
           gesperrterTeil: {
@@ -158,6 +160,7 @@ const Order = () => {
               ppml: 0,
               saugfaehigkeit: e.gesperrtSaugfaehigkeit,
               weissgrad: e.gesperrtWeissgrad,
+              deltaE: 0
             },
           },
           reklamierterTeil: {
@@ -180,6 +183,41 @@ const Order = () => {
       label: `${m.typ} – ${m.farbe} – ${m.groesse}`,
       color: m.farbe?.toLowerCase() ?? "transparent",
     }));
+
+  const ColourOption = (props: any) => (
+    <components.Option {...props}>
+      <div className="flex items-center space-x-2">
+        <div
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            backgroundColor: props.data.color || "#ccc",
+            border: "1px solid #999",
+          }}
+        />
+        <span>{props.label}</span>
+      </div>
+    </components.Option>
+  );
+
+  const ColourSingleValue = (props: any) => (
+    <components.SingleValue {...props}>
+      <div className="flex items-center space-x-2">
+        <div
+          style={{
+            width: 16,
+            height: 16,
+            borderRadius: "50%",
+            backgroundColor: props.data.color || "#ccc",
+            border: "1px solid #999",
+          }}
+        />
+        <span>{props.data.label}</span>
+      </div>
+    </components.SingleValue>
+  );
+
 
   return (
     <BaseContentLayout title="Bestellungen">
@@ -373,8 +411,10 @@ const Order = () => {
             onChange={(selected) =>
               setFormData((prev) => ({ ...prev, material_ID: selected ? selected.value.toString() : "" }))
             }
+            components={{ Option: ColourOption, SingleValue: ColourSingleValue }}
             className="mb-4"
           />
+
 
           <label htmlFor="menge">Menge</label>
           <input
@@ -383,7 +423,7 @@ const Order = () => {
             name="menge"
             value={formData.menge}
             onChange={handleFormChange}
-            className="mb-6 w-full"
+            className="mb-6 w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             min={1}
           />
 

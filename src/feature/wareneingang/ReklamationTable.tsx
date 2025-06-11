@@ -56,7 +56,7 @@ const ReklamationTable: React.FC<ReklamationTableProps> = ({ setRefetch }) => {
     {
       accessorFn: (row) => row.status,
       id: "status",
-      header: "Status",cell: ({ getValue }) => (
+      header: "Status", cell: ({ getValue }) => (
         <span className="px-2 py-1 rounded bg-red-500 text-white">
           {getValue() as string}
         </span>
@@ -67,7 +67,7 @@ const ReklamationTable: React.FC<ReklamationTableProps> = ({ setRefetch }) => {
       id: "wareneingang_ID",
       header: "Wareneingang-ID",
     },
-    
+
   ];
 
   if (isLoading) return <div>Lädt...</div>;
