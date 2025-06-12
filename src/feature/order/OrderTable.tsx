@@ -343,7 +343,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                   }}
                   disabled={isCreating}
                   className="flex items-center hover:bg-yellow-100 gap-2"
-                  title="Einlagern"
+                  title="Wareneingang anlegen"
                 >
                   <Store className="h-5 w-5" />
                 </Button>
@@ -352,7 +352,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
 
                 {/** Wareneingang Anlegen */}
                 <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-                  <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
+                  <DialogContent className="max-h-[50vh] overflow-y-auto max-w-4xl w-full">
                     <DialogHeader>
                       <DialogTitle>Wareneingang anlegen</DialogTitle>
                     </DialogHeader>
