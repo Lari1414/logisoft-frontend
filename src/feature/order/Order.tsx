@@ -99,9 +99,15 @@ const Order = () => {
     guterMenge: number;
     guterSaugfaehigkeit: number;
     guterWeissgrad: number;
+    guterViskositaet: number;
+    guterPpml: number;
+    guterDeltaE: number;
     gesperrtMenge: number;
     gesperrtSaugfaehigkeit: number;
     gesperrtWeissgrad: number;
+    gesperrtViskositaet: number;
+    gesperrtPpml: number;
+    gesperrtDeltaE: number;
     reklamiertMenge: number;
   }>>({});
 
@@ -112,9 +118,15 @@ const Order = () => {
         guterMenge: 0,
         guterSaugfaehigkeit: 0,
         guterWeissgrad: 0,
+        guterViskositaet: 0,
+        guterPpml: 0,
+        guterDeltaE: 0,
         gesperrtMenge: 0,
         gesperrtSaugfaehigkeit: 0,
         gesperrtWeissgrad: 0,
+        gesperrtViskositaet: 0,
+        gesperrtPpml: 0,
+        gesperrtDeltaE: 0,
         reklamiertMenge: 0,
       };
     });
@@ -270,7 +282,7 @@ const Order = () => {
 
       {/* Wareneingang Dialog */}
       <Dialog open={wareneingangDialogOpen} onOpenChange={setWareneingangDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
           <DialogHeader>
             <DialogTitle>Wareneingang für ausgewählte Bestellungen</DialogTitle>
           </DialogHeader>
@@ -284,89 +296,149 @@ const Order = () => {
           />
 
           <div className="flex flex-wrap gap-4">
-            {selectedOrders.map((order) => (
-              <div
-                key={order.materialbestellung_ID}
-                className="p-4 border rounded w-full sm:w-[48%] md:w-[30%] flex-grow"
-              >
-                <h3 className="font-semibold mb-2">Bestellung {order.materialbestellung_ID}</h3>
+            {selectedOrders.map((order) => {
+              const category = order.material.category.toLowerCase();
+              const isTShirt = category === "t-shirt";
+              const id = order.materialbestellung_ID.toString();
+              const input = eingaben[id] || {};
 
-                <div className="mb-2">
-                  <span className="font-semibold">Guter Teil</span>
-                  <label className="block text-sm mt-1">Menge</label>
-                  <input
-                    type="number"
-                    value={eingaben[order.materialbestellung_ID]?.guterMenge || 0}
-                    onChange={(e) =>
-                      handleInputChange(order.materialbestellung_ID.toString(), "guterMenge", Number(e.target.value))
-                    }
-                    className="mb-2 w-full"
-                  />
-                  <label className="block text-sm">Saugfähigkeit</label>
-                  <input
-                    type="number"
-                    value={eingaben[order.materialbestellung_ID]?.guterSaugfaehigkeit || 0}
-                    onChange={(e) =>
-                      handleInputChange(order.materialbestellung_ID.toString(), "guterSaugfaehigkeit", Number(e.target.value))
-                    }
-                    className="mb-2 w-full"
-                  />
-                  <label className="block text-sm">Weißgrad</label>
-                  <input
-                    type="number"
-                    value={eingaben[order.materialbestellung_ID]?.guterWeissgrad || 0}
-                    onChange={(e) =>
-                      handleInputChange(order.materialbestellung_ID.toString(), "guterWeissgrad", Number(e.target.value))
-                    }
-                    className="w-full"
-                  />
-                </div>
+              return (
+                <div
+                  key={id}
+                  className="p-4 border rounded w-full sm:w-[48%] md:w-[30%] flex-grow"
+                >
+                  <h3 className="font-semibold mb-2">Bestellung {id}</h3>
+                  {/* bestellte Menge */}
+                  <div className="mb-4">
+                    <label className="block mb-1 font-medium">Die bestellte Menge</label>
+                    <div className="w-full border rounded p-2 bg-gray-100">
+                      {order.menge}
+                    </div>
+                  </div>
+                  {/* Guter Teil */}
+                  <div className="mb-2">
+                    <span className="font-semibold">Guter Teil</span>
+                    <label className="block text-sm mt-1">Menge</label>
+                    <input
+                      type="number"
+                      value={input.guterMenge || 0}
+                      onChange={(e) => handleInputChange(id, "guterMenge", Number(e.target.value))}
+                      className="mb-2 w-full"
+                    />
 
-                <div className="mb-2">
-                  <span className="font-semibold">Gesperrter Teil</span>
-                  <label className="block text-sm mt-1">Menge</label>
-                  <input
-                    type="number"
-                    value={eingaben[order.materialbestellung_ID]?.gesperrtMenge || 0}
-                    onChange={(e) =>
-                      handleInputChange(order.materialbestellung_ID.toString(), "gesperrtMenge", Number(e.target.value))
-                    }
-                    className="mb-2 w-full"
-                  />
-                  <label className="block text-sm">Saugfähigkeit</label>
-                  <input
-                    type="number"
-                    value={eingaben[order.materialbestellung_ID]?.gesperrtSaugfaehigkeit || 0}
-                    onChange={(e) =>
-                      handleInputChange(order.materialbestellung_ID.toString(), "gesperrtSaugfaehigkeit", Number(e.target.value))
-                    }
-                    className="mb-2 w-full"
-                  />
-                  <label className="block text-sm">Weißgrad</label>
-                  <input
-                    type="number"
-                    value={eingaben[order.materialbestellung_ID]?.gesperrtWeissgrad || 0}
-                    onChange={(e) =>
-                      handleInputChange(order.materialbestellung_ID.toString(), "gesperrtWeissgrad", Number(e.target.value))
-                    }
-                    className="w-full"
-                  />
-                </div>
+                    {isTShirt ? (
+                      <>
+                        <label className="block text-sm">Saugfähigkeit</label>
+                        <input
+                          type="number"
+                          value={input.guterSaugfaehigkeit || 0}
+                          onChange={(e) => handleInputChange(id, "guterSaugfaehigkeit", Number(e.target.value))}
+                          className="mb-2 w-full"
+                        />
+                        <label className="block text-sm">Weißgrad</label>
+                        <input
+                          type="number"
+                          value={input.guterWeissgrad || 0}
+                          onChange={(e) => handleInputChange(id, "guterWeissgrad", Number(e.target.value))}
+                          className="w-full"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <label className="block text-sm">Viskosität</label>
+                        <input
+                          type="number"
+                          value={input.guterViskositaet || 0}
+                          onChange={(e) => handleInputChange(id, "guterViskositaet", Number(e.target.value))}
+                          className="mb-2 w-full"
+                        />
+                        <label className="block text-sm">Ppml</label>
+                        <input
+                          type="number"
+                          value={input.guterPpml || 0}
+                          onChange={(e) => handleInputChange(id, "guterPpml", Number(e.target.value))}
+                          className="mb-2 w-full"
+                        />
+                        <label className="block text-sm">DeltaE</label>
+                        <input
+                          type="number"
+                          value={input.guterDeltaE || 0}
+                          onChange={(e) => handleInputChange(id, "guterDeltaE", Number(e.target.value))}
+                          className="w-full"
+                        />
+                      </>
+                    )}
+                  </div>
 
-                <div>
-                  <span className="font-semibold">Reklamierter Teil</span>
-                  <label className="block text-sm mt-1">Menge</label>
-                  <input
-                    type="number"
-                    value={eingaben[order.materialbestellung_ID]?.reklamiertMenge || 0}
-                    onChange={(e) =>
-                      handleInputChange(order.materialbestellung_ID.toString(), "reklamiertMenge", Number(e.target.value))
-                    }
-                    className="w-full"
-                  />
+                  {/* Gesperrter Teil */}
+                  <div className="mb-2">
+                    <span className="font-semibold">Gesperrter Teil</span>
+                    <label className="block text-sm mt-1">Menge</label>
+                    <input
+                      type="number"
+                      value={input.gesperrtMenge || 0}
+                      onChange={(e) => handleInputChange(id, "gesperrtMenge", Number(e.target.value))}
+                      className="mb-2 w-full"
+                    />
+
+                    {isTShirt ? (
+                      <>
+                        <label className="block text-sm">Saugfähigkeit</label>
+                        <input
+                          type="number"
+                          value={input.gesperrtSaugfaehigkeit || 0}
+                          onChange={(e) => handleInputChange(id, "gesperrtSaugfaehigkeit", Number(e.target.value))}
+                          className="mb-2 w-full"
+                        />
+                        <label className="block text-sm">Weißgrad</label>
+                        <input
+                          type="number"
+                          value={input.gesperrtWeissgrad || 0}
+                          onChange={(e) => handleInputChange(id, "gesperrtWeissgrad", Number(e.target.value))}
+                          className="w-full"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <label className="block text-sm">Viskosität</label>
+                        <input
+                          type="number"
+                          value={input.gesperrtViskositaet || 0}
+                          onChange={(e) => handleInputChange(id, "gesperrtViskositaet", Number(e.target.value))}
+                          className="mb-2 w-full"
+                        />
+                        <label className="block text-sm">Ppml</label>
+                        <input
+                          type="number"
+                          value={input.gesperrtPpml || 0}
+                          onChange={(e) => handleInputChange(id, "gesperrtPpml", Number(e.target.value))}
+                          className="mb-2 w-full"
+                        />
+                        <label className="block text-sm">DeltaE</label>
+                        <input
+                          type="number"
+                          value={input.gesperrtDeltaE || 0}
+                          onChange={(e) => handleInputChange(id, "gesperrtDeltaE", Number(e.target.value))}
+                          className="w-full"
+                        />
+                      </>
+                    )}
+                  </div>
+
+                  {/* Reklamierter Teil */}
+                  <div>
+                    <span className="font-semibold">Reklamierter Teil</span>
+                    <label className="block text-sm mt-1">Menge</label>
+                    <input
+                      type="number"
+                      value={input.reklamiertMenge || 0}
+                      onChange={(e) => handleInputChange(id, "reklamiertMenge", Number(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="flex justify-end mt-6 gap-4">
@@ -379,6 +451,7 @@ const Order = () => {
           </div>
         </DialogContent>
       </Dialog>
+
 
       {/* Bestellung anlegen Dialog */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
