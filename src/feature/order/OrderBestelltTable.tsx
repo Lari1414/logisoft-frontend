@@ -172,7 +172,7 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                   <Store className="h-5 w-5" />
                 </Button>
                 <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-                  <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
+                  <DialogContent className="max-h-[50vh] overflow-y-auto max-w-4xl w-full">
                     <DialogHeader>
                       <DialogTitle>Wareneingang anlegen</DialogTitle>
                     </DialogHeader>
