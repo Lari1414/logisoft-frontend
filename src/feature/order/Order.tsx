@@ -233,7 +233,28 @@ const Order = () => {
 
 
   return (
-    <BaseContentLayout title="Bestellungen">
+    <BaseContentLayout
+      title="Bestellungen"
+      primaryCallToActionButton={{
+        text: "Bestellung anlegen",
+        icon: Grid2x2Plus,
+        onClick: handleOpenModal,
+        isLoading: isLoading,
+      }}
+      secondaryActions={
+        <div className="flex gap-2">
+          <Button onClick={handleAbsenden} disabled={selectedOrders.length === 0}>
+            Absenden
+          </Button>
+          <Button
+            onClick={openWareneingangDialog}
+            disabled={selectedOrders.length === 0 || isCreatingWareneingang}
+          >
+            Wareneingang anlegen
+          </Button>
+        </div>
+      }
+    >
       <div className="flex flex-col space-y-4">
         <Tabs
           value={activeTab}
@@ -249,35 +270,24 @@ const Order = () => {
 
         <div>
           {activeTab === "alle" && (
-            <>
-              <OrderTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchOrdersFn} />
-            </>
+            <OrderTable
+              onSelectionChange={handleSelectionChange}
+              setRefetch={setRefetchOrdersFn}
+            />
           )}
-
           {activeTab === "offen" && (
-            <>
-              <OrderOffenTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchOrdersFn} />
-            </>
+            <OrderOffenTable
+              onSelectionChange={handleSelectionChange}
+              setRefetch={setRefetchOrdersFn}
+            />
           )}
-
           {activeTab === "bestellt" && (
-            <>
-              <OrderBestelltTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchOrdersFn} />
-            </>
+            <OrderBestelltTable
+              onSelectionChange={handleSelectionChange}
+              setRefetch={setRefetchOrdersFn}
+            />
           )}
         </div>
-      </div>
-      <div className="flex gap-4 mt-6 mb-4">
-        <Button onClick={handleOpenModal} disabled={isLoading}>
-          <Grid2x2Plus className="mr-2 h-4 w-4" />
-          Bestellung anlegen
-        </Button>
-        <Button onClick={handleAbsenden} disabled={selectedOrders.length === 0}>
-          Absenden
-        </Button>
-        <Button onClick={openWareneingangDialog} disabled={selectedOrders.length === 0 || isCreatingWareneingang}>
-          Wareneingang anlegen
-        </Button>
       </div>
 
       {/* Wareneingang Dialog */}
