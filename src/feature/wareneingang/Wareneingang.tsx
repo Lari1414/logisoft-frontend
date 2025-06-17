@@ -612,18 +612,18 @@ const Wareneingang = () => {
               </div>
 
               {/* Reklamierter Teil nur bei Nicht-T-Shirt */}
-              {neuerWareneingang.materialDetails.category.toLowerCase() !== "t-shirt" && (
-                <div className="flex-1 p-4 border rounded">
-                  <h3 className="font-semibold mb-2">Reklamierter Teil</h3>
-                  <label className="block">Menge</label>
-                  <input
-                    type="number"
-                    value={reklamiertMenge}
-                    onChange={(e) => setReklamiertMenge(Number(e.target.value))}
-                    className="w-full border rounded p-2"
-                  />
-                </div>
-              )}
+
+              <div className="flex-1 p-4 border rounded">
+                <h3 className="font-semibold mb-2">Reklamierter Teil</h3>
+                <label className="block">Menge</label>
+                <input
+                  type="number"
+                  value={reklamiertMenge}
+                  onChange={(e) => setReklamiertMenge(Number(e.target.value))}
+                  className="w-full border rounded p-2"
+                />
+              </div>
+
             </div>
 
           </div>

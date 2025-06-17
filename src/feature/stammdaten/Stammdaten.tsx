@@ -50,7 +50,8 @@ const Stammdaten = () => {
     typ: "",
     groesse: "",
     url: "",
-    standardmaterial: false
+    standardmaterial: false,
+    materialbezeichnung: ""
   });
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
@@ -75,7 +76,8 @@ const Stammdaten = () => {
       typ: "",
       groesse: "",
       url: "",
-      standardmaterial: false
+      standardmaterial: false,
+      materialbezeichnung: ""
     });
   };
 
@@ -133,6 +135,7 @@ const Stammdaten = () => {
         typ: materialForm.typ,
         groesse: materialForm.groesse,
         url: materialForm.url,
+        materialbezeichnung: materialForm.materialbezeichnung,
       }).unwrap();
 
       await refetchMaterials();
@@ -339,7 +342,15 @@ const Stammdaten = () => {
                   <option value="XXL">XXL</option>
                 </select>
               </div>
-
+              <div>
+                <label className="block font-medium mb-1">Materialbezeichnung</label>
+                <Input
+                  name="materialbezeichnung"
+                  placeholder="Materialbezeichnung"
+                  value={materialForm.materialbezeichnung}
+                  onChange={handleMaterialChange}
+                />
+              </div>
               <div>
                 <label className="block font-medium mb-1">Bild-URL</label>
                 <Input

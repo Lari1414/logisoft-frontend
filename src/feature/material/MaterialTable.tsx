@@ -25,6 +25,7 @@ interface Material {
   typ: string;
   groesse: string;
   url: string;
+  materialbezeichnung: string;
 }
 
 
@@ -102,6 +103,7 @@ const MaterialTable = ({ onRefetch }: MaterialTableProps) => {
           typ: formData.typ!,
           groesse: formData.groesse!,
           url: formData.url!,
+          materialbezeichnung: formData.materialbezeichnung!,
         },
       }).unwrap();
 
@@ -165,6 +167,7 @@ const MaterialTable = ({ onRefetch }: MaterialTableProps) => {
     { accessorKey: "typ", header: "Typ" },
     { accessorKey: "groesse", header: "Größe" },
     { accessorKey: "url", header: "Url" },
+    { accessorKey: "materialbezeichnung", header: "Materialbezeichnung" },
     {
       id: "actions",
       header: "Aktionen",
@@ -197,7 +200,8 @@ const MaterialTable = ({ onRefetch }: MaterialTableProps) => {
         item.groesse,
         item.url,
         lagerMap[item.lager_ID],
-        item.farbe
+        item.farbe,
+        item.materialbezeichnung
       ]
         .filter(Boolean)
         .some((val) => val.toLowerCase().includes(search));
@@ -295,7 +299,15 @@ const MaterialTable = ({ onRefetch }: MaterialTableProps) => {
                   onChange={(e) => handleInputChange("url", e.target.value)}
                 />
               </div>
-
+              {/* URL */}
+              <div>
+                <label className="block font-medium mb-1">Materialbezeichnung</label>
+                <Input
+                  placeholder="materialbezeichnung"
+                  value={formData.materialbezeichnung || ""}
+                  onChange={(e) => handleInputChange("materialbezeichnung", e.target.value)}
+                />
+              </div>
               {/* Lager-ID */}
 
               <div className="col-span-2">

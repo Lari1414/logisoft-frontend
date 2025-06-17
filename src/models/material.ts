@@ -13,4 +13,5 @@ export interface Material {
   typ: string;
   groesse: string;
   url: string;
+  materialbezeichnung: string;
 }
