@@ -1,4 +1,4 @@
-import { Material } from "@/models/material.ts"; 
+import { Material } from "@/models/material.ts";
 import { baseApi } from "@/api/baseApi.ts";
 
 
@@ -25,6 +25,10 @@ export const materialApi = baseApi.injectEndpoints({
       query: () => "/materials"
     }),
 
+    getStandardMaterial: builder.query<Material[], void>({
+      query: () => "/materials/standards"
+    }),
+
     // Materialen erstellen
     createMaterial: builder.mutation<Material, CreateMaterialRequest>({
       query: (data) => ({
@@ -32,7 +36,7 @@ export const materialApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-    
+
     }),
 
     // Materialen aktualisieren
@@ -42,7 +46,7 @@ export const materialApi = baseApi.injectEndpoints({
         method: "PUT",
         body: data,
       }),
-    
+
     }),
 
     // Material löschen
@@ -51,7 +55,7 @@ export const materialApi = baseApi.injectEndpoints({
         url: `/materials/${id}`,
         method: "DELETE",
       }),
-   
+
     }),
   }),
 });
