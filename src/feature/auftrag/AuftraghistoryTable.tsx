@@ -81,11 +81,26 @@ const AuftraghistoryTable = () => {
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ getValue }) => (
-        <span className="px-2 py-1 rounded bg-green-500 text-white">
-          {getValue() as string}
-        </span>
-      ),
+      cell: ({ getValue }) => {
+        const status = getValue() as string;
+
+        let bgColor = "";
+        let textColor = "text-white";
+
+        if (status === "auslagerung abgeschlossen") {
+          bgColor = "bg-yellow-500";
+        } else if (status === "einlagerung abgeschlossen") {
+          bgColor = "bg-green-600";
+        } else {
+          bgColor = "bg-gray-400";
+        }
+
+        return (
+          <span className={`px-2 py-1 rounded ${bgColor} ${textColor}`}>
+            {status}
+          </span>
+        );
+      },
     },
     { accessorKey: "lagerbestand_ID", header: "Lagerbestand-ID" },
     { accessorKey: "bestellposition", header: "Bestellposition" },

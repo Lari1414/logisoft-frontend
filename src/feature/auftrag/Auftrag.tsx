@@ -94,15 +94,48 @@ const Auftrag = () => {
         </Tabs>
 
         {activeTab === "offen" && (
-          <AuftragTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} />
+          <AuftragTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} onExecuteSingle={async (auftrag) => {
+            try {
+              if (auftrag.status?.toLowerCase() === "einlagerung angefordert") {
+                await storeMaterial({ auftragIds: [auftrag.auftrag_ID] });
+              } else if (auftrag.status?.toLowerCase() === "auslagerung angefordert") {
+                await outsourceMaterial({ auftragIds: [auftrag.auftrag_ID] });
+              }
+              if (refetchTable) refetchTable();
+            } catch (error) {
+              console.error("Fehler bei Einzelauftrag-Ausführung:", error);
+            }
+          }} />
         )}
 
         {activeTab === "einlagerung" && (
-          <EinlagerungsAuftraegeTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} />
+          <EinlagerungsAuftraegeTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} onExecuteSingle={async (auftrag) => {
+            try {
+              if (auftrag.status?.toLowerCase() === "einlagerung angefordert") {
+                await storeMaterial({ auftragIds: [auftrag.auftrag_ID] });
+              } else if (auftrag.status?.toLowerCase() === "auslagerung angefordert") {
+                await outsourceMaterial({ auftragIds: [auftrag.auftrag_ID] });
+              }
+              if (refetchTable) refetchTable();
+            } catch (error) {
+              console.error("Fehler bei Einzelauftrag-Ausführung:", error);
+            }
+          }} />
         )}
 
         {activeTab === "auslagerung" && (
-          <AuslagerungsAuftraegeTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} />
+          <AuslagerungsAuftraegeTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} onExecuteSingle={async (auftrag) => {
+            try {
+              if (auftrag.status?.toLowerCase() === "einlagerung angefordert") {
+                await storeMaterial({ auftragIds: [auftrag.auftrag_ID] });
+              } else if (auftrag.status?.toLowerCase() === "auslagerung angefordert") {
+                await outsourceMaterial({ auftragIds: [auftrag.auftrag_ID] });
+              }
+              if (refetchTable) refetchTable();
+            } catch (error) {
+              console.error("Fehler bei Einzelauftrag-Ausführung:", error);
+            }
+          }} />
         )}
 
         {activeTab === "historie" && <AuftraghistoryTable />}

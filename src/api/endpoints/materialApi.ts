@@ -15,6 +15,7 @@ export interface CreateMaterialRequest {
   typ: string;
   groesse: string;
   url: string;
+  materialbezeichnung: string;
 }
 
 export const materialApi = baseApi.injectEndpoints({

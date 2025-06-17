@@ -4,6 +4,8 @@ import { DataTable } from "@/components/sidebar/data-table";
 import { auftragApi } from "@/api/endpoints/auftragApi";
 import { Auftrag } from "@/models/auftrag";
 import { materialApi } from "@/api/endpoints/materialApi";
+import { Button } from "@/components/ui/button";
+import { Play } from "lucide-react";
 
 // Zusätzlicher Typ für die transformierten Daten
 export interface TransformedAuftrag extends Auftrag {
@@ -18,9 +20,10 @@ export interface TransformedAuftrag extends Auftrag {
 interface AuftragTableProps {
   onSelectionChange: (selectedRows: TransformedAuftrag[]) => void;
   onRefetch?: (refetchFn: () => void) => void;
+  onExecuteSingle?: (auftrag: TransformedAuftrag) => void;
 }
 
-const AuftragAuslagerungTable = ({ onSelectionChange, onRefetch }: AuftragTableProps) => {
+const AuftragAuslagerungTable = ({ onSelectionChange, onRefetch, onExecuteSingle }: AuftragTableProps) => {
   const { data, isLoading, error, refetch } = auftragApi.useGetAuslagerungsAuftraegeQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const { data: materialsData } = materialApi.useGetMaterialQuery();
@@ -119,15 +122,51 @@ const AuftragAuslagerungTable = ({ onSelectionChange, onRefetch }: AuftragTableP
     },
     { accessorKey: "menge", header: "Menge" },
     {
-      accessorKey: "status", header: "Status", cell: ({ getValue }) => (
-        <span className="px-2 py-1 rounded bg-yellow-400 text-black">
-          {getValue() as string}
-        </span>
-      ),
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ getValue }) => {
+        const status = getValue() as string;
+
+        let bgColor = "";
+        let textColor = "text-white";
+
+        if (status === "auslagerung angefordert") {
+          bgColor = "bg-yellow-500";
+        } else if (status === "einlagerung angefordert") {
+          bgColor = "bg-green-600";
+        } else {
+          bgColor = "bg-gray-400";
+        }
+
+        return (
+          <span className={`px-2 py-1 rounded ${bgColor} ${textColor}`}>
+            {status}
+          </span>
+        );
+      },
     },
     { accessorKey: "lagerbestand_ID", header: "Lagerbestand-ID" },
     { accessorKey: "bestellposition", header: "Bestellposition" },
     { accessorKey: "angefordertVon", header: "Angefordert Von" },
+    {
+      id: "actions",
+      header: "Aktion",
+      cell: ({ row }) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          title="Ausführen"
+          className="flex items-center hover:bg-blue-100 gap-2"
+          onClick={() => {
+            if (onExecuteSingle) {
+              onExecuteSingle(row.original);
+            }
+          }}
+        >
+          <Play className="w-4 h-4" />
+        </Button>
+      ),
+    },
   ];
 
   if (isLoading) return <div>Lädt...</div>;
