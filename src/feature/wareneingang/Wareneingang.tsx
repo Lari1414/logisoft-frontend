@@ -224,7 +224,35 @@ const Wareneingang = () => {
   return (
 
 
-    <BaseContentLayout title="Wareneingang" >
+    <BaseContentLayout
+      title="Wareneingang"
+      primaryCallToActionButton={
+        activeTab === "wareneingang"
+          ? {
+            text: "Wareneingang anlegen",
+            icon: Grid2x2Plus,
+            onClick: () => setModalType("anlegen"),
+            isLoading: false,
+          }
+          : undefined
+      }
+      secondaryActions={
+        activeTab === "wareneingang" ? (
+          <div className="flex gap-2">
+            <Button onClick={handleEinlagernClick} disabled={einlagerbareRows.length === 0}>
+              <Grid2x2Plus className="mr-2 h-4 w-4" />
+              Einlagern
+            </Button>
+            <Button onClick={handleSperrenClick} disabled={entsperrbareRows.length === 0}>
+              Sperren
+            </Button>
+            <Button onClick={handleEntsperrenClick} disabled={entsperrbareRows.length === 0}>
+              Entsperren
+            </Button>
+          </div>
+        ) : undefined
+      }
+    >
       <div className="flex flex-col space-y-4">
         <Tabs
           value={activeTab}
@@ -237,39 +265,23 @@ const Wareneingang = () => {
           <Tab label="Reklamation" value="reklamation" />
         </Tabs>
 
-        <div>
-          {activeTab === "wareneingang" ? (
-            <>
-              <div className="flex gap-4 mt-4">
-                <WareneingangTable onSelectionChange={handleSelectionChange} setRefetch={setRefetchTable} onEinlagernRow={handleEinlagernRow}
-                  onSperrenRow={handleSperrenRow} onEntsperrenRow={handleEntsperrenRow} />
-                <Button onClick={handleEinlagernClick} disabled={einlagerbareRows.length === 0}>
-                  <Grid2x2Plus className="mr-2 h-4 w-4" />
-                  Einlagern
-                </Button>
-                <Button onClick={handleSperrenClick} disabled={entsperrbareRows.length === 0}>
-                  Sperren
-                </Button>
-                <Button onClick={handleEntsperrenClick} disabled={entsperrbareRows.length === 0}>
-                  Entsperren
-                </Button>
-                <Button onClick={() => setModalType("anlegen")}>
-                  Wareneingang anlegen
-                </Button>
-
-              </div>
-
-
-
-            </>
-          ) : (
-            <div className="flex gap-4 mt-4">
-              {<ReklamationTable onSelectionChange={handleReklamationSelection} setRefetch={setRefetchTable} />}
-
-            </div>
-          )}
-        </div>
+        {activeTab === "wareneingang" ? (
+          <WareneingangTable
+            onSelectionChange={handleSelectionChange}
+            setRefetch={setRefetchTable}
+            onEinlagernRow={handleEinlagernRow}
+            onSperrenRow={handleSperrenRow}
+            onEntsperrenRow={handleEntsperrenRow}
+          />
+        ) : (
+          <ReklamationTable
+            onSelectionChange={handleReklamationSelection}
+            setRefetch={setRefetchTable}
+          />
+        )}
       </div>
+
+
 
       {/* Einlagern Dialog */}
       <Dialog open={modalType === "einlagern"} onOpenChange={() => setModalType(null)}>

@@ -190,18 +190,24 @@ const FertigMateriallager = () => {
   }
 
   return (
-    <BaseContentLayout title="Fertigmaterial Lager">
-      <FertigMateriallagerTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} onAuslagernClick={handleEinzelAuslagernClick} />
-      <div className="flex gap-4 mb-4">
+    <BaseContentLayout
+      title="Fertigmaterial Lager"
+      primaryCallToActionButton={{
+        text: "Auslagern",
+        icon: Grid2x2Plus,
+        onClick: handleAuslagernClick,
+        isLoading: false,
+        disabled: selectedRows.length === 0,
+      }}
+      secondaryActions={
         <Button onClick={() => setIsEinlagernModalOpen(true)} disabled={isStoring}>
           <Grid2x2Plus className="mr-2 h-4 w-4" />
           Einlagern
         </Button>
-        <Button onClick={handleAuslagernClick} disabled={selectedRows.length === 0}>
-          <Grid2x2Plus className="mr-2 h-4 w-4" />
-          Auslagern
-        </Button>
-      </div>
+      }
+    >
+      <FertigMateriallagerTable onSelectionChange={handleSelectionChange} onRefetch={handleSetRefetch} onAuslagernClick={handleEinzelAuslagernClick} />
+
 
       {/* Auslagern Dialog */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
