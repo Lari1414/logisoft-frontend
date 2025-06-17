@@ -113,12 +113,21 @@ const MindestbestandTable = () => {
       console.error("Fehler beim Löschen:", err);
     }
   };
-  const materialOptions =
+  /*const materialOptions =
     materialsData?.map((m) => ({
       value: m.material_ID,
       label: `${m.typ ?? ""} – ${m.farbe ?? ""} – ${m.groesse ?? ""}`,
       color: m.farbe?.toLowerCase() ?? "transparent",
-    })) || [];
+    })) || [];*/
+  const materialOptions =
+    materialsData
+      ?.filter((m) => m.lager_ID === 1)
+      .map((m) => ({
+        value: m.material_ID,
+        label: `${m.typ ?? ""} – ${m.farbe ?? ""} – ${m.groesse ?? ""}`,
+        color: m.farbe?.toLowerCase() ?? "transparent",
+      })) || [];
+
 
 
   const ColourOption = (props: any) => (
