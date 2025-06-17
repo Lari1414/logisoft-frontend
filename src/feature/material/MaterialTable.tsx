@@ -34,7 +34,7 @@ interface MaterialTableProps {
 }
 
 const MaterialTable = ({ onRefetch }: MaterialTableProps) => {
-  const { data, isLoading, error, refetch } = materialApi.useGetMaterialQuery();
+  const { data, isLoading, error, refetch } = materialApi.useGetStandardMaterialQuery();
   const [deleteMaterial] = materialApi.useDeleteMaterialMutation();
   const [updateMaterial] = materialApi.useUpdateMaterialMutation();
   const { data: lagerData } = lagerApi.useGetLagerQuery();
