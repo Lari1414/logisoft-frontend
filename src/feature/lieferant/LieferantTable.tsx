@@ -102,7 +102,7 @@ const LieferantTable = ({ lieferanten }: { lieferanten: Lieferant[] }) => {
       header: "Aktionen",
       cell: ({ row }) => (
         <div className="flex gap-2">
-          <Button variant="ghost" className="p-2 text-blue-600 hover:bg-blue-100 rounded" onClick={() => openEditDialog(row.original)} title="Bearbeiten">
+          <Button variant="ghost" className="p-2 text-black-600 hover:bg-blue-100 rounded" onClick={() => openEditDialog(row.original)} title="Bearbeiten">
             <Pencil size={18} />
           </Button>
           <button onClick={() => handleDelete(row.original.lieferant_ID)} className="hover:bg-red-100 rounded" title="Löschen">

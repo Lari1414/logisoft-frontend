@@ -133,7 +133,7 @@ const AuftragTable = ({ onSelectionChange, onRefetch, onExecuteSingle }: Auftrag
         if (status === "auslagerung angefordert") {
           bgColor = "bg-yellow-500";
         } else if (status === "einlagerung angefordert") {
-          bgColor = "bg-green-600";
+          bgColor = "bg-blue-400";
         } else {
           bgColor = "bg-gray-400";
         }

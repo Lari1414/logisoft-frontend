@@ -88,7 +88,7 @@ const AuftraghistoryTable = () => {
         let textColor = "text-white";
 
         if (status === "auslagerung abgeschlossen") {
-          bgColor = "bg-yellow-500";
+          bgColor = "bg-green-800";
         } else if (status === "einlagerung abgeschlossen") {
           bgColor = "bg-green-600";
         } else {
