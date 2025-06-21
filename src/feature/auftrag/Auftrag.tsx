@@ -141,7 +141,7 @@ const Auftrag = () => {
         {activeTab === "historie" && <AuftraghistoryTable />}
 
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent>
+          <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
             <DialogHeader>
               <DialogTitle>Ausgewählte Aufträge ausführen</DialogTitle>
             </DialogHeader>
