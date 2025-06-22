@@ -23,7 +23,6 @@ import logo from '@/assets/logo.jpeg';
 // IconBuildingFactory 
 //} from "@tabler/icons-react";
 
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
