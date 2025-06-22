@@ -11,7 +11,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar.tsx";
 import { NAV_MAIN } from "@/navigation/sidebarItems.tsx";
-import { Shirt } from "lucide-react";
+//import { Shirt } from "lucide-react";
 import { SidebarFooterLinks } from "@/components/sidebar/sidebarfooterlinks.tsx";
 //import { NavUser } from "@/components/sidebar/nav-user.tsx";
 //import {
@@ -33,7 +33,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="#">
-                <Shirt className="!size-5" />
+                {/*<Shirt className="!size-5" /> */}
+                <img src="/src/assets/logo.png" alt="Logo" className="w-9 h-9 object-contain mb-1"></img>
                 <span className="text-base font-semibold">YourShirt GmbH</span>
 
               </a>
