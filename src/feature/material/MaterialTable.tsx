@@ -195,6 +195,7 @@ const MaterialTable = ({ onRefetch }: MaterialTableProps) => {
     return allData.filter((item) => {
       const search = searchTerm.toLowerCase();
       return [
+        item.material_ID,
         item.category,
         item.typ,
         item.groesse,
@@ -204,7 +205,9 @@ const MaterialTable = ({ onRefetch }: MaterialTableProps) => {
         item.materialbezeichnung
       ]
         .filter(Boolean)
-        .some((val) => val.toLowerCase().includes(search));
+        .some((val) =>
+          String(val).toLowerCase().includes(search)
+        );
     });
   }, [data, searchTerm, lagerMap]);
 

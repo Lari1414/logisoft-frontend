@@ -12,10 +12,10 @@ export function SidebarFooterLinks() {
     <SidebarFooter className="mt-auto">
       {state === "collapsed" ? (
         <div className="flex flex-col items-center gap-4 p-4">
-          <a href="/Verkauf&Versand" title="Verkauf & Versand">
+          <a href="https://white-dune-0347c7a03.6.azurestaticapps.net/dashboard" title="Verkauf & Versand">
             <Package className="size-5" />
           </a>
-          <a href="/Produktion" title="Produktion">
+          <a href="https://frontend-your-shirt-gmbh.vercel.app/produktion" title="Produktion">
             <Factory className="size-5" />
           </a>
           <a href="/kennzahlen" title="Materialwirtschaft">
@@ -26,14 +26,14 @@ export function SidebarFooterLinks() {
         <div className="flex flex-col gap-1 p-4 text-sm">
           
           <a
-            href="/Verkauf&Versand"
+            href="https://white-dune-0347c7a03.6.azurestaticapps.net/dashboard"
             className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors"
           >
                <Package className="size-5" />
             <span className="text-gray-800 font-medium">Verkauf & Versand</span>
           </a>
           <a
-            href="/Produktion"
+            href="https://frontend-your-shirt-gmbh.vercel.app/produktion"
             className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors"
           >
             <Factory className="size-5" />

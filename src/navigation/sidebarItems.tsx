@@ -1,4 +1,4 @@
-import { IconClipboardList, IconDashboard, IconDatabase, IconPackage, IconShoppingCart} from "@tabler/icons-react";
+import { IconClipboardList, IconDashboard, IconDatabase, IconShoppingCart, IconPackageImport, IconBuildingWarehouse } from "@tabler/icons-react";
 import Dashboard from "@/feature/dashboard/Dashboard.tsx";
 import Order from "@/feature/order/Order.tsx";
 import Lieferant from "@/feature/stammdaten/Stammdaten.tsx";
@@ -29,19 +29,19 @@ export const NAV_MAIN = [
   {
     title: "Wareneingang",
     url: "/wareneingang",
-    icon: IconDatabase,
+    icon: IconPackageImport ,
     element: <Wareneingang />,
   },
   {
    title: "Rohmateriallager",
     url: "/rohmateriallager",
-    icon: IconPackage,
+    icon: IconBuildingWarehouse,
     element: <RohMateriallager />,
   },
   {
     title: "Fertigmateriallager",
     url: "/fertigmateriallager",
-    icon: IconPackage,
+    icon: IconBuildingWarehouse,
     element: <Fertigmateriallager />,
   },
   {

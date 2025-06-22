@@ -11,14 +11,16 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar.tsx";
 import { NAV_MAIN } from "@/navigation/sidebarItems.tsx";
-import { Shirt } from "lucide-react";
+//import { Shirt } from "lucide-react";
 import { SidebarFooterLinks } from "@/components/sidebar/sidebarfooterlinks.tsx";
+import logo from '@/assets/logo.jpeg';
+
 //import { NavUser } from "@/components/sidebar/nav-user.tsx";
 //import {
-  //IconPackage,
- //IconWarehouse ,
+//IconPackage,
+//IconWarehouse ,
 //  IconShoppingCart,
- // IconBuildingFactory 
+// IconBuildingFactory 
 //} from "@tabler/icons-react";
 
 
@@ -32,10 +34,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
-                <Shirt className="!size-5" />
+
+              <a href="/kennzahlen" className="flex items-center space-x-2">
+                <img src={logo} alt="Logo" className="w-9 h-9 object-contain mb-1" />
+                {/* <Shirt className="!size-5" /> */}
                 <span className="text-base font-semibold">YourShirt GmbH</span>
-              
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -46,10 +49,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/*<NavDocuments items={data.documents} />*/}
         {/*<NavSecondary items={data.navSecondary} className="mt-auto" />*/}
       </SidebarContent>
-      
-  <SidebarFooter>
-    < SidebarFooterLinks />
-  </SidebarFooter>
+
+      <SidebarFooter>
+        < SidebarFooterLinks />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
