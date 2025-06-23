@@ -19,7 +19,7 @@ export function SidebarFooterLinks() {
           <a href="https://frontend-your-shirt-gmbh.vercel.app" title="Produktion">
             <Factory className="size-5" />
           </a>
-          <a href="/kennzahlen" title="Materialwirtschaft">
+          <a href="/" title="Materialwirtschaft">
             <IconBuildingWarehouse className="size-5" />
           </a>
         </div>
@@ -47,7 +47,7 @@ export function SidebarFooterLinks() {
           </a>
 
           <a
-            href="/kennzahlen"
+            href="/"
             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 hover:bg-gray-100 transition-colors"
           >
             <IconBuildingWarehouse className="size-5" />
