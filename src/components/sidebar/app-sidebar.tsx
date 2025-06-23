@@ -32,7 +32,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="/kennzahlen">
+              <a href="/">
                 {/*<Shirt className="!size-5" /> */}
                 <img src="/logo.png" alt="Logo" className="w-9 h-9 object-contain mb-1"></img>
                 <span className="text-base font-semibold">YourShirt GmbH</span>
