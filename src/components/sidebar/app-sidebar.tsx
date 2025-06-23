@@ -43,6 +43,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+          Funktionen
+          <div className="mt-2 h-px w-full bg-gray-200" />
+        </div>
         <NavMain items={NAV_MAIN} />
         {/*<NavDocuments items={data.documents} />*/}
         {/*<NavSecondary items={data.navSecondary} className="mt-auto" />*/}
