@@ -46,8 +46,13 @@ export const wareneingangApi = baseApi.injectEndpoints({
     getWareneingang: builder.query<Wareneingang[], void>({
       query: () => "/wareneingaenge"
     }),
+    
     getWareneingangHeute: builder.query<Wareneingang[], void>({
       query: () => "/wareneingaenge/heute"
+    }),
+
+    getWareneingangAlle: builder.query<Wareneingang[], void>({
+      query: () => "/wareneingaenge/alle"
     }),
      // Materialen Einlagern
     storeRohmaterial: builder.mutation<Wareneingang, storeMaterialRequest>({

@@ -28,14 +28,22 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
   const columns: ColumnDef<Order & { id: string }>[] = [
     {
       id: "select",
-      header: () => null,
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllPageRowsSelected()}
+          onChange={table.getToggleAllPageRowsSelectedHandler()}
+        />
+      ),
       cell: ({ row }) => (
         <input
           type="checkbox"
           checked={row.getIsSelected()}
-          onChange={() => row.toggleSelected()}
+          onChange={row.getToggleSelectedHandler()}
         />
       ),
+      enableSorting: false,
+      enableHiding: false,
     },
     { accessorKey: "materialbestellung_ID", header: "Materialbestellung-ID" },
     { accessorKey: "lieferant.firmenname", header: "Lieferantname" },
@@ -119,6 +127,7 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
 
 
         const handleWareneingang = async () => {
+          console.count("handleWareneingang triggered");
           try {
             await createWareneingang({
               materialbestellung_ID: order.materialbestellung_ID,
@@ -127,21 +136,21 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
               guterTeil: {
                 menge: guterMenge,
                 qualitaet: {
-                  viskositaet: 0,
-                  ppml: 0,
+                  viskositaet: guterViskositaet,
+                  ppml: guterPpml,
                   saugfaehigkeit: guterSaugfaehigkeit,
                   weissgrad: guterWeissgrad,
-                  deltaE: 0
+                  deltaE: guterDeltaE
                 },
               },
               gesperrterTeil: {
                 menge: gesperrtMenge,
                 qualitaet: {
-                  viskositaet: 0,
-                  ppml: 0,
+                  viskositaet: gesperrtViskositaet,
+                  ppml: gesperrtPpml,
                   saugfaehigkeit: gesperrtSaugfaehigkeit,
                   weissgrad: gesperrtWeissgrad,
-                  deltaE: 0
+                  deltaE: gesperrtDeltaE
                 },
               },
               reklamierterTeil: {
@@ -167,7 +176,7 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                   }}
                   disabled={isCreating}
                   className="flex items-center hover:bg-yellow-100 gap-2"
-                  title="Einlagern"
+                  title="Wareneingang anlegen"
                 >
                   <Store className="h-5 w-5" />
                 </Button>
@@ -202,7 +211,7 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                         <label className="block">Menge</label>
                         <input
                           type="number"
-                          value={guterMenge}
+
                           onChange={(e) => setGuterMenge(Number(e.target.value))}
                           className="w-full mb-2 border rounded p-2"
                         />
@@ -212,14 +221,14 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                             <label className="block">Saugfähigkeit</label>
                             <input
                               type="number"
-                              value={guterSaugfaehigkeit}
+
                               onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">Weißgrad</label>
                             <input
                               type="number"
-                              value={guterWeissgrad}
+
                               onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
                               className="w-full border rounded p-2"
                             />
@@ -229,21 +238,21 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                             <label className="block">Viskosität</label>
                             <input
                               type="number"
-                              value={guterViskositaet}
+
                               onChange={(e) => setGuterViskositaet(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">Ppml</label>
                             <input
                               type="number"
-                              value={guterPpml}
+
                               onChange={(e) => setGuterPpml(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">DeltaE</label>
                             <input
                               type="number"
-                              value={guterDeltaE}
+
                               onChange={(e) => setGuterDeltaE(Number(e.target.value))}
                               className="w-full border rounded p-2"
                             />
@@ -257,7 +266,7 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                         <label className="block">Menge</label>
                         <input
                           type="number"
-                          value={gesperrtMenge}
+
                           onChange={(e) => setGesperrtMenge(Number(e.target.value))}
                           className="w-full mb-2 border rounded p-2"
                         />
@@ -267,14 +276,14 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                             <label className="block">Saugfähigkeit</label>
                             <input
                               type="number"
-                              value={gesperrtSaugfaehigkeit}
+
                               onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">Weißgrad</label>
                             <input
                               type="number"
-                              value={gesperrtWeissgrad}
+
                               onChange={(e) => setGesperrtWeissgrad(Number(e.target.value))}
                               className="w-full border rounded p-2"
                             />
@@ -284,21 +293,21 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                             <label className="block">Viskosität</label>
                             <input
                               type="number"
-                              value={gesperrtViskositaet}
+
                               onChange={(e) => setGesperrtViskositaet(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">Ppml</label>
                             <input
                               type="number"
-                              value={gesperrtPpml}
+
                               onChange={(e) => setGesperrtPpml(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">DeltaE</label>
                             <input
                               type="number"
-                              value={gesperrtDeltaE}
+
                               onChange={(e) => setGesperrtDeltaE(Number(e.target.value))}
                               className="w-full border rounded p-2"
                             />
@@ -311,7 +320,7 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                         <label className="block">Menge</label>
                         <input
                           type="number"
-                          value={reklamiertMenge}
+
                           onChange={(e) => setReklamiertMenge(Number(e.target.value))}
                           className="w-full border rounded p-2"
                         />

@@ -502,7 +502,7 @@ const Wareneingang = () => {
                   <label className="block">Menge</label>
                   <input
                     type="number"
-                    value={guterMenge}
+              
                     onChange={(e) => setGuterMenge(Number(e.target.value))}
                     className="w-full mb-2 border rounded p-2"
                   />
@@ -515,7 +515,7 @@ const Wareneingang = () => {
                     <label className="block">Saugfähigkeit</label>
                     <input
                       type="number"
-                      value={guterSaugfaehigkeit}
+                
                       onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
@@ -523,7 +523,7 @@ const Wareneingang = () => {
                     <label className="block">Weißgrad</label>
                     <input
                       type="number"
-                      value={guterWeissgrad}
+                 
                       onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
@@ -536,21 +536,21 @@ const Wareneingang = () => {
                     <label className="block">Viskosität</label>
                     <input
                       type="number"
-                      value={guterViskositaet}
+                  
                       onChange={(e) => setGuterViskositaet(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
                     <label className="block">Ppml</label>
                     <input
                       type="number"
-                      value={guterPpml}
+                  
                       onChange={(e) => setGuterPpml(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
                     <label className="block">DeltaE</label>
                     <input
                       type="number"
-                      value={guterDeltaE}
+             
                       onChange={(e) => setGuterDeltaE(Number(e.target.value))}
                       className="w-full border rounded p-2"
                     />
@@ -567,7 +567,7 @@ const Wareneingang = () => {
                     <label className="block">Menge</label>
                     <input
                       type="number"
-                      value={gesperrtMenge}
+                
                       onChange={(e) => setGesperrtMenge(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
@@ -580,7 +580,7 @@ const Wareneingang = () => {
                     <label className="block">Saugfähigkeit</label>
                     <input
                       type="number"
-                      value={gesperrtSaugfaehigkeit}
+                
                       onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
@@ -601,21 +601,21 @@ const Wareneingang = () => {
                     <label className="block">Viskosität</label>
                     <input
                       type="number"
-                      value={gesperrtViskositaet}
+                
                       onChange={(e) => setGesperrtViskositaet(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
                     <label className="block">Ppml</label>
                     <input
                       type="number"
-                      value={gesperrtPpml}
+                    
                       onChange={(e) => setGesperrtPpml(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
                     <label className="block">DeltaE</label>
                     <input
                       type="number"
-                      value={gesperrtDeltaE}
+                     value={gesperrtDeltaE}
                       onChange={(e) => setGesperrtDeltaE(Number(e.target.value))}
                       className="w-full border rounded p-2"
                     />

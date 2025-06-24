@@ -75,14 +75,22 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
   const columns: ColumnDef<Order & { id: string }>[] = [
     {
       id: "select",
-      header: () => null,
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllPageRowsSelected()}
+          onChange={table.getToggleAllPageRowsSelectedHandler()}
+        />
+      ),
       cell: ({ row }) => (
         <input
           type="checkbox"
           checked={row.getIsSelected()}
-          onChange={() => row.toggleSelected()}
+          onChange={row.getToggleSelectedHandler()}
         />
       ),
+      enableSorting: false,
+      enableHiding: false,
     },
     { accessorKey: "materialbestellung_ID", header: "Materialbestellung-ID" },
     { accessorKey: "lieferant.firmenname", header: "Lieferantname" },
@@ -147,6 +155,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
         const [gesperrtMenge, setGesperrtMenge] = useState<number>(0);
         const [reklamiertMenge, setReklamiertMenge] = useState<number>(0);
         const [menge, setMenge] = useState<number>(order.menge);
+        const [summeUngueltig, setSummeUngueltig] = useState(false);
 
         const [guterSaugfaehigkeit, setGuterSaugfaehigkeit] = useState<number>(0);
         const [guterWeissgrad, setGuterWeissgrad] = useState<number>(0);
@@ -160,10 +169,6 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
         const [gesperrtPpml, setGesperrtPpml] = useState<number>(0);
         const [gesperrtDeltaE, setGesperrtDeltaE] = useState<number>(0);
 
-        useEffect(() => {
-          const sum = guterMenge + gesperrtMenge + reklamiertMenge;
-          setMenge(sum);
-        }, [guterMenge, gesperrtMenge, reklamiertMenge]);
 
         const [updateStatus, { isLoading: isUpdating }] = orderApi.useUpdateMultipleOrdersStatusMutation();
         const [createWareneingang, { isLoading: isCreating }] = wareneingangApi.useCreateWareneingangMutation();
@@ -189,6 +194,12 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
           }
         }, [openEditDialog, order]);
 
+        useEffect(() => {
+          const summe = guterMenge + gesperrtMenge + reklamiertMenge;
+          setSummeUngueltig(summe > menge);
+        }, [menge, guterMenge, gesperrtMenge, reklamiertMenge]);
+
+
         const handleSave = async () => {
           try {
             await updateOrder({
@@ -208,6 +219,12 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
         };
 
         const handleWareneingang = async () => {
+          const summeTeilmengen = guterMenge + gesperrtMenge + reklamiertMenge;
+          console.log("Menge: " + menge + ", guterMenge: " + guterMenge + ", gesperrtMenge: " + gesperrtMenge + ", reklamiertMenge: " + reklamiertMenge)
+          if (summeTeilmengen > menge) {
+            alert("Die Summe aus guter, gesperrter und reklamierter Menge darf die eingetroffene Menge nicht übersteigen.");
+            return;
+          }
           try {
             await createWareneingang({
               materialbestellung_ID: order.materialbestellung_ID,
@@ -216,21 +233,21 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
               guterTeil: {
                 menge: guterMenge,
                 qualitaet: {
-                  viskositaet: 0,
-                  ppml: 0,
+                  viskositaet: guterViskositaet,
+                  ppml: guterPpml,
                   saugfaehigkeit: guterSaugfaehigkeit,
                   weissgrad: guterWeissgrad,
-                  deltaE: 0
+                  deltaE: guterDeltaE
                 },
               },
               gesperrterTeil: {
                 menge: gesperrtMenge,
                 qualitaet: {
-                  viskositaet: 0,
-                  ppml: 0,
+                  viskositaet: gesperrtViskositaet,
+                  ppml: gesperrtPpml,
                   saugfaehigkeit: gesperrtSaugfaehigkeit,
                   weissgrad: gesperrtWeissgrad,
-                  deltaE: 0
+                  deltaE: gesperrtDeltaE
                 },
               },
               reklamierterTeil: {
@@ -382,7 +399,6 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                         <label className="block">Menge</label>
                         <input
                           type="number"
-                          value={guterMenge}
                           onChange={(e) => setGuterMenge(Number(e.target.value))}
                           className="w-full mb-2 border rounded p-2"
                         />
@@ -392,14 +408,14 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                             <label className="block">Saugfähigkeit</label>
                             <input
                               type="number"
-                              value={guterSaugfaehigkeit}
+
                               onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">Weißgrad</label>
                             <input
                               type="number"
-                              value={guterWeissgrad}
+
                               onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
                               className="w-full border rounded p-2"
                             />
@@ -409,21 +425,21 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                             <label className="block">Viskosität</label>
                             <input
                               type="number"
-                              value={guterViskositaet}
+
                               onChange={(e) => setGuterViskositaet(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">Ppml</label>
                             <input
                               type="number"
-                              value={guterPpml}
+
                               onChange={(e) => setGuterPpml(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">DeltaE</label>
                             <input
                               type="number"
-                              value={guterDeltaE}
+
                               onChange={(e) => setGuterDeltaE(Number(e.target.value))}
                               className="w-full border rounded p-2"
                             />
@@ -437,7 +453,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                         <label className="block">Menge</label>
                         <input
                           type="number"
-                          value={gesperrtMenge}
+
                           onChange={(e) => setGesperrtMenge(Number(e.target.value))}
                           className="w-full mb-2 border rounded p-2"
                         />
@@ -447,14 +463,14 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                             <label className="block">Saugfähigkeit</label>
                             <input
                               type="number"
-                              value={gesperrtSaugfaehigkeit}
+
                               onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">Weißgrad</label>
                             <input
                               type="number"
-                              value={gesperrtWeissgrad}
+
                               onChange={(e) => setGesperrtWeissgrad(Number(e.target.value))}
                               className="w-full border rounded p-2"
                             />
@@ -464,21 +480,21 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                             <label className="block">Viskosität</label>
                             <input
                               type="number"
-                              value={gesperrtViskositaet}
+
                               onChange={(e) => setGesperrtViskositaet(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">Ppml</label>
                             <input
                               type="number"
-                              value={gesperrtPpml}
+
                               onChange={(e) => setGesperrtPpml(Number(e.target.value))}
                               className="w-full mb-2 border rounded p-2"
                             />
                             <label className="block">DeltaE</label>
                             <input
                               type="number"
-                              value={gesperrtDeltaE}
+
                               onChange={(e) => setGesperrtDeltaE(Number(e.target.value))}
                               className="w-full border rounded p-2"
                             />
@@ -491,16 +507,22 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                         <label className="block">Menge</label>
                         <input
                           type="number"
-                          value={reklamiertMenge}
+
                           onChange={(e) => setReklamiertMenge(Number(e.target.value))}
                           className="w-full border rounded p-2"
                         />
                       </div>
 
+
                     </div>
 
                     <div className="mt-6">
-                      <Button onClick={handleWareneingang}>Anlegen</Button>
+                      {summeUngueltig && (
+                        <div className="text-red-500 mt-2">
+                          Die Summe aus guter, gesperrter und reklamierter Menge darf die eingetroffene Menge nicht übersteigen.
+                        </div>
+                      )}
+                      <Button onClick={handleWareneingang} disabled={summeUngueltig}>Anlegen</Button>
                     </div>
                   </DialogContent>
 

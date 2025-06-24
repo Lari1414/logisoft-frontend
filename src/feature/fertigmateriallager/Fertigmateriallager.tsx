@@ -211,7 +211,7 @@ const FertigMateriallager = () => {
 
       {/* Auslagern Dialog */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
+         <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
           <DialogHeader>
             {einzelAuslagerung ? "Material auslagern" : "Materialien auslagern"}
           </DialogHeader>
@@ -282,7 +282,7 @@ const FertigMateriallager = () => {
 
       {/* Einlagern Dialog */}
       <Dialog open={isEinlagernModalOpen} onOpenChange={setIsEinlagernModalOpen}>
-        <DialogContent>
+      <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
           <DialogHeader>
             <DialogTitle>Material einlagern</DialogTitle>
           </DialogHeader>

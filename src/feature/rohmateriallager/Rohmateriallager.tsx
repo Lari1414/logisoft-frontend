@@ -126,7 +126,7 @@ const RohMateriallager = () => {
 
       {/* Gemeinsamer Dialog für Mehrfach- und Einzel-Auslagerung */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
+       <DialogContent className="max-h-[60vh] overflow-y-auto max-w-4xl w-full">
           <DialogHeader>
             <DialogTitle>
               {einzelAuslagerung ? "Material auslagern" : "Materialien auslagern"}

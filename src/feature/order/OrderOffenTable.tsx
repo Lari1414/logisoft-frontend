@@ -75,14 +75,22 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
   const columns: ColumnDef<Order & { id: string }>[] = [
     {
       id: "select",
-      header: () => null,
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllPageRowsSelected()}
+          onChange={table.getToggleAllPageRowsSelectedHandler()}
+        />
+      ),
       cell: ({ row }) => (
         <input
           type="checkbox"
           checked={row.getIsSelected()}
-          onChange={() => row.toggleSelected()}
+          onChange={row.getToggleSelectedHandler()}
         />
       ),
+      enableSorting: false,
+      enableHiding: false,
     },
     { accessorKey: "materialbestellung_ID", header: "Materialbestellung-ID" },
     { accessorKey: "lieferant.firmenname", header: "Lieferantname" },
