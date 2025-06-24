@@ -28,12 +28,17 @@ export function AutoBreadcrumb() {
           return (
             <BreadcrumbItem key={crumb.path}>
               <BreadcrumbLink asChild>
-                <Link
-                  to={crumb.path}
-                  className={isActive ? "" : "text-muted-foreground"}
-                >
-                  {crumb.label}
-                </Link>
+                <>
+                  <span className="text-muted-foreground text-sm">Materialwirtschaft</span>
+                  <span className="text-muted-foreground text-xs align-super mx-[2px]">{">"}</span>
+
+                  <Link
+                    to={crumb.path}
+                    className={isActive ? "" : "text-muted-foreground"}
+                  >
+                    {crumb.label === "Auftraege" ? "Aufträge" : crumb.label}
+                  </Link>
+                </>
               </BreadcrumbLink>
               {idx < breadcrumbs.length - 1 && (
                 <ChevronRight size={14} className="text-muted-foreground" />

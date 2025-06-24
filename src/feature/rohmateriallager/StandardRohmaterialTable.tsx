@@ -125,17 +125,7 @@ const StandardRohmaterialTable = () => {
   };
 
   const columns: ColumnDef<TransformedData>[] = [
-    {
-      id: "select",
-      header: () => null,
-      cell: ({ row }) => (
-        <input
-          type="checkbox"
-          checked={row.getIsSelected()}
-          onChange={() => row.toggleSelected()}
-        />
-      ),
-    },
+  
     { accessorKey: "lagerbestand_ID", header: "Lagerbestand-ID" },
     { accessorKey: "material_ID", header: "Material-ID" },
     { accessorKey: "category", header: "Kategorie" },
