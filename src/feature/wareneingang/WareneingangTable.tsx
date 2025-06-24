@@ -97,16 +97,24 @@ const WareneingangTable: React.FC<WareneingangTableProps> = ({ onSelectionChange
   }, [refetch, setRefetch]);
 
   const columns: ColumnDef<TransformedWareneingang>[] = [
-    {
+      {
       id: "select",
-      header: () => null,
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllPageRowsSelected()}
+          onChange={table.getToggleAllPageRowsSelectedHandler()}
+        />
+      ),
       cell: ({ row }) => (
         <input
           type="checkbox"
           checked={row.getIsSelected()}
-          onChange={() => row.toggleSelected()}
+          onChange={row.getToggleSelectedHandler()}
         />
       ),
+      enableSorting: false,
+      enableHiding: false,
     },
     {
       accessorFn: (row) => row.eingang_ID,

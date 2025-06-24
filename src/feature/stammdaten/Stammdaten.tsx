@@ -310,19 +310,12 @@ const Stammdaten = () => {
 
               <div>
                 <label className="block font-medium mb-1">Typ</label>
-                <select
+                <Input
                   name="typ"
+                  placeholder="Typ"
                   value={materialForm.typ}
                   onChange={handleMaterialChange}
-                  className="w-full border rounded p-2"
-                >
-                  <option value="">Bitte auswählen</option>
-                  <option value="Sport">Sport</option>
-                  <option value="Top">Top</option>
-                  <option value="Rundhals">Rundhals</option>
-                  <option value="Oversize">Oversize</option>
-                  <option value="Standardfarbe">Standardfarbe</option>
-                </select>
+                />
               </div>
 
               <div>
@@ -410,7 +403,7 @@ const Stammdaten = () => {
                       id="cyan"
                       name="cyan"
                       placeholder="Cyan"
-                      value={materialForm.cyan}
+
                       onChange={handleMaterialChange}
                       className="w-full"
                     />
@@ -423,7 +416,7 @@ const Stammdaten = () => {
                       id="magenta"
                       name="magenta"
                       placeholder="Magenta"
-                      value={materialForm.magenta}
+
                       onChange={handleMaterialChange}
                       className="w-full"
                     />
@@ -436,7 +429,7 @@ const Stammdaten = () => {
                       id="yellow"
                       name="yellow"
                       placeholder="Yellow"
-                      value={materialForm.yellow}
+
                       onChange={handleMaterialChange}
                       className="w-full"
                     />
@@ -449,7 +442,7 @@ const Stammdaten = () => {
                       id="black"
                       name="black"
                       placeholder="Black"
-                      value={materialForm.black}
+
                       onChange={handleMaterialChange}
                       className="w-full"
                     />

@@ -158,21 +158,21 @@ const Order = () => {
           guterTeil: {
             menge: e.guterMenge,
             qualitaet: {
-              viskositaet: 0,
-              ppml: 0,
+              viskositaet: e.guterViskositaet,
+              ppml: e.guterPpml,
               saugfaehigkeit: e.guterSaugfaehigkeit,
               weissgrad: e.guterWeissgrad,
-              deltaE: 0
+              deltaE: e.guterDeltaE
             },
           },
           gesperrterTeil: {
             menge: e.gesperrtMenge,
             qualitaet: {
-              viskositaet: 0,
-              ppml: 0,
+              viskositaet: e.gesperrtViskositaet,
+              ppml: e.gesperrtPpml,
               saugfaehigkeit: e.gesperrtSaugfaehigkeit,
               weissgrad: e.gesperrtWeissgrad,
-              deltaE: 0
+              deltaE: e.gesperrtDeltaE
             },
           },
           reklamierterTeil: {
@@ -310,7 +310,7 @@ const Order = () => {
               const category = order.material.category.toLowerCase();
               const isTShirt = category === "t-shirt";
               const id = order.materialbestellung_ID.toString();
-              const input = eingaben[id] || {};
+           
 
               return (
                 <div
@@ -331,7 +331,7 @@ const Order = () => {
                     <label className="block text-sm mt-1">Menge</label>
                     <input
                       type="number"
-                      value={input.guterMenge || 0}
+
                       onChange={(e) => handleInputChange(id, "guterMenge", Number(e.target.value))}
                       className="mb-2 w-full"
                     />
@@ -341,14 +341,14 @@ const Order = () => {
                         <label className="block text-sm">Saugfähigkeit</label>
                         <input
                           type="number"
-                          value={input.guterSaugfaehigkeit || 0}
+
                           onChange={(e) => handleInputChange(id, "guterSaugfaehigkeit", Number(e.target.value))}
                           className="mb-2 w-full"
                         />
                         <label className="block text-sm">Weißgrad</label>
                         <input
                           type="number"
-                          value={input.guterWeissgrad || 0}
+
                           onChange={(e) => handleInputChange(id, "guterWeissgrad", Number(e.target.value))}
                           className="w-full"
                         />
@@ -358,21 +358,21 @@ const Order = () => {
                         <label className="block text-sm">Viskosität</label>
                         <input
                           type="number"
-                          value={input.guterViskositaet || 0}
+
                           onChange={(e) => handleInputChange(id, "guterViskositaet", Number(e.target.value))}
                           className="mb-2 w-full"
                         />
                         <label className="block text-sm">Ppml</label>
                         <input
                           type="number"
-                          value={input.guterPpml || 0}
+
                           onChange={(e) => handleInputChange(id, "guterPpml", Number(e.target.value))}
                           className="mb-2 w-full"
                         />
                         <label className="block text-sm">DeltaE</label>
                         <input
                           type="number"
-                          value={input.guterDeltaE || 0}
+
                           onChange={(e) => handleInputChange(id, "guterDeltaE", Number(e.target.value))}
                           className="w-full"
                         />
@@ -386,7 +386,7 @@ const Order = () => {
                     <label className="block text-sm mt-1">Menge</label>
                     <input
                       type="number"
-                      value={input.gesperrtMenge || 0}
+
                       onChange={(e) => handleInputChange(id, "gesperrtMenge", Number(e.target.value))}
                       className="mb-2 w-full"
                     />
@@ -396,14 +396,14 @@ const Order = () => {
                         <label className="block text-sm">Saugfähigkeit</label>
                         <input
                           type="number"
-                          value={input.gesperrtSaugfaehigkeit || 0}
+
                           onChange={(e) => handleInputChange(id, "gesperrtSaugfaehigkeit", Number(e.target.value))}
                           className="mb-2 w-full"
                         />
                         <label className="block text-sm">Weißgrad</label>
                         <input
                           type="number"
-                          value={input.gesperrtWeissgrad || 0}
+
                           onChange={(e) => handleInputChange(id, "gesperrtWeissgrad", Number(e.target.value))}
                           className="w-full"
                         />
@@ -413,21 +413,21 @@ const Order = () => {
                         <label className="block text-sm">Viskosität</label>
                         <input
                           type="number"
-                          value={input.gesperrtViskositaet || 0}
+
                           onChange={(e) => handleInputChange(id, "gesperrtViskositaet", Number(e.target.value))}
                           className="mb-2 w-full"
                         />
                         <label className="block text-sm">Ppml</label>
                         <input
                           type="number"
-                          value={input.gesperrtPpml || 0}
+
                           onChange={(e) => handleInputChange(id, "gesperrtPpml", Number(e.target.value))}
                           className="mb-2 w-full"
                         />
                         <label className="block text-sm">DeltaE</label>
                         <input
                           type="number"
-                          value={input.gesperrtDeltaE || 0}
+
                           onChange={(e) => handleInputChange(id, "gesperrtDeltaE", Number(e.target.value))}
                           className="w-full"
                         />
@@ -441,7 +441,7 @@ const Order = () => {
                     <label className="block text-sm mt-1">Menge</label>
                     <input
                       type="number"
-                      value={input.reklamiertMenge || 0}
+
                       onChange={(e) => handleInputChange(id, "reklamiertMenge", Number(e.target.value))}
                       className="w-full"
                     />

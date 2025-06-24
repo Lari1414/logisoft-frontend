@@ -78,14 +78,22 @@ const AuftragAuslagerungTable = ({ onSelectionChange, onRefetch, onExecuteSingle
   const columns: ColumnDef<TransformedAuftrag>[] = [
     {
       id: "select",
-      header: () => null,
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllPageRowsSelected()}
+          onChange={table.getToggleAllPageRowsSelectedHandler()}
+        />
+      ),
       cell: ({ row }) => (
         <input
           type="checkbox"
           checked={row.getIsSelected()}
-          onChange={() => row.toggleSelected()}
+          onChange={row.getToggleSelectedHandler()}
         />
       ),
+      enableSorting: false,
+      enableHiding: false,
     },
     { accessorKey: "auftrag_ID", header: "Auftrag-ID" },
     { accessorKey: "material_ID", header: "Material-ID" },

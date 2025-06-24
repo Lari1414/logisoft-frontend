@@ -90,14 +90,22 @@ const FertigMateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernCli
   const columns: ColumnDef<TransformedData>[] = [
     {
       id: "select",
-      header: () => null,
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllPageRowsSelected()}
+          onChange={table.getToggleAllPageRowsSelectedHandler()}
+        />
+      ),
       cell: ({ row }) => (
         <input
           type="checkbox"
           checked={row.getIsSelected()}
-          onChange={() => row.toggleSelected()}
+          onChange={row.getToggleSelectedHandler()}
         />
       ),
+      enableSorting: false,
+      enableHiding: false,
     },
     { accessorKey: "lagerbestand_ID", header: "Lagerbestand-ID" },
     { accessorKey: "material_ID", header: "Material-ID" },

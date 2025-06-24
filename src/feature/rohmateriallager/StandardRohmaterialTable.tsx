@@ -1,12 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { ColumnDef, RowSelectionState, Updater } from "@tanstack/react-table";
 import { DataTable } from "@/components/sidebar/data-table";
 import { rohmateriallagerApi } from "@/api/endpoints/rohmateriallagerApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Eye } from "react-bootstrap-icons";
-import { IoExit } from "react-icons/io5";
-import { Input } from "@/components/ui/input";
+
 
 // Define the type for the transformed data
 export interface TransformedData {
@@ -34,19 +33,14 @@ export interface TransformedData {
   deltaE: number;
 }
 
-// Type for the onSelectionChange function prop
-interface RohmateriallagerTableProps {
-  onSelectionChange: (selectedRows: TransformedData[]) => void;
-  onRefetch?: (refetchFn: () => void) => void;
-  onAuslagernClick?: (row: TransformedData) => void;
-}
 
-const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick }: RohmateriallagerTableProps) => {
-  const { data, isLoading, error, refetch } = rohmateriallagerApi.useGetRohmaterialQuery();
+
+const StandardRohmaterialTable = () => {
+  const { data, isLoading, error} = rohmateriallagerApi.useGetRohmaterialQuery();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [selectedQualitaet, setSelectedQualitaet] = useState<TransformedData | null>(null);
   const [isQualitaetDialogOpen, setIsQualitaetDialogOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm] = useState("");
 
 
 
@@ -90,6 +84,7 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick 
         deltaE: item.qualitaet?.deltaE ?? 0
       };
     })
+      .filter((item) => item.standardmaterial)
   ), [data]);
 
   const filteredData = useMemo(() => {
@@ -104,17 +99,10 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick 
     });
   }, [searchTerm, transformedData]);
 
-  useEffect(() => {
-    if (onRefetch && refetch) {
-      onRefetch(refetch);
-    }
-  }, [onRefetch, refetch]);
 
-  // Monitor row selection state and filter selected rows
-  useEffect(() => {
-    const selected = transformedData.filter(row => rowSelection[String(row.id)]);
-    onSelectionChange(selected);
-  }, [rowSelection, transformedData, onSelectionChange]);
+
+
+
 
   // Handle row selection change with support for Updater function or object
   const handleRowSelectionChange = useCallback(
@@ -139,22 +127,14 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick 
   const columns: ColumnDef<TransformedData>[] = [
     {
       id: "select",
-      header: ({ table }) => (
-        <input
-          type="checkbox"
-          checked={table.getIsAllPageRowsSelected()}
-          onChange={table.getToggleAllPageRowsSelectedHandler()}
-        />
-      ),
+      header: () => null,
       cell: ({ row }) => (
         <input
           type="checkbox"
           checked={row.getIsSelected()}
-          onChange={row.getToggleSelectedHandler()}
+          onChange={() => row.toggleSelected()}
         />
       ),
-      enableSorting: false,
-      enableHiding: false,
     },
     { accessorKey: "lagerbestand_ID", header: "Lagerbestand-ID" },
     { accessorKey: "material_ID", header: "Material-ID" },
@@ -192,22 +172,7 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick 
         </button>
       ),
     },
-    {
-      id: "auslagern",
-      header: "Aktion",
-      cell: ({ row }) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            if (onAuslagernClick) onAuslagernClick(row.original);
-          }}
-          title="Auslagern"
-        >
-          <IoExit className="h-5 w-5" />
-        </Button>
-      ),
-    },
+
   ];
 
   if (isLoading) return <div>Lädt...</div>;
@@ -216,15 +181,7 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick 
   return (
     <>
       <div className="flex flex-col gap-4">
-        <Input
-          placeholder="Rohrmaterial  suchen..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="
-        w-40 focus:w-72 transition-all duration-300 ease-in-out
-        px-2 py-1 text-sm focus:shadow-md
-      "
-        />
+
 
         <DataTable
           data={filteredData}
@@ -259,4 +216,4 @@ const RohmateriallagerTable = ({ onSelectionChange, onRefetch, onAuslagernClick 
   );
 };
 
-export default RohmateriallagerTable;
+export default StandardRohmaterialTable;
