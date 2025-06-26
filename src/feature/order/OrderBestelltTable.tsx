@@ -103,6 +103,7 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
         const [gesperrtMenge, setGesperrtMenge] = useState<number>(0);
         const [reklamiertMenge, setReklamiertMenge] = useState<number>(0);
         const [menge, setMenge] = useState<number>(order.menge);
+        const [summeUngueltig, setSummeUngueltig] = useState(false);
 
         const [guterSaugfaehigkeit, setGuterSaugfaehigkeit] = useState<number>(0);
         const [guterWeissgrad, setGuterWeissgrad] = useState<number>(0);
@@ -116,14 +117,14 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
         const [gesperrtPpml, setGesperrtPpml] = useState<number>(0);
         const [gesperrtDeltaE, setGesperrtDeltaE] = useState<number>(0);
 
-        useEffect(() => {
-          const sum = guterMenge + gesperrtMenge + reklamiertMenge;
-          setMenge(sum);
-        }, [guterMenge, gesperrtMenge, reklamiertMenge]);
 
 
         const [createWareneingang, { isLoading: isCreating }] = wareneingangApi.useCreateWareneingangMutation();
 
+        useEffect(() => {
+          const summe = guterMenge + gesperrtMenge + reklamiertMenge;
+          setSummeUngueltig(summe > menge);
+        }, [menge, guterMenge, gesperrtMenge, reklamiertMenge]);
 
 
         const handleWareneingang = async () => {
@@ -329,7 +330,12 @@ const OrderBestelltTable: React.FC<OrderBestelltTableProps> = ({ onSelectionChan
                     </div>
 
                     <div className="mt-6">
-                      <Button onClick={handleWareneingang}>Anlegen</Button>
+                      {summeUngueltig && (
+                        <div className="text-red-500 mt-2">
+                          Die Summe aus guter, gesperrter und reklamierter Menge darf die eingetroffene Menge nicht übersteigen.
+                        </div>
+                      )}
+                      <Button onClick={handleWareneingang}  disabled={summeUngueltig}>Anlegen</Button>
                     </div>
                   </DialogContent>
                 </Dialog>
