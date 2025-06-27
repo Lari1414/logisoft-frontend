@@ -193,7 +193,7 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
 
         useEffect(() => {
           const summe = guterMenge + gesperrtMenge + reklamiertMenge;
-          setSummeUngueltig(summe > menge);
+          setSummeUngueltig(summe > menge || summe < menge);
         }, [menge, guterMenge, gesperrtMenge, reklamiertMenge]);
 
 
@@ -430,13 +430,13 @@ const OrderOffenTable: React.FC<OrderOffenTableProps> = ({ onSelectionChange, se
                     </div>
 
                     <div className="mt-6">
-                      
+
                       {summeUngueltig && (
                         <div className="text-red-500 mt-2">
-                          Die Summe aus guter, gesperrter und reklamierter Menge darf die eingetroffene Menge nicht übersteigen.
+                          Die Summe aus gut, gesperrt und reklamiert muss der eingetroffenen Menge entsprechen
                         </div>
                       )}
-                      <Button onClick={handleWareneingang}  disabled={summeUngueltig}>Anlegen</Button>
+                      <Button onClick={handleWareneingang} disabled={summeUngueltig}>Anlegen</Button>
                     </div>
                   </DialogContent>
                 </Dialog>
