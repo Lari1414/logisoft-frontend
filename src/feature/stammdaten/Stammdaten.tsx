@@ -16,10 +16,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, Tab } from "@mui/material";
+import { useTheme } from "@/components/dark/theme-provider";
 
 const Stammdaten = () => {
   const [activeTab, setActiveTab] = useState("lieferant");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isDarkMode } = useTheme();
 
   const [createLieferant, { isLoading: isLieferantLoading }] =
     lieferantApi.useCreateLieferantMutation();
@@ -183,8 +185,21 @@ const Stammdaten = () => {
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
-          textColor="primary"
+          textColor="inherit"
           indicatorColor="primary"
+          className="mb-4"
+          sx={{
+            color: isDarkMode ? "#fff" : "#000",
+            "& .MuiTab-root": {
+              color: isDarkMode ? "#ccc" : "#333",
+            },
+            "& .Mui-selected": {
+              color: isDarkMode ? "#fff" : "#1976d2", // blau im Light Mode
+            },
+            "& .MuiTabs-indicator": {
+              backgroundColor: isDarkMode ? "#fff" : "#1976d2", // blau im Light Mode
+            },
+          }}
         >
           <Tab label="Lieferantenstammdaten" value="lieferant" />
           <Tab label="Materialstammdaten" value="material" />

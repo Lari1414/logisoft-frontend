@@ -9,12 +9,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import EinlagerungsAuftraegeTable from "@/feature/auftrag/AuftragEinlagerungTable.tsx";
 import AuslagerungsAuftraegeTable from "@/feature/auftrag/AuftragAuslagerungTable.tsx";
+import { useTheme } from "@/components/dark/theme-provider";
+
 
 const Auftrag = () => {
   const [activeTab, setActiveTab] = useState("offen");
   const [storeMaterial, { isLoading: isStoring }] = auftragApi.useStoreMaterialMutation();
   const [outsourceMaterial, { isLoading: isOutsourcing }] = auftragApi.useOutsourceMaterialMutation();
   const isLoading = isStoring || isOutsourcing;
+
+  const { isDarkMode } = useTheme();
 
   const [selectedRows, setSelectedRows] = useState<TransformedAuftrag[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,12 +85,26 @@ const Auftrag = () => {
       }}
     >
       <div className="flex flex-col space-y-4">
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          textColor="primary"
-          indicatorColor="primary"
-        >
+<Tabs
+  value={activeTab}
+  onChange={handleTabChange}
+  textColor="inherit"
+  indicatorColor="primary"
+  className="mb-4"
+  sx={{
+    color: isDarkMode ? "#fff" : "#000",
+    "& .MuiTab-root": {
+      color: isDarkMode ? "#ccc" : "#333",
+    },
+    "& .Mui-selected": {
+      color: isDarkMode ? "#fff" : "#1976d2", // blau im Light Mode
+    },
+    "& .MuiTabs-indicator": {
+      backgroundColor: isDarkMode ? "#fff" : "#1976d2", // blau im Light Mode
+    },
+  }}
+>
+
           <Tab label="Offene Aufträge" value="offen" />
           <Tab label="Einlagerungsaufträge" value="einlagerung" />
           <Tab label="Auslagerungsaufträge" value="auslagerung" />

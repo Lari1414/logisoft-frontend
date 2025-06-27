@@ -14,6 +14,8 @@ import { wareneingangApi } from "@/api/endpoints/wareneingangApi.ts";
 import Select from "react-select";
 import { Tabs, Tab } from "@mui/material";
 import { components } from "react-select";
+import { useTheme } from "@/components/dark/theme-provider";
+
 
 const Order = () => {
   const [createOrder, { isLoading }] = orderApi.useCreateOrderMutation();
@@ -39,6 +41,7 @@ const Order = () => {
 
   const [ungueltigeSummen, setUngueltigeSummen] = useState<Record<string, boolean>>({});
 
+  const { isDarkMode } = useTheme();
 
 
 
@@ -283,9 +286,21 @@ const Order = () => {
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
-          textColor="primary"
+          textColor="inherit"
           indicatorColor="primary"
           className="mb-4"
+          sx={{
+            color: isDarkMode ? "#fff" : "#000",
+            "& .MuiTab-root": {
+              color: isDarkMode ? "#ccc" : "#333",
+            },
+            "& .Mui-selected": {
+              color: isDarkMode ? "#fff" : "#1976d2", // blau im Light Mode
+            },
+            "& .MuiTabs-indicator": {
+              backgroundColor: isDarkMode ? "#fff" : "#1976d2", // blau im Light Mode
+            },
+          }}
         >
           <Tab label="Alle Bestellungen" value="alle" />
           <Tab label="Offene Bestellungen" value="offen" />

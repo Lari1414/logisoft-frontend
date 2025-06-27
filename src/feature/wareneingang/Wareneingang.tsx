@@ -8,7 +8,7 @@ import ReklamationTable, { ReklamationData } from "@/feature/wareneingang/Reklam
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tabs, Tab } from "@mui/material";
-
+import { useTheme } from "@/components/dark/theme-provider";
 
 
 const Wareneingang = () => {
@@ -22,6 +22,7 @@ const Wareneingang = () => {
 
   const [selectedRows, setSelectedRows] = useState<WareneingangData[]>([]);
   const [modalType, setModalType] = useState<"einlagern" | "sperren" | "entsperren" | "anlegen" | null>(null);
+  const { isDarkMode } = useTheme();
 
   const [refetchTable, setRefetchTable] = useState<(() => void) | null>(null);
   const einlagerbareRows = selectedRows.filter(row => row.status === "eingetroffen");
@@ -257,9 +258,21 @@ const Wareneingang = () => {
         <Tabs
           value={activeTab}
           onChange={handleTabChange}
-          textColor="primary"
+          textColor="inherit"
           indicatorColor="primary"
           className="mb-4"
+          sx={{
+            color: isDarkMode ? "#fff" : "#000",
+            "& .MuiTab-root": {
+              color: isDarkMode ? "#ccc" : "#333",
+            },
+            "& .Mui-selected": {
+              color: isDarkMode ? "#fff" : "#1976d2", // blau im Light Mode
+            },
+            "& .MuiTabs-indicator": {
+              backgroundColor: isDarkMode ? "#fff" : "#1976d2", // blau im Light Mode
+            },
+          }}
         >
           <Tab label="Wareneingang" value="wareneingang" />
           <Tab label="Reklamation" value="reklamation" />
@@ -502,7 +515,7 @@ const Wareneingang = () => {
                   <label className="block">Menge</label>
                   <input
                     type="number"
-              
+
                     onChange={(e) => setGuterMenge(Number(e.target.value))}
                     className="w-full mb-2 border rounded p-2"
                   />
@@ -515,7 +528,7 @@ const Wareneingang = () => {
                     <label className="block">Saugfähigkeit</label>
                     <input
                       type="number"
-                
+
                       onChange={(e) => setGuterSaugfaehigkeit(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
@@ -523,7 +536,7 @@ const Wareneingang = () => {
                     <label className="block">Weißgrad</label>
                     <input
                       type="number"
-                 
+
                       onChange={(e) => setGuterWeissgrad(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
@@ -536,21 +549,21 @@ const Wareneingang = () => {
                     <label className="block">Viskosität</label>
                     <input
                       type="number"
-                  
+
                       onChange={(e) => setGuterViskositaet(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
                     <label className="block">Ppml</label>
                     <input
                       type="number"
-                  
+
                       onChange={(e) => setGuterPpml(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
                     <label className="block">DeltaE</label>
                     <input
                       type="number"
-             
+
                       onChange={(e) => setGuterDeltaE(Number(e.target.value))}
                       className="w-full border rounded p-2"
                     />
@@ -567,7 +580,7 @@ const Wareneingang = () => {
                     <label className="block">Menge</label>
                     <input
                       type="number"
-                
+
                       onChange={(e) => setGesperrtMenge(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
@@ -580,7 +593,7 @@ const Wareneingang = () => {
                     <label className="block">Saugfähigkeit</label>
                     <input
                       type="number"
-                
+
                       onChange={(e) => setGesperrtSaugfaehigkeit(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
@@ -601,21 +614,21 @@ const Wareneingang = () => {
                     <label className="block">Viskosität</label>
                     <input
                       type="number"
-                
+
                       onChange={(e) => setGesperrtViskositaet(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
                     <label className="block">Ppml</label>
                     <input
                       type="number"
-                    
+
                       onChange={(e) => setGesperrtPpml(Number(e.target.value))}
                       className="w-full mb-2 border rounded p-2"
                     />
                     <label className="block">DeltaE</label>
                     <input
                       type="number"
-                     value={gesperrtDeltaE}
+                      value={gesperrtDeltaE}
                       onChange={(e) => setGesperrtDeltaE(Number(e.target.value))}
                       className="w-full border rounded p-2"
                     />
