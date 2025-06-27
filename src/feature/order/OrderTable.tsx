@@ -196,7 +196,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
 
         useEffect(() => {
           const summe = guterMenge + gesperrtMenge + reklamiertMenge;
-          setSummeUngueltig(summe > menge);
+          setSummeUngueltig(summe > menge || summe < menge);
         }, [menge, guterMenge, gesperrtMenge, reklamiertMenge]);
 
 
@@ -219,12 +219,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
         };
 
         const handleWareneingang = async () => {
-          const summeTeilmengen = guterMenge + gesperrtMenge + reklamiertMenge;
-          console.log("Menge: " + menge + ", guterMenge: " + guterMenge + ", gesperrtMenge: " + gesperrtMenge + ", reklamiertMenge: " + reklamiertMenge)
-          if (summeTeilmengen > menge) {
-            alert("Die Summe aus guter, gesperrter und reklamierter Menge darf die eingetroffene Menge nicht übersteigen.");
-            return;
-          }
+          
           try {
             await createWareneingang({
               materialbestellung_ID: order.materialbestellung_ID,
@@ -519,7 +514,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ onSelectionChange, setRefetch }
                     <div className="mt-6">
                       {summeUngueltig && (
                         <div className="text-red-500 mt-2">
-                          Die Summe aus guter, gesperrter und reklamierter Menge darf die eingetroffene Menge nicht übersteigen.
+                          Die Summe aus gut, gesperrt und reklamiert muss der eingetroffenen Menge entsprechen
                         </div>
                       )}
                       <Button onClick={handleWareneingang} disabled={summeUngueltig}>Anlegen</Button>

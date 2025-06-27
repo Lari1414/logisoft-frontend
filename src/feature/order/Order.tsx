@@ -157,7 +157,7 @@ const Order = () => {
       const summe = guter + gesperrt + reklamiert;
 
       const eingetroffeneMenge = updated[id]?.eingetroffeneMenge || 0;
-      const istUngueltig = summe > eingetroffeneMenge;
+      const istUngueltig = summe > eingetroffeneMenge || summe < eingetroffeneMenge;
 
       setUngueltigeSummen((prevFehler) => ({
         ...prevFehler,
@@ -513,7 +513,7 @@ const Order = () => {
                     {
                       summeUngueltig && (
                         <div className="text-red-500 mt-2">
-                          Die Summe aus guter, gesperrter und reklamierter Menge darf die bestellte Menge nicht übersteigen.
+                          Die Summe aus gut, gesperrt und reklamiert muss der eingetroffenen Menge entsprechen
                         </div>
                       )
                     }
